@@ -4,27 +4,31 @@ List data = [
     "text" : "Entree",
     "count" : 1,
     "max" : 10,
-    "min" : 0,
+
+    "price": 10,
   },
   {
     "imageUrl" : "https://images.unsplash.com/photo-1650855543755-f300cd0dff3c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "text" : "Main Course",
     "count" : 1,
     "max" : 10,
-    "min" : 0,
+
+    "price": 15,
   },
   {
     "imageUrl" : "https://images.unsplash.com/photo-1499638673689-79a0b5115d87?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "text" : "Beverage",
     "count" : 1,
-    "max" : 10,
-    "min" : 0,
+    "max" : 20,
+
+    "price": 25,
   },
   {
     "imageUrl" : "https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "text" : "Dessert",
     "count" : 1,
     "max" : 10,
-    "min" : 0,
+
+    "price": 25,
   },
 ];

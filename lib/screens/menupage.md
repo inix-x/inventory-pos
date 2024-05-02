@@ -25,77 +25,118 @@ class _MenuScreenState extends State<MenuScreen> {
       home: Scaffold(
         body: SafeArea(
           child: Center(
-            child: ListView.builder(
-              itemCount: _data.length,
-              itemBuilder: (context, index) {
-                final item = _data[index];
-                return Card(
-                  margin: const EdgeInsets.all(16),
-                  elevation: 12,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                // Text "Categories" with emphasis
+                const Padding(
+                  padding: EdgeInsets.only(left: 30.0),
+                  child: Text(
+                    "Categories",
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 10),
-                    child: Row(
-                      children: [
-                        Image.network(
-                          item["imageUrl"],
-                          width: 48,
-                          height: 48,
+                ),
+                const SizedBox(width: 16.0),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _data.length,
+                    itemBuilder: (context, index) {
+                      final item = _data[index];
+                      return Card(
+                        margin: const EdgeInsets.all(16),
+                        elevation: 12,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
                         ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0, vertical: 10),
+                          child: Row(
                             children: [
-                              Text(
-                                item["text"],
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
+                              Image.network(
+                                item["imageUrl"],
+                                width: 48,
+                                height: 48,
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: () => setState(() {
-                                      // Decrement only if count is greater than 0
-                                      _data[index]["count"] =
-                                          math.max(0, _data[index]["count"]);
-                                    }),
-                                  ),
-                                  Text(
-                                    (_data[index]["count"] ?? 0).toString(),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall,
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.add),
-                                    onPressed: () => setState(() => _data[index]
-                                            ["count"] =
-                                        (_data[index]["count"] ?? 0) + 1),
-                                  ),
-                                ],
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      item["text"],
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.remove),
+                                          onPressed: () => setState(() {
+                                            if (_data[index]
+                                                .containsKey("count")) {
+                                              final count = _data[index]
+                                                      ["count"] ??
+                                                  0; // Handle null case with default 0
+                                              if (count > 0) {
+                                                _data[index]["count"] =
+                                                    count - 1;
+                                              }
+                                            }
+                                          }),
+                                        ),
+                                        Text(
+                                          (_data[index]["count"] ?? 0)
+                                              .toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall,
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.add),
+                                          onPressed: () => setState(() {
+                                            if (_data[index]
+                                                    .containsKey("count") &&
+                                                _data[index]
+                                                    .containsKey("max")) {
+                                              final count = _data[index]
+                                                      ["count"] ??
+                                                  0; // Handle null case with default 0
+                                              if (count < _data[index]["max"]) {
+                                                _data[index]["count"] =
+                                                    count + 1;
+                                              }
+                                            }
+                                          }),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
+                )
+              ],
             ),
           ),
         ),
+        
       ),
     );
   }
