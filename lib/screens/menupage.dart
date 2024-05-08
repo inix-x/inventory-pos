@@ -21,6 +21,8 @@ class _MenuScreenState extends State<MenuScreen> {
 
   get price => null;
 
+  bool _showCounter = false;
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -30,7 +32,8 @@ class _MenuScreenState extends State<MenuScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              Container(//1st category
+              Container(
+                //1st category
                 height: screenHeight * 0.5,
                 padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
                 child: Column(
@@ -51,47 +54,50 @@ class _MenuScreenState extends State<MenuScreen> {
                     Expanded(
                       child: ListView.builder(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: _data.length,
                         itemBuilder: (context, index) {
                           final item = _data[index];
-                          return Card(
-                            margin: const EdgeInsets.only( top: 3, left: 8, right: 8, bottom: 12),
-                            elevation: 10,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                8.0,
+                          return GestureDetector(
+                            onTap: () => setState(() {
+                              _showCounter = !_showCounter;
+                            }),
+                            child: Card(
+                              margin: const EdgeInsets.only(
+                                  top: 3, left: 8, right: 8, bottom: 12),
+                              elevation: 10,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    //image
-                                    height: 40,
-                                    width: 40,
-                                    color: Colors.transparent,
-                                    child: Image.network(
-                                      item["imageUrl"],
-                                      width: 40,
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                  8.0,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      //image
                                       height: 40,
+                                      width: 40,
+                                      color: Colors.transparent,
+                                      child: Image.network(
+                                        item["imageUrl"],
+                                        width: 40,
+                                        height: 40,
+                                      ),
                                     ),
-                                  ),
-                                  Column(
-                                    //menu name
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                       
-                                        child: Center(
+                                    Column(
+                                      //menu name
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Center(
                                           child: Text(
                                             item["text"],
                                             style: const TextStyle(
@@ -100,11 +106,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        //price
-                                      
-                                        child: Center(
+                                        Center(
                                           child: Text(
                                             item != null &&
                                                     item.containsKey("price")
@@ -116,100 +118,118 @@ class _MenuScreenState extends State<MenuScreen> {
                                               color: Colors.grey,
                                             ), // Optional: style the price text
                                           ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  Row(
-                                    //text
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    mainAxisSize: MainAxisSize.min,
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                      //text
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisSize: MainAxisSize.min,
 
-                                    children: [
-                                      const SizedBox(width: 12.0),
-                                      Row(
-                                        //number
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        10.0), // Add border radius
-                                                color: Colors.red,
-                                              ),
-                                              width: 40,
-                                              height: 40,
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(right: 10.0),
-                                                child: IconButton(
-                                                  icon: const Icon(Icons.remove),
-                                                  onPressed: () => setState(() {
-                                                    if (_data[index]
-                                                        .containsKey("count")) {
-                                                      final count = _data[index]
-                                                              ["count"] ??
-                                                          0; // Handle null case with default 0
-                                                      if (count > 0) {
-                                                        _data[index]["count"] =
-                                                            count - 1;
-                                                      }
-                                                    }
-                                                  }),
+                                      children: [
+                                        const SizedBox(width: 12.0),
+                                        Visibility(
+                                          visible: _showCounter,
+                                          child: Row(
+                                            //number
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0), // Add border radius
+                                                    color: Colors.red,
+                                                  ),
+                                                  width: 40,
+                                                  height: 40,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 10.0),
+                                                    child: IconButton(
+                                                      icon: const Icon(
+                                                          Icons.remove),
+                                                      onPressed: () =>
+                                                          setState(() {
+                                                        if (_data[index]
+                                                            .containsKey(
+                                                                "count")) {
+                                                          final count = _data[
+                                                                      index]
+                                                                  ["count"] ??
+                                                              0; // Handle null case with default 0
+                                                          if (count > 0) {
+                                                            _data[index]
+                                                                    ["count"] =
+                                                                count - 1;
+                                                          }
+                                                        }
+                                                      }),
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                          Text(
-                                            (_data[index]["count"] ?? 0)
-                                                .toString(),
-                                            style: const TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        10.0), // Add border radius
-                                                color: Colors.green,
+                                              Text(
+                                                (_data[index]["count"] ?? 0)
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
-                                              width: 40,
-                                              height: 40,
-                                              child: IconButton(
-                                                icon: const Icon(Icons.add),
-                                                onPressed: () => setState(() {
-                                                  if (_data[index].containsKey(
-                                                          "count") &&
-                                                      _data[index]
-                                                          .containsKey("max")) {
-                                                    final count = _data[index]
-                                                            ["count"] ??
-                                                        0; // Handle null case with default 0
-                                                    if (count <
-                                                        _data[index]["max"]) {
-                                                      _data[index]["count"] =
-                                                          count + 1;
-                                                    }
-                                                  }
-                                                }),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0), // Add border radius
+                                                    color: Colors.green,
+                                                  ),
+                                                  width: 40,
+                                                  height: 40,
+                                                  child: IconButton(
+                                                    icon: const Icon(Icons.add),
+                                                    onPressed: () =>
+                                                        setState(() {
+                                                      if (_data[index]
+                                                              .containsKey(
+                                                                  "count") &&
+                                                          _data[index]
+                                                              .containsKey(
+                                                                  "max")) {
+                                                        final count = _data[
+                                                                    index]
+                                                                ["count"] ??
+                                                            0; // Handle null case with default 0
+                                                        if (count <
+                                                            _data[index]
+                                                                ["max"]) {
+                                                          _data[index]
+                                                                  ["count"] =
+                                                              count + 1;
+                                                        }
+                                                      }
+                                                    }),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -219,7 +239,8 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
               ),
-              Container(//2nd category
+              Container(
+                //1st category
                 height: screenHeight * 0.5,
                 padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
                 child: Column(
@@ -229,7 +250,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     const Padding(
                       padding: EdgeInsets.only(left: 30.0),
                       child: Text(
-                        "Category 2",
+                        "Category 1",
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
@@ -240,47 +261,50 @@ class _MenuScreenState extends State<MenuScreen> {
                     Expanded(
                       child: ListView.builder(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: _data.length,
                         itemBuilder: (context, index) {
                           final item = _data[index];
-                          return Card(
-                            margin: const EdgeInsets.only( top: 3, left: 8, right: 8, bottom: 12),
-                            elevation: 10,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                8.0,
+                          return GestureDetector(
+                            onTap: () => setState(() {
+                              _showCounter = !_showCounter;
+                            }),
+                            child: Card(
+                              margin: const EdgeInsets.only(
+                                  top: 3, left: 8, right: 8, bottom: 12),
+                              elevation: 10,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    //image
-                                    height: 40,
-                                    width: 40,
-                                    color: Colors.transparent,
-                                    child: Image.network(
-                                      item["imageUrl"],
-                                      width: 40,
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                  8.0,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      //image
                                       height: 40,
+                                      width: 40,
+                                      color: Colors.transparent,
+                                      child: Image.network(
+                                        item["imageUrl"],
+                                        width: 40,
+                                        height: 40,
+                                      ),
                                     ),
-                                  ),
-                                  Column(
-                                    //menu name
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                       
-                                        child: Center(
+                                    Column(
+                                      //menu name
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Center(
                                           child: Text(
                                             item["text"],
                                             style: const TextStyle(
@@ -289,11 +313,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        //price
-                                      
-                                        child: Center(
+                                        Center(
                                           child: Text(
                                             item != null &&
                                                     item.containsKey("price")
@@ -305,100 +325,118 @@ class _MenuScreenState extends State<MenuScreen> {
                                               color: Colors.grey,
                                             ), // Optional: style the price text
                                           ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  Row(
-                                    //text
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    mainAxisSize: MainAxisSize.min,
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                      //text
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      mainAxisSize: MainAxisSize.min,
 
-                                    children: [
-                                      const SizedBox(width: 12.0),
-                                      Row(
-                                        //number
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        10.0), // Add border radius
-                                                color: Colors.red,
-                                              ),
-                                              width: 40,
-                                              height: 40,
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(right: 10.0),
-                                                child: IconButton(
-                                                  icon: const Icon(Icons.remove),
-                                                  onPressed: () => setState(() {
-                                                    if (_data[index]
-                                                        .containsKey("count")) {
-                                                      final count = _data[index]
-                                                              ["count"] ??
-                                                          0; // Handle null case with default 0
-                                                      if (count > 0) {
-                                                        _data[index]["count"] =
-                                                            count - 1;
-                                                      }
-                                                    }
-                                                  }),
+                                      children: [
+                                        const SizedBox(width: 12.0),
+                                        Visibility(
+                                          visible: _showCounter,
+                                          child: Row(
+                                            //number
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0), // Add border radius
+                                                    color: Colors.red,
+                                                  ),
+                                                  width: 40,
+                                                  height: 40,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 10.0),
+                                                    child: IconButton(
+                                                      icon: const Icon(
+                                                          Icons.remove),
+                                                      onPressed: () =>
+                                                          setState(() {
+                                                        if (_data[index]
+                                                            .containsKey(
+                                                                "count")) {
+                                                          final count = _data[
+                                                                      index]
+                                                                  ["count"] ??
+                                                              0; // Handle null case with default 0
+                                                          if (count > 0) {
+                                                            _data[index]
+                                                                    ["count"] =
+                                                                count - 1;
+                                                          }
+                                                        }
+                                                      }),
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                          Text(
-                                            (_data[index]["count"] ?? 0)
-                                                .toString(),
-                                            style: const TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        10.0), // Add border radius
-                                                color: Colors.green,
+                                              Text(
+                                                (_data[index]["count"] ?? 0)
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
-                                              width: 40,
-                                              height: 40,
-                                              child: IconButton(
-                                                icon: const Icon(Icons.add),
-                                                onPressed: () => setState(() {
-                                                  if (_data[index].containsKey(
-                                                          "count") &&
-                                                      _data[index]
-                                                          .containsKey("max")) {
-                                                    final count = _data[index]
-                                                            ["count"] ??
-                                                        0; // Handle null case with default 0
-                                                    if (count <
-                                                        _data[index]["max"]) {
-                                                      _data[index]["count"] =
-                                                          count + 1;
-                                                    }
-                                                  }
-                                                }),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0), // Add border radius
+                                                    color: Colors.green,
+                                                  ),
+                                                  width: 40,
+                                                  height: 40,
+                                                  child: IconButton(
+                                                    icon: const Icon(Icons.add),
+                                                    onPressed: () =>
+                                                        setState(() {
+                                                      if (_data[index]
+                                                              .containsKey(
+                                                                  "count") &&
+                                                          _data[index]
+                                                              .containsKey(
+                                                                  "max")) {
+                                                        final count = _data[
+                                                                    index]
+                                                                ["count"] ??
+                                                            0; // Handle null case with default 0
+                                                        if (count <
+                                                            _data[index]
+                                                                ["max"]) {
+                                                          _data[index]
+                                                                  ["count"] =
+                                                              count + 1;
+                                                        }
+                                                      }
+                                                    }),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -409,6 +447,22 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+        floatingActionButton: Theme(
+          data: Theme.of(context).copyWith(
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              extendedSizeConstraints: BoxConstraints.tightFor(height: 70),
+              
+            ),
+          ),
+          child: FloatingActionButton.extended(
+            icon: const Icon(Icons.shopping_basket),
+            label: const Text('Your added items'),
+            onPressed: () {},
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+
           ),
         ),
       ),

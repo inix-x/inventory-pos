@@ -31,8 +31,8 @@ class _MenuScreenState extends State<MenuScreen> {
           child: Column(
             children: [
               Container(//1st category
-                height: screenHeight * 0.45,
-                padding: const EdgeInsets.all(16.0),
+                height: screenHeight * 0.5,
+                padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -51,12 +51,12 @@ class _MenuScreenState extends State<MenuScreen> {
                     Expanded(
                       child: ListView.builder(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: _data.length,
                         itemBuilder: (context, index) {
                           final item = _data[index];
                           return Card(
-                            margin: const EdgeInsets.all(8),
+                            margin: const EdgeInsets.only( top: 3, left: 8, right: 8, bottom: 12),
                             elevation: 10,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
@@ -64,7 +64,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             color: Colors.white,
                             child: Padding(
                               padding: const EdgeInsets.all(
-                                15.0,
+                                8.0,
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -73,13 +73,13 @@ class _MenuScreenState extends State<MenuScreen> {
                                 children: [
                                   Container(
                                     //image
-                                    height: 60,
-                                    width: 60,
+                                    height: 40,
+                                    width: 40,
                                     color: Colors.transparent,
                                     child: Image.network(
                                       item["imageUrl"],
-                                      width: 60,
-                                      height: 60,
+                                      width: 40,
+                                      height: 40,
                                     ),
                                   ),
                                   Column(
@@ -89,33 +89,26 @@ class _MenuScreenState extends State<MenuScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                       
-                                        child: Center(
-                                          child: Text(
-                                            item["text"],
-                                            style: const TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                      Center(
+                                        child: Text(
+                                          item["text"],
+                                          style: const TextStyle(
+                                            fontSize: 15.0,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ),
-                                      Container(
-                                        //price
-                                      
-                                        child: Center(
-                                          child: Text(
-                                            item != null &&
-                                                    item.containsKey("price")
-                                                ? "\$${item["price"]}"
-                                                : "No Price", // Default to "No Price"
-                                            style: const TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.grey,
-                                            ), // Optional: style the price text
-                                          ),
+                                      Center(
+                                        child: Text(
+                                          item != null &&
+                                                  item.containsKey("price")
+                                              ? "\$${item["price"]}"
+                                              : "No Price", // Default to "No Price"
+                                          style: const TextStyle(
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey,
+                                          ), // Optional: style the price text
                                         ),
                                       )
                                     ],
@@ -127,7 +120,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                     mainAxisSize: MainAxisSize.min,
 
                                     children: [
-                                      const SizedBox(width: 15.0),
+                                      const SizedBox(width: 12.0),
                                       Row(
                                         //number
                                         mainAxisAlignment:
@@ -146,20 +139,23 @@ class _MenuScreenState extends State<MenuScreen> {
                                               ),
                                               width: 40,
                                               height: 40,
-                                              child: IconButton(
-                                                icon: const Icon(Icons.remove),
-                                                onPressed: () => setState(() {
-                                                  if (_data[index]
-                                                      .containsKey("count")) {
-                                                    final count = _data[index]
-                                                            ["count"] ??
-                                                        0; // Handle null case with default 0
-                                                    if (count > 0) {
-                                                      _data[index]["count"] =
-                                                          count - 1;
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(right: 10.0),
+                                                child: IconButton(
+                                                  icon: const Icon(Icons.remove),
+                                                  onPressed: () => setState(() {
+                                                    if (_data[index]
+                                                        .containsKey("count")) {
+                                                      final count = _data[index]
+                                                              ["count"] ??
+                                                          0; // Handle null case with default 0
+                                                      if (count > 0) {
+                                                        _data[index]["count"] =
+                                                            count - 1;
+                                                      }
                                                     }
-                                                  }
-                                                }),
+                                                  }),
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -216,9 +212,9 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
               ),
-              Container( //2nd category
-                height: screenHeight * 0.45,
-                padding: const EdgeInsets.all(16.0),
+              Container(//2nd category
+                height: screenHeight * 0.5,
+                padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -226,7 +222,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     const Padding(
                       padding: EdgeInsets.only(left: 30.0),
                       child: Text(
-                        "Category 1",
+                        "Category 2",
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
@@ -236,11 +232,13 @@ class _MenuScreenState extends State<MenuScreen> {
                     // const SizedBox(width: 16.0),
                     Expanded(
                       child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: _data.length,
                         itemBuilder: (context, index) {
                           final item = _data[index];
                           return Card(
-                            margin: const EdgeInsets.all(8),
+                            margin: const EdgeInsets.only( top: 3, left: 8, right: 8, bottom: 12),
                             elevation: 10,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
@@ -248,7 +246,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             color: Colors.white,
                             child: Padding(
                               padding: const EdgeInsets.all(
-                                15.0,
+                                8.0,
                               ),
                               child: Row(
                                 mainAxisAlignment:
@@ -257,13 +255,13 @@ class _MenuScreenState extends State<MenuScreen> {
                                 children: [
                                   Container(
                                     //image
-                                    height: 60,
-                                    width: 60,
+                                    height: 40,
+                                    width: 40,
                                     color: Colors.transparent,
                                     child: Image.network(
                                       item["imageUrl"],
-                                      width: 60,
-                                      height: 60,
+                                      width: 40,
+                                      height: 40,
                                     ),
                                   ),
                                   Column(
@@ -273,33 +271,26 @@ class _MenuScreenState extends State<MenuScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                       
-                                        child: Center(
-                                          child: Text(
-                                            item["text"],
-                                            style: const TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                      Center(
+                                        child: Text(
+                                          item["text"],
+                                          style: const TextStyle(
+                                            fontSize: 15.0,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ),
-                                      Container(
-                                        //price
-                                      
-                                        child: Center(
-                                          child: Text(
-                                            item != null &&
-                                                    item.containsKey("price")
-                                                ? "\$${item["price"]}"
-                                                : "No Price", // Default to "No Price"
-                                            style: const TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.grey,
-                                            ), // Optional: style the price text
-                                          ),
+                                      Center(
+                                        child: Text(
+                                          item != null &&
+                                                  item.containsKey("price")
+                                              ? "\$${item["price"]}"
+                                              : "No Price", // Default to "No Price"
+                                          style: const TextStyle(
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey,
+                                          ), // Optional: style the price text
                                         ),
                                       )
                                     ],
@@ -311,7 +302,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                     mainAxisSize: MainAxisSize.min,
 
                                     children: [
-                                      const SizedBox(width: 15.0),
+                                      const SizedBox(width: 12.0),
                                       Row(
                                         //number
                                         mainAxisAlignment:
@@ -330,20 +321,23 @@ class _MenuScreenState extends State<MenuScreen> {
                                               ),
                                               width: 40,
                                               height: 40,
-                                              child: IconButton(
-                                                icon: const Icon(Icons.remove),
-                                                onPressed: () => setState(() {
-                                                  if (_data[index]
-                                                      .containsKey("count")) {
-                                                    final count = _data[index]
-                                                            ["count"] ??
-                                                        0; // Handle null case with default 0
-                                                    if (count > 0) {
-                                                      _data[index]["count"] =
-                                                          count - 1;
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(right: 10.0),
+                                                child: IconButton(
+                                                  icon: const Icon(Icons.remove),
+                                                  onPressed: () => setState(() {
+                                                    if (_data[index]
+                                                        .containsKey("count")) {
+                                                      final count = _data[index]
+                                                              ["count"] ??
+                                                          0; // Handle null case with default 0
+                                                      if (count > 0) {
+                                                        _data[index]["count"] =
+                                                            count - 1;
+                                                      }
                                                     }
-                                                  }
-                                                }),
+                                                  }),
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -403,6 +397,8 @@ class _MenuScreenState extends State<MenuScreen> {
             ],
           ),
         ),
+        floatingActionButton: FloatingActionButton(onPressed: () {  },
+        child: const Icon(Icons.shopping_basket),),
       ),
     );
   }
