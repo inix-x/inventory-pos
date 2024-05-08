@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../img/list.dart';
+import '../img//list1.dart';
 
 void main() {
   runApp(const MenuScreen());
@@ -14,7 +15,9 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  final List _data = data; // Copy data to state
+  final List _data = data;
+  final List _data1 = data1;
+// Copy data to state
   int counter = 0;
 
   get math => null;
@@ -22,6 +25,7 @@ class _MenuScreenState extends State<MenuScreen> {
   get price => null;
 
   bool _showCounter = false;
+  bool _showCounter1 = false;
 
   @override
   Widget build(BuildContext context) {
@@ -167,9 +171,13 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                   ["count"] ??
                                                               0; // Handle null case with default 0
                                                           if (count > 0) {
-                                                            _data[index]
+                                                            _data1[index]
                                                                     ["count"] =
                                                                 count - 1;
+                                                            counter = counter >
+                                                                    0
+                                                                ? counter - 1
+                                                                : 0;
                                                           }
                                                         }
                                                       }),
@@ -212,11 +220,12 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                 ["count"] ??
                                                             0; // Handle null case with default 0
                                                         if (count <
-                                                            _data[index]
+                                                            _data1[index]
                                                                 ["max"]) {
-                                                          _data[index]
+                                                          _data1[index]
                                                                   ["count"] =
                                                               count + 1;
+                                                          counter++;
                                                         }
                                                       }
                                                     }),
@@ -240,7 +249,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
               Container(
-                //1st category
+                //2nd category
                 height: screenHeight * 0.5,
                 padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
                 child: Column(
@@ -250,7 +259,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     const Padding(
                       padding: EdgeInsets.only(left: 30.0),
                       child: Text(
-                        "Category 1",
+                        "Category 2",
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
@@ -262,12 +271,12 @@ class _MenuScreenState extends State<MenuScreen> {
                       child: ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _data.length,
+                        itemCount: _data1.length,
                         itemBuilder: (context, index) {
-                          final item = _data[index];
+                          final item = _data1[index];
                           return GestureDetector(
                             onTap: () => setState(() {
-                              _showCounter = !_showCounter;
+                              _showCounter1 = !_showCounter1;
                             }),
                             child: Card(
                               margin: const EdgeInsets.only(
@@ -337,7 +346,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                       children: [
                                         const SizedBox(width: 12.0),
                                         Visibility(
-                                          visible: _showCounter,
+                                          visible: _showCounter1,
                                           child: Row(
                                             //number
                                             mainAxisAlignment:
@@ -366,17 +375,21 @@ class _MenuScreenState extends State<MenuScreen> {
                                                           Icons.remove),
                                                       onPressed: () =>
                                                           setState(() {
-                                                        if (_data[index]
+                                                        if (_data1[index]
                                                             .containsKey(
                                                                 "count")) {
-                                                          final count = _data[
+                                                          final count = _data1[
                                                                       index]
                                                                   ["count"] ??
                                                               0; // Handle null case with default 0
                                                           if (count > 0) {
-                                                            _data[index]
+                                                            _data1[index]
                                                                     ["count"] =
                                                                 count - 1;
+                                                            counter = counter >
+                                                                    0
+                                                                ? counter - 1
+                                                                : 0;
                                                           }
                                                         }
                                                       }),
@@ -385,7 +398,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                (_data[index]["count"] ?? 0)
+                                                (_data1[index]["count"] ?? 0)
                                                     .toString(),
                                                 style: const TextStyle(
                                                   fontSize: 18.0,
@@ -408,22 +421,23 @@ class _MenuScreenState extends State<MenuScreen> {
                                                     icon: const Icon(Icons.add),
                                                     onPressed: () =>
                                                         setState(() {
-                                                      if (_data[index]
+                                                      if (_data1[index]
                                                               .containsKey(
                                                                   "count") &&
-                                                          _data[index]
+                                                          _data1[index]
                                                               .containsKey(
                                                                   "max")) {
-                                                        final count = _data[
+                                                        final count = _data1[
                                                                     index]
                                                                 ["count"] ??
                                                             0; // Handle null case with default 0
                                                         if (count <
-                                                            _data[index]
+                                                            _data1[index]
                                                                 ["max"]) {
-                                                          _data[index]
+                                                          _data1[index]
                                                                   ["count"] =
                                                               count + 1;
+                                                          counter++; // Increment counter if count is less than max
                                                         }
                                                       }
                                                     }),
@@ -453,16 +467,15 @@ class _MenuScreenState extends State<MenuScreen> {
           data: Theme.of(context).copyWith(
             floatingActionButtonTheme: const FloatingActionButtonThemeData(
               extendedSizeConstraints: BoxConstraints.tightFor(height: 70),
-              
             ),
           ),
           child: FloatingActionButton.extended(
             icon: const Icon(Icons.shopping_basket),
-            label: const Text('Your added items'),
+            label:
+                Text('Your $counter Added Items'), // Update label with counter
             onPressed: () {},
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
-
           ),
         ),
       ),
