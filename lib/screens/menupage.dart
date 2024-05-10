@@ -171,7 +171,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                   ["count"] ??
                                                               0; // Handle null case with default 0
                                                           if (count > 0) {
-                                                            _data1[index]
+                                                            _data[index]
                                                                     ["count"] =
                                                                 count - 1;
                                                             counter = counter >
@@ -186,7 +186,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                (_data[index]["count"] ?? 0)
+                                                (_data[index]["count"])
                                                     .toString(),
                                                 style: const TextStyle(
                                                   fontSize: 18.0,
@@ -205,7 +205,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                                   ),
                                                   width: 40,
                                                   height: 40,
-                                                  child: IconButton(
+                                                  child:IconButton(
                                                     icon: const Icon(Icons.add),
                                                     onPressed: () =>
                                                         setState(() {
@@ -220,12 +220,12 @@ class _MenuScreenState extends State<MenuScreen> {
                                                                 ["count"] ??
                                                             0; // Handle null case with default 0
                                                         if (count <
-                                                            _data1[index]
+                                                            _data[index]
                                                                 ["max"]) {
-                                                          _data1[index]
+                                                          _data[index]
                                                                   ["count"] =
                                                               count + 1;
-                                                          counter++;
+                                                          counter++; // Increment counter if count is less than max
                                                         }
                                                       }
                                                     }),
