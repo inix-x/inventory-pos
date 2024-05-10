@@ -7,23 +7,37 @@
         {
             "name": "inventory-pos",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "program": "./lib/main.dart", // Adjust the path to your main Dart file
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "inventory-pos (debug mode)",
+            "request": "launch", 
+            "type": "dart",
+            "flutterMode": "debug", // "debug" mode allows hot reload
+            "program": "./lib/main.dart", // Adjust to the correct main file path
+            "cwd": "${workspaceFolder}",
+            "noDebug": false, // Set to false to run with debugging
+            "enableAsserts": true // Optional, enable assertions
+        },
+        {
+            "name": "inventory-pos (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile",
-            "program": "./lib/main.dart",
+            "program": "./lib/main.dart", // Adjust to the correct main file path
             "cwd": "${workspaceFolder}",
-            "noDebug": false, // Set to true to run without debugging
+            "noDebug": true
         },
         {
             "name": "inventory-pos (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",
-            "noDebug": true, // Set to true to run without debugging
+            "program": "./lib/main.dart", // Adjust to the correct main file path
+            "cwd": "${workspaceFolder}",
+            "noDebug": true
         }
     ]
 }
