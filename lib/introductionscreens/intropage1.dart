@@ -21,9 +21,9 @@ class IntroPage1 extends StatelessWidget {
               alignment: const Alignment(0, 0),
               color: Colors.transparent,
               child: const Text(
-                'Make your Business Easy and Professional',
+                'Make your Business Easy and Professional.',
                 style: TextStyle(
-                  fontSize: 45,
+                  fontSize: 44,
                   fontWeight: FontWeight.bold,
                 ),
               ),

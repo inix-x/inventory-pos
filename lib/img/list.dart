@@ -4,7 +4,6 @@ List data = [
     "text" : "Entree",
     "count" : 0,
     "max" : 10,
-
     "price": 10,
   },
   {
@@ -12,7 +11,6 @@ List data = [
     "text" : "Main",
     "count" :0,
     "max" : 10,
-
     "price": 15,
   },
   {
@@ -20,7 +18,6 @@ List data = [
     "text" : "Beverage",
     "count" : 0,
     "max" : 20,
-
     "price": 25,
   },
   {

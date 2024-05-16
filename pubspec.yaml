@@ -38,6 +38,9 @@ dependencies:
   cached_network_image: ^3.3.1
   smooth_page_indicator: ^1.1.0
   lottie: ^3.1.0
+  dotted_line: ^3.2.2
+
+
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +52,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

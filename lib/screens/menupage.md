@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/cartscreen.dart';
+import 'package:dotted_line/dotted_line.dart';
 
 import '../img/list.dart';
 import '../img//list1.dart';
 
-void main() {
+void main() async {
   runApp(const MenuScreen());
 }
 
@@ -15,37 +18,80 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  final List _data = data;
-  final List _data1 = data1;
+  // ignore: prefer_final_fields
+  List _data = data;
+  // ignore: prefer_final_fields
+  List _data1 = data1;
 // Copy data to state
+
+  final List<Map<String, dynamic>> selectedItems = [];
+
+  //counter  shows the number of items added to the cart widget in the floating action button
   int counter = 0;
 
-  get math => null;
+  double totalPrice = 0.0; //totalPrice of the Cart added items in selectedItems List
 
-  get price => null;
-
+  //This Boolean section toggles the visibility of the counter of each card item and enables each category container to expand based on t or f.
   bool _showCounter = false;
   bool _showCounter1 = false;
+
+  //debugging function to ensure that there's an element inside an array or List.
+  void logListContent() {
+    //unused printing for every element in a list
+    for (var item in selectedItems) {
+      if (kDebugMode) {
+        print(item); //displays each element in the data from list.dart
+      }
+    }
+  }
+
+ double calculateTotalPrice() {
+  double total = 0.0;
+  for (var item in selectedItems) {
+    total += item["price"];
+  }
+  return total;
+}
+
+
+void removeFromSelectedItems(int index) {
+  // Check if index is within bounds
+  if (index < 0 || index >= selectedItems.length) {
+    if (kDebugMode) {
+        print('Warning: Index out of bounds for selectedItems.');
+        return;
+      }
+    
+  }
+
+  // Get the price of the item to remove
+  int priceToRemove = selectedItems[index]["price"];
+
+  // Remove the item from selectedItems
+  selectedItems.removeAt(index);
+
+  // Update total price by subtracting the removed item's price
+  totalPrice -= priceToRemove;
+}
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
+      home: Scaffold( //Scaffold contains the UI of a mobile device as a whole
+        body: SingleChildScrollView( //Widget that enables Scrollablity of the widgets.
+          child: Column( //displays the contents in a column or vertical manner
             children: [
-              Container(
-                //1st category
-                height: screenHeight * 0.5,
-                padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
+              Container( //1st category container
+                height: _showCounter ? screenHeight * 0.55 : screenHeight * 0.45, //The height changes depending on the _showCounter for the display to be responsive and flexible
+                padding: const EdgeInsets.only(top: 5, left: 16, right: 16),    
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Text "Categories" with emphasis
                     const Padding(
-                      padding: EdgeInsets.only(left: 30.0),
+                      padding: EdgeInsets.only(left: 30.0, bottom: 10),
                       child: Text(
                         "Category 1",
                         style: TextStyle(
@@ -54,7 +100,18 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                       ),
                     ),
-                    // const SizedBox(width: 16.0),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
+                      child: DottedLine(
+                          direction: Axis.horizontal,
+                          alignment: WrapAlignment.center,
+                          dashLength: 5,
+                          lineLength: double.infinity,
+                          lineThickness: 1.0,
+                          dashColor: Colors.black54,
+                          
+                      ),
+                    ),
                     Expanded(
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -65,6 +122,9 @@ class _MenuScreenState extends State<MenuScreen> {
                           return GestureDetector(
                             onTap: () => setState(() {
                               _showCounter = !_showCounter;
+                              if (kDebugMode) {
+                                print("$_showCounter"); //displays each element in the data from list.dart
+                              }
                             }),
                             child: Card(
                               margin: const EdgeInsets.only(
@@ -163,21 +223,31 @@ class _MenuScreenState extends State<MenuScreen> {
                                                           Icons.remove),
                                                       onPressed: () =>
                                                           setState(() {
+                                                        int count = _data[index]
+                                                            ["count"];
                                                         if (_data[index]
                                                             .containsKey(
                                                                 "count")) {
-                                                          final count = _data[
-                                                                      index]
-                                                                  ["count"] ??
-                                                              0; // Handle null case with default 0
-                                                          if (count > 0) {
-                                                            _data1[index]
-                                                                    ["count"] =
-                                                                count - 1;
-                                                            counter = counter >
-                                                                    0
-                                                                ? counter - 1
-                                                                : 0;
+                                                          // Check if selectedItems is not empty and the item exists in selectedItems
+                                                          
+                                                          if (selectedItems.isNotEmpty && selectedItems.any((item) => item["text"] == _data[index]["text"])) {
+                                                            // Find the index of the item based on "text" (assuming this approach)
+                                                            int indexToRemove = selectedItems.indexWhere((item) => item["text"] == _data[index]["text"]);
+
+                                                            // Remove the item and update total price
+                                                            removeFromSelectedItems(indexToRemove);
+
+                                                            // Decrement count if it's greater than 0
+                                                            if (count > 0) {
+                                                              count--;
+                                                              _data[index]["count"] = count;
+                                                              counter--;
+                                                            }
+                                                          } else {
+                                                            if (kDebugMode) {
+                                                              print(
+                                                                  'Item not found in selected items or selectedItems is empty.');
+                                                            }
                                                           }
                                                         }
                                                       }),
@@ -209,23 +279,33 @@ class _MenuScreenState extends State<MenuScreen> {
                                                     icon: const Icon(Icons.add),
                                                     onPressed: () =>
                                                         setState(() {
+                                                      int count =
+                                                          _data[index]["count"];
                                                       if (_data[index]
-                                                              .containsKey(
-                                                                  "count") &&
-                                                          _data[index]
-                                                              .containsKey(
-                                                                  "max")) {
-                                                        final count = _data[
-                                                                    index]
-                                                                ["count"] ??
-                                                            0; // Handle null case with default 0
+                                                          .containsKey("max")) {
                                                         if (count <
-                                                            _data1[index]
+                                                            _data[index]
                                                                 ["max"]) {
-                                                          _data1[index]
-                                                                  ["count"] =
-                                                              count + 1;
+                                                          count++;
+                                                          _data[index]
+                                                              ["count"] = count;
                                                           counter++;
+                                                        }
+                                                        if (kDebugMode) {
+                                                          print(
+                                                              'the count is $count and the counter is $counter');
+                                                        }
+                                                        // Check if count is greater than 0 before adding to selected items
+                                                        if (count > 0) {
+                                                          selectedItems.add({ //this only adds the the items selected in _data or category1
+                                                            "text": _data[index]
+                                                                ["text"],
+                                                            "price":
+                                                                _data[index]
+                                                                    ["price"],
+                                                            "count": count,
+                                                          });
+                                                          totalPrice = calculateTotalPrice();
                                                         }
                                                       }
                                                     }),
@@ -250,14 +330,14 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               Container(
                 //2nd category
-                height: screenHeight * 0.5,
+                height:_showCounter1 ? screenHeight * 0.60 : screenHeight * 0.5,
                 padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Text "Categories" with emphasis
                     const Padding(
-                      padding: EdgeInsets.only(left: 30.0),
+                      padding: EdgeInsets.only(left: 30.0, bottom: 10),
                       child: Text(
                         "Category 2",
                         style: TextStyle(
@@ -266,7 +346,18 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                       ),
                     ),
-                    // const SizedBox(width: 16.0),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
+                      child: DottedLine(
+                          direction: Axis.horizontal,
+                          alignment: WrapAlignment.center,
+                          dashLength: 5,
+                          lineLength: double.infinity,
+                          lineThickness: 1.0,
+                          dashColor: Colors.black54,
+                          
+                      ),
+                    ),
                     Expanded(
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -277,6 +368,9 @@ class _MenuScreenState extends State<MenuScreen> {
                           return GestureDetector(
                             onTap: () => setState(() {
                               _showCounter1 = !_showCounter1;
+                              if (kDebugMode) {
+                                print("$_showCounter1"); //displays each element in the data from list.dart
+                              }
                             }),
                             child: Card(
                               margin: const EdgeInsets.only(
@@ -375,21 +469,30 @@ class _MenuScreenState extends State<MenuScreen> {
                                                           Icons.remove),
                                                       onPressed: () =>
                                                           setState(() {
+                                                        int count1 = _data1[index]
+                                                            ["count"];
                                                         if (_data1[index]
                                                             .containsKey(
                                                                 "count")) {
-                                                          final count = _data1[
-                                                                      index]
-                                                                  ["count"] ??
-                                                              0; // Handle null case with default 0
-                                                          if (count > 0) {
-                                                            _data1[index]
-                                                                    ["count"] =
-                                                                count - 1;
-                                                            counter = counter >
-                                                                    0
-                                                                ? counter - 1
-                                                                : 0;
+                                                          // Check if selectedItems is not empty and the item exists in selectedItems
+                                                          if (selectedItems.isNotEmpty && selectedItems.any((item) => item["text"] == _data1[index]["text"])) {
+                                                            // Find the index of the item based on "text" (assuming this approach)
+                                                            int indexToRemove = selectedItems.indexWhere((item) => item["text"] == _data1[index]["text"]);
+
+                                                            // Remove the item and update total price
+                                                            removeFromSelectedItems(indexToRemove);
+
+                                                            // Decrement count if it's greater than 0
+                                                            if (count1 > 0) {
+                                                              count1--;
+                                                              _data[index]["count"] = count1;
+                                                              counter--;
+                                                            }
+                                                          }else {
+                                                            if (kDebugMode) {
+                                                              print(
+                                                                  'Item not found in selected items or selectedItems is empty.');
+                                                            }
                                                           }
                                                         }
                                                       }),
@@ -421,23 +524,33 @@ class _MenuScreenState extends State<MenuScreen> {
                                                     icon: const Icon(Icons.add),
                                                     onPressed: () =>
                                                         setState(() {
+                                                      int count1 =
+                                                          _data1[index]["count"];
                                                       if (_data1[index]
-                                                              .containsKey(
-                                                                  "count") &&
-                                                          _data1[index]
-                                                              .containsKey(
-                                                                  "max")) {
-                                                        final count = _data1[
-                                                                    index]
-                                                                ["count"] ??
-                                                            0; // Handle null case with default 0
-                                                        if (count <
+                                                          .containsKey("max")) {
+                                                        if (count1 <
                                                             _data1[index]
                                                                 ["max"]) {
+                                                          count1++;
                                                           _data1[index]
-                                                                  ["count"] =
-                                                              count + 1;
-                                                          counter++; // Increment counter if count is less than max
+                                                              ["count"] = count1;
+                                                          counter++;
+                                                        }
+                                                        if (kDebugMode) {
+                                                          print(
+                                                              'the count is $count1 and the counter is $counter');
+                                                        }
+                                                        // Check if count is greater than 0 before adding to selected items
+                                                        if (count1 > 0) {
+                                                          selectedItems.add({ //this only adds the the items selected in _data or category1
+                                                            "text": _data1[index]
+                                                                ["text"],
+                                                            "price":
+                                                                _data1[index]
+                                                                    ["price"],
+                                                            "count": count1,
+                                                          });
+                                                           totalPrice = calculateTotalPrice();
                                                         }
                                                       }
                                                     }),
@@ -466,14 +579,18 @@ class _MenuScreenState extends State<MenuScreen> {
         floatingActionButton: Theme(
           data: Theme.of(context).copyWith(
             floatingActionButtonTheme: const FloatingActionButtonThemeData(
-              extendedSizeConstraints: BoxConstraints.tightFor(height: 70),
+              extendedSizeConstraints: BoxConstraints.tightFor(height: 60),
             ),
           ),
           child: FloatingActionButton.extended(
             icon: const Icon(Icons.shopping_basket),
-            label:
-                Text('Your $counter Added Items'), // Update label with counter
-            onPressed: () {},
+            label: Text('Your $counter Added Items   \$$totalPrice'), // Update label with counter and totalPrice
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CartScreen(selectedItems: selectedItems),
+              ),
+            ),
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
           ),
