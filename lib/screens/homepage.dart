@@ -27,47 +27,11 @@ class _HomeAppState extends State<HomeApp> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           centerTitle: true,
-          title: const Text('Omar\'s Eatery ', style: TextStyle(color: Colors.black)),
+          title: const Text('Omar\'s Eatery ',
+              style: TextStyle(color: Colors.black)),
         ),
-        // drawer: Drawer(
-        //   // Add a ListView to the drawer. This ensures the user can scroll
-        //   // through the options in the drawer if there isn't enough vertical
-        //   // space to fit everything.
-        //   child: ListView(
-        //     // Important: Remove any padding from the ListView.
-        //     padding: EdgeInsets.zero,
-        //     children: [
-        //       const DrawerHeader(
-        //         decoration: BoxDecoration(
-        //           color: Colors.blue,
-                  
-        //         ),
-        //         child: Text('Drawer Header'),
-        //       ),
-        //       ListTile(
-        //         title: const Text('Home'),
-        //         onTap: () {
-        //           // Update the state of the app
-
-        //           // Then close the drawer
-        //         },
-        //       ),
-        //       ListTile(
-        //         title: const Text('Business'),
-        //         onTap: () {
-        //           // Update the state of the app
-
-        //           // Then close the drawer
-        //         },
-        //       ),
-        //       const ListTile(
-        //         title: Text('School'),
-        //       ),
-        //     ],
-        //   ),
-        // ),
         body: screens[index],
         bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(
@@ -78,14 +42,27 @@ class _HomeAppState extends State<HomeApp> {
           ),
           child: NavigationBar(
             height: 60,
-            backgroundColor: const Color.fromARGB(255, 94, 103, 116),
+            backgroundColor: Colors.white12,
             selectedIndex: index,
             onDestinationSelected: (int newIndex) =>
                 setState(() => index = newIndex),
             destinations: const [
-              NavigationDestination(icon: Icon(Icons.home), label: 'Menu'),
               NavigationDestination(
-                  icon: Icon(Icons.person_2_rounded), label: 'Account'),
+                icon: Padding(
+                  padding:
+                      EdgeInsets.all(3.0), // Adjust padding values as needed
+                  child: Icon(Icons.home),
+                ),
+                label: 'Menu',
+              ),
+              NavigationDestination(
+                icon: Padding(
+                  padding:
+                      EdgeInsets.all(3.0), // Adjust padding values as needed
+                  child: Icon(Icons.person_2_rounded),
+                ),
+                label: 'Account',
+              ),
             ],
           ),
         ),

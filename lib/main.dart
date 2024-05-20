@@ -14,6 +14,6 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false, // Optional: Hide debug banner in all modes
       home: OnboardingScreen(),
-    );
+    );  
   }
 }

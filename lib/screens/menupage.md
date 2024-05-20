@@ -29,7 +29,8 @@ class _MenuScreenState extends State<MenuScreen> {
   //counter  shows the number of items added to the cart widget in the floating action button
   int counter = 0;
 
-  double totalPrice = 0.0; //totalPrice of the Cart added items in selectedItems List
+  double totalPrice =
+      0.0; //totalPrice of the Cart added items in selectedItems List
 
   //This Boolean section toggles the visibility of the counter of each card item and enables each category container to expand based on t or f.
   bool _showCounter = false;
@@ -45,47 +46,73 @@ class _MenuScreenState extends State<MenuScreen> {
     }
   }
 
- double calculateTotalPrice() {
+double calculateTotalPrice() {
   double total = 0.0;
   for (var item in selectedItems) {
-    total += item["price"];
+    // Check if item has "count" key (assuming it might not always exist)
+    if (item.containsKey("count")) {
+      int count = item["count"];
+      total += item["price"] * count;  // Multiply price by count
+    } else {
+      // Handle case where "count" is missing (optional)
+      if (kDebugMode) {
+        print('Item in selectedItems missing "count" key.');
+      }
+    }
   }
   return total;
 }
-
 
 void removeFromSelectedItems(int index) {
   // Check if index is within bounds
   if (index < 0 || index >= selectedItems.length) {
     if (kDebugMode) {
-        print('Warning: Index out of bounds for selectedItems.');
-        return;
-      }
-    
+      print('Warning: Index out of bounds for selectedItems.');
+    }
+    return;
   }
 
-  // Get the price of the item to remove
-  int priceToRemove = selectedItems[index]["price"];
+  // Get the item and its count (assuming "count" exists)
+  Map<String, dynamic> item = selectedItems[index];
+  int count = item.containsKey("count") ? item["count"] : 1;
 
-  // Remove the item from selectedItems
-  selectedItems.removeAt(index);
+  // Handle removing single item or decrementing count
+  if (count == 1) {
+    // Remove the item from selectedItems
+    selectedItems.removeAt(index);
+  } else {
+    // Decrement count
+    count--;
+    item["count"] = count;
+  }
 
-  // Update total price by subtracting the removed item's price
-  totalPrice -= priceToRemove;
+  // Update total price based on selectedItems
+  totalPrice = calculateTotalPrice(); // Call the calculateTotalPrice function
 }
+
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold( //Scaffold contains the UI of a mobile device as a whole
-        body: SingleChildScrollView( //Widget that enables Scrollablity of the widgets.
-          child: Column( //displays the contents in a column or vertical manner
+      home: Scaffold(
+        //Scaffold contains the UI of a mobile device as a whole
+        body: SingleChildScrollView(
+          //Widget that enables Scrollablity of the widgets.
+          child: Column(
+            //displays the contents in a column or vertical manner
             children: [
-              Container( //1st category container
-                height: _showCounter ? screenHeight * 0.55 : screenHeight * 0.45, //The height changes depending on the _showCounter for the display to be responsive and flexible
-                padding: const EdgeInsets.only(top: 5, left: 16, right: 16),    
+              Container(
+                //1st category container
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(244, 244, 244, 244),
+                ),
+                height: _showCounter
+                    ? screenHeight * 0.55
+                    : screenHeight *
+                        0.45, //The height changes depending on the _showCounter for the display to be responsive and flexible
+                padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -101,15 +128,15 @@ void removeFromSelectedItems(int index) {
                       ),
                     ),
                     const Padding(
-                      padding: EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
+                      padding:
+                          EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
                       child: DottedLine(
-                          direction: Axis.horizontal,
-                          alignment: WrapAlignment.center,
-                          dashLength: 5,
-                          lineLength: double.infinity,
-                          lineThickness: 1.0,
-                          dashColor: Colors.black54,
-                          
+                        direction: Axis.horizontal,
+                        alignment: WrapAlignment.center,
+                        dashLength: 5,
+                        lineLength: double.infinity,
+                        lineThickness: 1.0,
+                        dashColor: Colors.black54,
                       ),
                     ),
                     Expanded(
@@ -123,7 +150,8 @@ void removeFromSelectedItems(int index) {
                             onTap: () => setState(() {
                               _showCounter = !_showCounter;
                               if (kDebugMode) {
-                                print("$_showCounter"); //displays each element in the data from list.dart
+                                print(
+                                    "$_showCounter"); //displays each element in the data from list.dart
                               }
                             }),
                             child: Card(
@@ -229,18 +257,34 @@ void removeFromSelectedItems(int index) {
                                                             .containsKey(
                                                                 "count")) {
                                                           // Check if selectedItems is not empty and the item exists in selectedItems
-                                                          
-                                                          if (selectedItems.isNotEmpty && selectedItems.any((item) => item["text"] == _data[index]["text"])) {
+
+                                                          if (selectedItems
+                                                                  .isNotEmpty &&
+                                                              selectedItems.any((item) =>
+                                                                  item[
+                                                                      "text"] ==
+                                                                  _data[index][
+                                                                      "text"])
+                                                                      ) {
                                                             // Find the index of the item based on "text" (assuming this approach)
-                                                            int indexToRemove = selectedItems.indexWhere((item) => item["text"] == _data[index]["text"]);
+                                                            int indexToRemove =
+                                                                selectedItems.indexWhere((item) =>
+                                                                    item[
+                                                                        "text"] ==
+                                                                    _data[index]
+                                                                        [
+                                                                        "text"]);
 
                                                             // Remove the item and update total price
-                                                            removeFromSelectedItems(indexToRemove);
+                                                            removeFromSelectedItems(
+                                                                indexToRemove);
 
                                                             // Decrement count if it's greater than 0
                                                             if (count > 0) {
                                                               count--;
-                                                              _data[index]["count"] = count;
+                                                              _data[index][
+                                                                      "count"] =
+                                                                  count;
                                                               counter--;
                                                             }
                                                           } else {
@@ -291,23 +335,45 @@ void removeFromSelectedItems(int index) {
                                                               ["count"] = count;
                                                           counter++;
                                                         }
-                                                        if (kDebugMode) {
-                                                          print(
-                                                              'the count is $count and the counter is $counter');
-                                                        }
-                                                        // Check if count is greater than 0 before adding to selected items
-                                                        if (count > 0) {
-                                                          selectedItems.add({ //this only adds the the items selected in _data or category1
-                                                            "text": _data[index]
-                                                                ["text"],
-                                                            "price":
+                                                      }
+                                                      if (kDebugMode) {
+                                                        print(
+                                                            'the count is $count and the counter is $counter');
+                                                      }
+
+                                                      // Check if item exists in selectedItems before adding
+                                                      bool foundExistingItem =
+                                                          false;
+                                                      for (var item
+                                                          in selectedItems) {
+                                                        if (item["id"] ==
                                                                 _data[index]
-                                                                    ["price"],
-                                                            "count": count,
-                                                          });
-                                                          totalPrice = calculateTotalPrice();
+                                                                    ["id"] &&
+                                                            item["id"] !=
+                                                                null) {
+                                                          // Check for null id
+                                                          foundExistingItem =
+                                                              true;
+                                                          item[
+                                                              "count"]++; // Increment count of existing item
+                                                          break;
                                                         }
                                                       }
+
+                                                      if (!foundExistingItem &&
+                                                          count > 0) {
+                                                        selectedItems.add({
+                                                          "text": _data[index]
+                                                              ["text"],
+                                                          "price": _data[index]
+                                                              ["price"],
+                                                          "count": count,
+                                                          "id": _data[index][
+                                                              "id"], // Assuming data has an "id" key
+                                                        });
+                                                      }
+                                                      totalPrice =
+                                                          calculateTotalPrice();
                                                     }),
                                                   ),
                                                 ),
@@ -330,7 +396,8 @@ void removeFromSelectedItems(int index) {
               ),
               Container(
                 //2nd category
-                height:_showCounter1 ? screenHeight * 0.60 : screenHeight * 0.5,
+                height:
+                    _showCounter1 ? screenHeight * 0.60 : screenHeight * 0.5,
                 padding: const EdgeInsets.only(top: 5, left: 16, right: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,15 +414,15 @@ void removeFromSelectedItems(int index) {
                       ),
                     ),
                     const Padding(
-                      padding: EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
+                      padding:
+                          EdgeInsets.only(left: 20.0, right: 20, bottom: 10),
                       child: DottedLine(
-                          direction: Axis.horizontal,
-                          alignment: WrapAlignment.center,
-                          dashLength: 5,
-                          lineLength: double.infinity,
-                          lineThickness: 1.0,
-                          dashColor: Colors.black54,
-                          
+                        direction: Axis.horizontal,
+                        alignment: WrapAlignment.center,
+                        dashLength: 5,
+                        lineLength: double.infinity,
+                        lineThickness: 1.0,
+                        dashColor: Colors.black54,
                       ),
                     ),
                     Expanded(
@@ -369,7 +436,8 @@ void removeFromSelectedItems(int index) {
                             onTap: () => setState(() {
                               _showCounter1 = !_showCounter1;
                               if (kDebugMode) {
-                                print("$_showCounter1"); //displays each element in the data from list.dart
+                                print(
+                                    "$_showCounter1"); //displays each element in the data from list.dart
                               }
                             }),
                             child: Card(
@@ -469,26 +537,42 @@ void removeFromSelectedItems(int index) {
                                                           Icons.remove),
                                                       onPressed: () =>
                                                           setState(() {
-                                                        int count1 = _data1[index]
-                                                            ["count"];
+                                                        int count1 =
+                                                            _data1[index]
+                                                                ["count"];
                                                         if (_data1[index]
                                                             .containsKey(
                                                                 "count")) {
                                                           // Check if selectedItems is not empty and the item exists in selectedItems
-                                                          if (selectedItems.isNotEmpty && selectedItems.any((item) => item["text"] == _data1[index]["text"])) {
+                                                          if (selectedItems
+                                                                  .isNotEmpty &&
+                                                              selectedItems.any((item) =>
+                                                                  item[
+                                                                      "text"] ==
+                                                                  _data1[index][
+                                                                      "text"])) {
                                                             // Find the index of the item based on "text" (assuming this approach)
-                                                            int indexToRemove = selectedItems.indexWhere((item) => item["text"] == _data1[index]["text"]);
+                                                            int indexToRemove =
+                                                                selectedItems.indexWhere((item) =>
+                                                                    item[
+                                                                        "text"] ==
+                                                                    _data1[index]
+                                                                        [
+                                                                        "text"]);
 
                                                             // Remove the item and update total price
-                                                            removeFromSelectedItems(indexToRemove);
+                                                            removeFromSelectedItems(
+                                                                indexToRemove);
 
                                                             // Decrement count if it's greater than 0
                                                             if (count1 > 0) {
                                                               count1--;
-                                                              _data[index]["count"] = count1;
+                                                              _data[index][
+                                                                      "count"] =
+                                                                  count1;
                                                               counter--;
                                                             }
-                                                          }else {
+                                                          } else {
                                                             if (kDebugMode) {
                                                               print(
                                                                   'Item not found in selected items or selectedItems is empty.');
@@ -536,23 +620,45 @@ void removeFromSelectedItems(int index) {
                                                               ["count"] = count1;
                                                           counter++;
                                                         }
-                                                        if (kDebugMode) {
-                                                          print(
-                                                              'the count is $count1 and the counter is $counter');
-                                                        }
-                                                        // Check if count is greater than 0 before adding to selected items
-                                                        if (count1 > 0) {
-                                                          selectedItems.add({ //this only adds the the items selected in _data or category1
-                                                            "text": _data1[index]
-                                                                ["text"],
-                                                            "price":
+                                                      }
+                                                      if (kDebugMode) {
+                                                        print(
+                                                            'the count is $count1 and the counter is $counter');
+                                                      }
+
+                                                      // Check if item exists in selectedItems before adding
+                                                      bool foundExistingItem1 =
+                                                          false;
+                                                      for (var item
+                                                          in selectedItems) {
+                                                        if (item["id"] ==
                                                                 _data1[index]
-                                                                    ["price"],
-                                                            "count": count1,
-                                                          });
-                                                           totalPrice = calculateTotalPrice();
+                                                                    ["id"] &&
+                                                            item["id"] !=
+                                                                null) {
+                                                          // Check for null id
+                                                          foundExistingItem1 =
+                                                              true;
+                                                          item[
+                                                              "count"]++; // Increment count of existing item
+                                                          break;
                                                         }
                                                       }
+
+                                                      if (!foundExistingItem1 &&
+                                                          count1 > 0) {
+                                                        selectedItems.add({
+                                                          "text": _data1[index]
+                                                              ["text"],
+                                                          "price": _data1[index]
+                                                              ["price"],
+                                                          "count": count1,
+                                                          "id": _data1[index][
+                                                              "id"], // Assuming data has an "id" key
+                                                        });
+                                                      }
+                                                      totalPrice =
+                                                          calculateTotalPrice();
                                                     }),
                                                   ),
                                                 ),
@@ -584,13 +690,41 @@ void removeFromSelectedItems(int index) {
           ),
           child: FloatingActionButton.extended(
             icon: const Icon(Icons.shopping_basket),
-            label: Text('Your $counter Added Items   \$$totalPrice'), // Update label with counter and totalPrice
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CartScreen(selectedItems: selectedItems),
-              ),
-            ),
+            label: Text(
+                'Your $counter Added Items   \$$totalPrice'), // Update label with counter and totalPrice
+            onPressed: () {
+              if (selectedItems.isNotEmpty) {
+                if (kDebugMode) {
+                  print(
+                      '$selectedItems'); //displays each element in the data from list.dart
+                }
+                // Navigate to CartScreen with selected items
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartScreen(
+                        selectedItems: selectedItems, totalPrice: totalPrice),
+                  ),
+                );
+              } else {
+                // Show alert dialog if cart is empty
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Cart is Empty'),
+                    content: const Text(
+                        'Please add items to your cart before proceeding.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context), // Close dialog
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
           ),
