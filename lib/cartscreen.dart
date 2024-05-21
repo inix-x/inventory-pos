@@ -38,11 +38,11 @@ class _CartScreenState extends State<CartScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('My Cart'),
+              Text('Order Details'),
               SizedBox(
                 width: 25,
               ),
-              Icon(Icons.shopping_cart_outlined),
+              
             ],
           ),
         ),
@@ -65,46 +65,66 @@ class _CartScreenState extends State<CartScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment
-                              .spaceBetween, // Distribute evenly
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            // Quantity
                             Container(
-                                margin: const EdgeInsets.all(10),
-                                decoration: const BoxDecoration(
-                                    // color: Colors.pink,
-                                    ),
-                                child: Text('Qty: ${item["count"]}' , style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),)),
-                            //Item Name
+                              margin: const EdgeInsets.all(10),
+                              decoration: const BoxDecoration(
+                                  // color: Colors.pink, // Optional background color
+                                  ),
+                              child: Text(
+                                'Qty: ${item["count"] ?? 0}', // Use null-ish coalescing operator
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+
+                            // Item Details
                             Container(
                               margin: const EdgeInsets.all(8),
                               decoration: const BoxDecoration(
-                                  // color: Colors.green,
+                                  // color: Colors.green, // Optional background color
                                   ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    item["text"],
-                                    style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                    item["name"] ??
+                                        "", // Use null-ish coalescing operator
+                                    style: const TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   const Text(
                                     "Variant",
-                                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            //Item Variant
 
-                            //Price
+                            // Price
                             Container(
-                                margin: const EdgeInsets.only(
-                                    top: 8, right: 10, bottom: 8),
-                                decoration: const BoxDecoration(
-                                    // x
-                                    ),
-                                child: Text('\$${item["price"]}', style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold))),
-                            //Checkout
+                              margin: const EdgeInsets.only(
+                                  top: 8, right: 10, bottom: 8),
+                              decoration: const BoxDecoration(
+                                  // color: Colors.blue, // Optional background color
+                                  ),
+                              child: Text(
+                                '\$${item["price"]?.toStringAsFixed(2) ?? 0.0}', // Use null-safe navigation and null-ish coalescing operator
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -139,13 +159,13 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
-                            right: 20.0, top: 8, bottom: 8),
+                            right: 8.0, top: 8, bottom: 8),
                         child: Container(
                             color: Colors.black,
                             child: MaterialButton(
                               onPressed: navigateToPaymentScreen,
                               child: const Text(
-                                'Checkout',
+                                'Process Transaction',
                                 style: TextStyle(color: Colors.white),
                               ),
                             )),

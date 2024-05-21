@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/colors.dart';
 import '../screens/menupage.dart';
 import '../screens/accountpage.dart';
+
 
 void main() {
   runApp(const HomeApp());
@@ -27,10 +29,12 @@ class _HomeAppState extends State<HomeApp> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          backgroundColor: primaryColor,
           centerTitle: true,
           title: const Text('Omar\'s Eatery ',
-              style: TextStyle(color: Colors.black)),
+                style: TextStyle(color: accentColor)
+                ),
+         
         ),
         body: screens[index],
         bottomNavigationBar: NavigationBarTheme(
@@ -42,7 +46,8 @@ class _HomeAppState extends State<HomeApp> {
           ),
           child: NavigationBar(
             height: 60,
-            backgroundColor: Colors.white12,
+            backgroundColor: accentColor,
+            
             selectedIndex: index,
             onDestinationSelected: (int newIndex) =>
                 setState(() => index = newIndex),
