@@ -1,6 +1,8 @@
 // Import the Category class from categories.dart
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_application_1/cartscreen.dart';
 import 'package:flutter_application_1/categories.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // Import widgets for building the UI
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ class MenuScreen extends StatefulWidget {
   _MenuScreenState createState() => _MenuScreenState();
 }
 
+//create class for selectedItems for the List type
 class SelectedItem {
   final String name;
   final double price;
@@ -20,7 +23,7 @@ class SelectedItem {
 
   SelectedItem({required this.name, required this.price, required this.count});
 
-  // Add a method to convert to Map
+  // Add a method to convert to Map, using map to convert each property into a List.
   Map<String, dynamic> toMap() => {
         'name': name,
         'price': price,
@@ -30,6 +33,7 @@ class SelectedItem {
 
 class _MenuScreenState extends State<MenuScreen> {
   List<SelectedItem> selectedItems = []; // New list to store selected items
+
   // Add a method to update the count of an item
   void updateItemCount(Item item, int change) {
     setState(() {
@@ -43,6 +47,7 @@ class _MenuScreenState extends State<MenuScreen> {
     });
   }
   
+  //Another add method to add the item to the selectedItems
   void addSelectedItem(Item item) {
   // ignore: collection_methods_unrelated_type
   final existingItem = selectedItems.contains((selectedItem) => selectedItem.name == item.name);
@@ -60,6 +65,8 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 }
 
+//subtract method that will check if the item exists in the selectedItems and if the count is more than one reduce 
+//the count by one, else remove it from the selectedItems (count < 0)
 void reduceSelectedItems(Item item) {
   final existingItem = selectedItems.firstWhere((selectedItem) => selectedItem.name == item.name);
   setState(() {
@@ -71,7 +78,8 @@ void reduceSelectedItems(Item item) {
   });
 }
 
-
+//total method that will get each item's price and count in the selectedItems and multiply them together to add all
+//product of each items then add them together to get the total sum.
 double calculateTotalPrice(List<SelectedItem> selectedItems) {
   double totalPrice = 0.0;
   for (final item in selectedItems) {
@@ -80,12 +88,16 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
   return totalPrice;
 }
 
-
+//main build/function that contains the structure of the menupage.dart
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Menu'),
+        title:  Center(
+          child: 
+          Text('Menu', style: GoogleFonts.lato(),
+          )
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -95,58 +107,64 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
         ),
       ),
       floatingActionButton: Theme(
-  data: Theme.of(context).copyWith(
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      data: Theme.of(context).copyWith(
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
       extendedSizeConstraints: BoxConstraints.tightFor(height: 60),
     ),
-  ),
-  child: FloatingActionButton.extended(
-    icon: const Icon(Icons.shopping_basket),
-    label: Text(
-      // Update label with counter and totalPrice (assuming they are defined elsewhere)
-      'Your ${selectedItems.fold(0, (sum, item) => sum + item.count)} Added Items  \$${calculateTotalPrice(selectedItems)}',
     ),
-    onPressed: () {
-      if (selectedItems.isNotEmpty) {
+      child: FloatingActionButton.extended(
+      icon: const Icon(Icons.shopping_basket),
+      label: Text(
+        // Update label with counter and totalPrice (assuming they are defined elsewhere)
+        'Your ${selectedItems.fold(0, (sum, item) => sum + item.count)} Added Items  \$${calculateTotalPrice(selectedItems)}',
+      ),
+      onPressed: () {
          final convertedItems = selectedItems.map((item) => item.toMap()).toList();
-    // Navigate to CartScreen with converted items
-        // Navigate to CartScreen with selected items
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CartScreen(
-              selectedItems: convertedItems,
-            ),
-          ),
-        );
-        // ignore: avoid_print
-        print('$convertedItems');
-      } else {
-        // Show alert dialog if cart is empty
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Cart is Empty'),
-            content: const Text(
-                'Please add items to your cart before proceeding.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context), // Close dialog
-                child: const Text('OK'),
+        if (selectedItems.isNotEmpty) {
+      // Navigate to CartScreen with converted items
+          // Navigate to CartScreen with selected items
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CartScreen(
+                selectedItems: convertedItems,
               ),
-            ],
-          ),
-        );
-      }
-    },
-    backgroundColor: Colors.black,
-    foregroundColor: Colors.white,
-  ),
+            ),
+          );
+      
+         
+          if (kDebugMode) {
+            print('$convertedItems');
+          }
+        } else {
+          // Show alert dialog if cart is empty
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Cart is Empty'),
+              content: const Text(
+                  'Please add items to your cart before proceeding.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context), // Close dialog
+                  child: const Text('OK'),
+                ),
+              ],
+              
+            ),
+            
+          );
+        }
+      },
+      backgroundColor: Colors.black,
+      foregroundColor: Colors.white,
+    ),
 )
 ,
     );
   }
 
+  //custom widget that takes 1 parameter called Category to access the categories.dart elements
   Widget buildCategoryContainer(Category category) {
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -160,8 +178,10 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            category.name,
-            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            category.name, //outputs dynamically each category name in the categories.dart
+            style:  GoogleFonts.montserrat(
+              textStyle: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)
+            ),
           ),
           const SizedBox(height: 8.0),
           buildItemList(category.items), // Call function to build dynamic list
@@ -200,9 +220,16 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.name),
+                  Text(item.name, style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500)
+                  ),
+                  ),
                   const SizedBox(height: 4.0),
-                  Text('\$${item.price.toStringAsFixed(2)}'), // Format price
+                  Text('\$${item.price.toStringAsFixed(2)}' , 
+                  style: GoogleFonts.raleway(
+                    textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)
+                  ),
+                  ), // Format price
                 ],
               ),
             ),

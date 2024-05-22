@@ -1,6 +1,9 @@
 // Import the Category class from categories.dart
+// ignore: unused_import
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_application_1/cartscreen.dart';
 import 'package:flutter_application_1/categories.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // Import widgets for building the UI
 import 'package:flutter/material.dart';
@@ -46,22 +49,24 @@ class _MenuScreenState extends State<MenuScreen> {
   }
   
   //Another add method to add the item to the selectedItems
-  void addSelectedItem(Item item) {
-  // ignore: collection_methods_unrelated_type
-  final existingItem = selectedItems.contains((selectedItem) => selectedItem.name == item.name);
-  if (existingItem) {
-    // Update count for existing item
+
+void addSelectedItem(Item item) {
+  final existingItemIndex = selectedItems.indexWhere(
+      (selectedItem) => selectedItem.name == item.name && selectedItem.count > 0);
+
+  if (existingItemIndex != -1) {
+    // Update count for existing item with count > 0
     setState(() {
-      final itemToUpdate = selectedItems.firstWhere((selectedItem) => selectedItem.name == item.name);
-      itemToUpdate.count += item.count;
+      selectedItems[existingItemIndex].count += item.count;
     });
   } else {
-    // Add new item with its count
+    // Add new item or existing item with count 0
     setState(() {
       selectedItems.add(SelectedItem(name: item.name, price: item.price, count: item.count));
     });
   }
 }
+
 
 //subtract method that will check if the item exists in the selectedItems and if the count is more than one reduce 
 //the count by one, else remove it from the selectedItems (count < 0)
@@ -91,7 +96,11 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Menu'),
+        title:  Center(
+          child: 
+          Text('Menu', style: GoogleFonts.lato(),
+          )
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -113,8 +122,8 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
         'Your ${selectedItems.fold(0, (sum, item) => sum + item.count)} Added Items  \$${calculateTotalPrice(selectedItems)}',
       ),
       onPressed: () {
+         final convertedItems = selectedItems.map((item) => item.toMap()).toList();
         if (selectedItems.isNotEmpty) {
-          final convertedItems = selectedItems.map((item) => item.toMap()).toList();
       // Navigate to CartScreen with converted items
           // Navigate to CartScreen with selected items
           Navigator.push(
@@ -125,8 +134,6 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
               ),
             ),
           );
-          // ignore: avoid_print
-          print('$convertedItems');
         } else {
           // Show alert dialog if cart is empty
           showDialog(
@@ -141,7 +148,9 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
                   child: const Text('OK'),
                 ),
               ],
+              
             ),
+            
           );
         }
       },
@@ -168,7 +177,9 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
         children: [
           Text(
             category.name, //outputs dynamically each category name in the categories.dart
-            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            style:  GoogleFonts.montserrat(
+              textStyle: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)
+            ),
           ),
           const SizedBox(height: 8.0),
           buildItemList(category.items), // Call function to build dynamic list
@@ -207,9 +218,16 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.name),
+                  Text(item.name, style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500)
+                  ),
+                  ),
                   const SizedBox(height: 4.0),
-                  Text('\$${item.price.toStringAsFixed(2)}'), // Format price
+                  Text('\$${item.price.toStringAsFixed(2)}' , 
+                  style: GoogleFonts.raleway(
+                    textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)
+                  ),
+                  ), // Format price
                 ],
               ),
             ),

@@ -1,6 +1,8 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/screens/paymentscreen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CartScreen extends StatefulWidget {
   final List<Map<String, dynamic>> selectedItems;
@@ -24,7 +26,7 @@ class _CartScreenState extends State<CartScreen> {
   void navigateToPaymentScreen() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PaymentScreen()),
+      MaterialPageRoute(builder: (context) =>  PaymentScreen( selectedItems : widget.selectedItems )),
     );
   }
 
@@ -33,13 +35,13 @@ class _CartScreenState extends State<CartScreen> {
     calculateTotalPrice();
     return Scaffold(
       appBar: AppBar(
-        title: const Padding(
-          padding: EdgeInsets.only(top: 8.0, right: 70, left: 70, bottom: 8.0),
+        title:  Padding(
+          padding: const EdgeInsets.only(top: 8.0, right: 70, left: 60, bottom: 8.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Order Details'),
-              SizedBox(
+              Text('Order Details' , style: GoogleFonts.lato(),),
+              const SizedBox(
                 width: 25,
               ),
               
@@ -75,10 +77,12 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                               child: Text(
                                 'Qty: ${item["count"] ?? 0}', // Use null-ish coalescing operator
-                                style: const TextStyle(
+                                style:  GoogleFonts.raleway(
+                                  textStyle: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
+                                )
                               ),
                             ),
 
@@ -94,17 +98,21 @@ class _CartScreenState extends State<CartScreen> {
                                   Text(
                                     item["name"] ??
                                         "", // Use null-ish coalescing operator
-                                    style: const TextStyle(
+                                    style:  GoogleFonts.poppins(
+                                      textStyle: const TextStyle(
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.bold,
                                     ),
+                                    )
                                   ),
-                                  const Text(
+                                   Text(
                                     "Variant",
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
+                                      textStyle: const TextStyle(
                                       fontSize: 12.0,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                     ),
+                                    )
                                   ),
                                 ],
                               ),
@@ -119,10 +127,12 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                               child: Text(
                                 '\$${item["price"]?.toStringAsFixed(2) ?? 0.0}', // Use null-safe navigation and null-ish coalescing operator
-                                style: const TextStyle(
+                                style:  GoogleFonts.raleway(
+                                  textStyle: const TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.bold,
                                 ),
+                                )
                               ),
                             ),
                           ],
@@ -140,11 +150,16 @@ class _CartScreenState extends State<CartScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      const Text('Total :',
-                          style: TextStyle(color: Colors.white)),
+                       Text('Total :',
+                          style: GoogleFonts.poppins(
+                            textStyle: const TextStyle(color: Colors.white)
+                          )
+                          ),
                       Text(
                         '\$${total.toStringAsFixed(2)}',
-                        style: const TextStyle(color: Colors.white),
+                        style: GoogleFonts.raleway(
+                          textStyle: const TextStyle(color: Colors.white, fontSize: 16)
+                        ),
                       ), // Display total with 2 decimal places
                       const SizedBox(
                         width: 15,
@@ -155,18 +170,20 @@ class _CartScreenState extends State<CartScreen> {
                         dashLength: 5,
                         lineLength: double.infinity,
                         lineThickness: 1.0,
-                        dashColor: Colors.white,
+                        dashColor: accentColor,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
                             right: 8.0, top: 8, bottom: 8),
                         child: Container(
-                            color: Colors.black,
+                            color: primaryColor,
                             child: MaterialButton(
                               onPressed: navigateToPaymentScreen,
-                              child: const Text(
+                              child:  Text(
                                 'Process Transaction',
-                                style: TextStyle(color: Colors.white),
+                                style: GoogleFonts.quattrocento(
+                                  textStyle: const TextStyle(color: accentColor, fontSize: 14, fontWeight: FontWeight.bold),
+                                )
                               ),
                             )),
                       )
