@@ -159,7 +159,10 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                           ),
                         ),
                       ),
-                      
+                      ElevatedButton(
+                        onPressed: shareReceipt,
+                        child: const Text('Share Receipt'),
+                      ),
                       ElevatedButton(
                         onPressed: takeScreenshot,
                         child: const Text('Screenshot Receipt'),

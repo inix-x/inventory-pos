@@ -1,7 +1,9 @@
 import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/colors.dart';
+import 'package:flutter_application_1/screens/receiptscreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -14,7 +16,7 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   double total = 0.0;
-
+  double? cashAmount; // Variable to store cash input
   void calculateTotalPrice() {
     total = 0.0; // Reset total before recalculating
 
@@ -22,6 +24,53 @@ class _PaymentScreenState extends State<PaymentScreen> {
       total += item["price"] * item["count"];
     }
   }
+
+   double calculateChange() {
+    if (cashAmount != null) {
+      return cashAmount! - total;
+    } else {
+      return 0.0; // Handle case where no cash amount is entered
+    }
+  }
+  void handleCashPayment() {
+  double change = calculateChange();
+  if (change >= 0 ) {
+    // Show success message and change amount (if any)
+    if (kDebugMode) {
+      print('Payment successful! Change: \$${change.toStringAsFixed(2)}');
+    }
+      Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ReceiptScreen(
+                selectedItems: widget.selectedItems, change: change, 
+              ),
+            ),
+          );
+  } else {
+    // Show error message for insufficient cash
+    showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Insufficient Cash! '),
+              content: const Text(
+                  'Please enter a higher amount than the total.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context), // Close dialog
+                  child: const Text('OK'),
+                ),
+              ],
+              
+            ),
+            
+          );
+    if (kDebugMode) {
+      print('Insufficient cash! Please enter a higher amount.');
+    }
+  }
+
+}
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +84,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
               fontSize: 20,
               fontWeight: FontWeight.bold,
             )),
-      )
-
-          // leading: IconButton(
+      ),
+                // leading: IconButton(
           //   icon: const Icon(Icons.arrow_back),
           //   // Ensure you're using the correct navigation context
           //   onPressed: () => Navigator.pop(context), // Navigate back on press
           // ),
+
           ),
       body: SafeArea(
         child: Center(
@@ -69,6 +118,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       border: OutlineInputBorder(),
                       labelText: 'Payment Amount',
                     ),
+                    onChanged: (value) {
+                      cashAmount = double.tryParse(value); // Update cashAmount on input change
+                    },
                   ),
                 ),
                 Container(
@@ -76,7 +128,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     width: 300,
                     color: Colors.green,
                     child: MaterialButton(
-                      onPressed: () {},
+                      onPressed: handleCashPayment,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

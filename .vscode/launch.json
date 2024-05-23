@@ -13,7 +13,7 @@
             "name": "inventory-pos (debug mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile",  // Change here to "debug"
+            "flutterMode": "debug",  // Change here to "debug"
             "program": "./lib/main.dart",
             "cwd": "${workspaceFolder}"
           }

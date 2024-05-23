@@ -34,18 +34,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
   void handleCashPayment() {
   double change = calculateChange();
-  if (change >= 0) {
+  if (change >= 0 && cashAmount != null ) {
     // Show success message and change amount (if any)
     if (kDebugMode) {
       print('Payment successful! Change: \$${change.toStringAsFixed(2)}');
     }
-  } else {
-    // Show error message for insufficient cash
-    if (kDebugMode) {
-      print('Insufficient cash! Please enter a higher amount.');
-    }
-  }
-  Navigator.push(
+      Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ReceiptScreen(
@@ -53,6 +47,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
           );
+  } else {
+    // Show error message for insufficient cash
+    showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Insufficient Cash! '),
+              content: const Text(
+                  'Please enter a higher amount than the total.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context), // Close dialog
+                  child: const Text('OK'),
+                ),
+              ],
+              
+            ),
+            
+          );
+    if (kDebugMode) {
+      print('Insufficient cash! Please enter a higher amount.');
+    }
+  }
+
 }
 
   @override
