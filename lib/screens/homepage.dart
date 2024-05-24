@@ -13,6 +13,7 @@ class HomeApp extends StatefulWidget {
 }
 
 bool _isClicked = false;
+bool _isFinished = true;
 
 class _HomeAppState extends State<HomeApp> {
 
@@ -40,7 +41,7 @@ class _HomeAppState extends State<HomeApp> {
                 ),
          
         ),
-        body: const MenuScreen(),
+        body:  MenuScreen(isFinished: _isFinished,),
         bottomNavigationBar: Container(
                 height: 70,
                 color: Colors.black,

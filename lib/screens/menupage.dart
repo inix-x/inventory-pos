@@ -9,7 +9,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 
 class MenuScreen extends StatefulWidget {
-  const MenuScreen({super.key});
+  const MenuScreen({super.key, required this.isFinished});
+  final bool isFinished;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -89,6 +90,17 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
     totalPrice += item.price * item.count;
   }
   return totalPrice;
+}
+
+  void clearSelectedItems() {
+  if(widget.isFinished){
+    setState(() {
+      for (var item in selectedItems) {
+        item.count = 0;
+      }
+    selectedItems.clear();
+  });
+  }
 }
 
 //main build/function that contains the structure of the menupage.dart
@@ -204,6 +216,7 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
+        
         child: Row(
           children: [
             // Display image (optional)
@@ -242,7 +255,8 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
                     reduceSelectedItems(item);
                   }
                 ),
-                Text(item.count.toString()),
+                Text(selectedItems.isEmpty ? '0' : item.count.toString()),
+
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {

@@ -1,4 +1,5 @@
 // Import the Category class from categories.dart
+// ignore: unused_import
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_application_1/cartscreen.dart';
 import 'package:flutter_application_1/categories.dart';
@@ -8,7 +9,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 
 class MenuScreen extends StatefulWidget {
-  const MenuScreen({super.key});
+  const MenuScreen({super.key, required this.isFinished});
+  final bool isFinished;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -48,22 +50,24 @@ class _MenuScreenState extends State<MenuScreen> {
   }
   
   //Another add method to add the item to the selectedItems
-  void addSelectedItem(Item item) {
-  // ignore: collection_methods_unrelated_type
-  final existingItem = selectedItems.contains((selectedItem) => selectedItem.name == item.name);
-  if (existingItem) {
-    // Update count for existing item
+
+void addSelectedItem(Item item) {
+  final existingItemIndex = selectedItems.indexWhere(
+      (selectedItem) => selectedItem.name == item.name && selectedItem.count > 0);
+
+  if (existingItemIndex != -1) {
+    // Update count for existing item with count > 0
     setState(() {
-      final itemToUpdate = selectedItems.firstWhere((selectedItem) => selectedItem.name == item.name);
-      itemToUpdate.count += item.count;
+      selectedItems[existingItemIndex].count += item.count;
     });
   } else {
-    // Add new item with its count
+    // Add new item or existing item with count 0
     setState(() {
       selectedItems.add(SelectedItem(name: item.name, price: item.price, count: item.count));
     });
   }
 }
+
 
 //subtract method that will check if the item exists in the selectedItems and if the count is more than one reduce 
 //the count by one, else remove it from the selectedItems (count < 0)
@@ -86,6 +90,17 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
     totalPrice += item.price * item.count;
   }
   return totalPrice;
+}
+
+  void clearSelectedItems() {
+  if(widget.isFinished){
+    setState(() {
+      for (var item in selectedItems) {
+        item.count = 0;
+      }
+    selectedItems.clear();
+  });
+  }
 }
 
 //main build/function that contains the structure of the menupage.dart
@@ -131,11 +146,6 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
               ),
             ),
           );
-      
-         
-          if (kDebugMode) {
-            print('$convertedItems');
-          }
         } else {
           // Show alert dialog if cart is empty
           showDialog(
@@ -206,6 +216,7 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
+        
         child: Row(
           children: [
             // Display image (optional)
@@ -244,7 +255,8 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
                     reduceSelectedItems(item);
                   }
                 ),
-                Text(item.count.toString()),
+                Text(selectedItems.isEmpty ? '0' : item.count.toString()),
+
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {

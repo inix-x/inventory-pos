@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
+import 'package:flutter_application_1/screens/menupage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
@@ -11,13 +12,17 @@ import 'package:path_provider/path_provider.dart';
 class ReceiptScreen extends StatefulWidget {
   final List<Map<String, dynamic>> selectedItems;
   final double change;
-  final screenshotController = ScreenshotController(); // New variable for screenshot
+  final screenshotController = ScreenshotController();
+   // New variable for screenshot
 
   ReceiptScreen({super.key, required this.selectedItems, required this.change});
 
   @override
   State<ReceiptScreen> createState() => _ReceiptScreenState();
 }
+
+bool _isFinished = false;
+
 
 String getFormattedDateTime() {
   final now = DateTime.now();
@@ -55,14 +60,12 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     if (widget.change >= 0) {
       receiptText += "Change: \$${widget.change.toStringAsFixed(2)}\n";
     }
+    
     return receiptText;
   }
   
 
-  void shareReceipt() {
-    String receiptText = generateReceiptText();
-    Share.share(receiptText);
-  }
+
 
   // New function to capture and share screenshot
   Future<void> takeScreenshot() async {
@@ -108,7 +111,22 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     // Wrap the path in a list and use Share.shareFiles
     await Share.shareXFiles([XFile(path)]);
   }
+  setState(() {
+    _isFinished = true;
+  });
+
+  Navigator.push(
+            // ignore: use_build_context_synchronously
+            context,
+            MaterialPageRoute(
+              builder: (context) => MenuScreen(
+                isFinished: _isFinished,
+              ),
+            ),
+          );
   }
+  
+
 
   @override
   Widget build(BuildContext context) {
