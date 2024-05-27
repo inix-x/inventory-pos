@@ -67,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onLastPage ? GestureDetector(
                   onTap: () {
                    Navigator.push(context, MaterialPageRoute(builder: (context){
-                    return const HomeApp();
+                    return const HomeApp(isFinished: true,);
                    }));
                   },
                   child: const Text('Done'),

@@ -255,7 +255,7 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
                     reduceSelectedItems(item);
                   }
                 ),
-                Text(selectedItems.isEmpty ? '0' : item.count.toString()),
+                Text(selectedItems.isEmpty ? '0' : item.count.toString()), //may error dito.
 
                 IconButton(
                   icon: const Icon(Icons.add),

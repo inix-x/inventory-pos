@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
-import 'package:flutter_application_1/screens/menupage.dart';
+import 'package:flutter_application_1/screens/homepage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
@@ -119,7 +119,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(
-              builder: (context) => MenuScreen(
+              builder: (context) => HomeApp(
                 isFinished: _isFinished,
               ),
             ),
