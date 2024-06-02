@@ -100,12 +100,15 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
       }
     selectedItems.clear();
   });
+  }else{
+    return;
   }
 }
 
 //main build/function that contains the structure of the menupage.dart
   @override
   Widget build(BuildContext context) {
+    clearSelectedItems();
     return Scaffold(
       appBar: AppBar(
         title:  Center(
@@ -255,7 +258,7 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
                     reduceSelectedItems(item);
                   }
                 ),
-                Text(selectedItems.isEmpty ? '0' : item.count.toString()),
+                Text(selectedItems.isEmpty ? '0' : item.count.toString()), //may error dito.
 
                 IconButton(
                   icon: const Icon(Icons.add),

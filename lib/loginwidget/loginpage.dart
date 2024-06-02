@@ -63,8 +63,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 onTap: () => goToSignup(context),
                 child:
                     const Text("Signup", style: TextStyle(color: Colors.red)),
+              ),
+              const SizedBox(width: 5),
+              InkWell(
+                onTap: () => const HomeApp(isFinished: true,),
+                child: const Text('Use Offline'),
               )
-            ]),
+            ]
+            ),
             const Spacer()
           ],
         ),

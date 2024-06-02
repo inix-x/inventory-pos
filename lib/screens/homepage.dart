@@ -1,22 +1,24 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
-import 'package:flutter_application_1/loginwidget/customersignout.dart';
+import 'package:flutter_application_1/providers/categoryprovider.dart';
+import 'package:provider/provider.dart';
+// import 'package:flutter_application_1/loginwidget/customersignout.dart';
 import '../screens/menupage.dart';
 import '../screens/accountpage.dart';
-import 'package:flutter_application_1/loginwidget/auth_service.dart';
-import 'package:flutter_application_1/loginwidget/loginpage.dart';
+// import 'package:flutter_application_1/loginwidget/auth_service.dart';
+// import 'package:flutter_application_1/loginwidget/loginpage.dart';
 
 class HomeApp extends StatefulWidget {
   const HomeApp({super.key, required bool isFinished});
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
+  // static final GlobalKey<NavigatorState> navigatorKey =
+  //     GlobalKey<NavigatorState>();
   @override
   State<HomeApp> createState() => _HomeAppState();
 }
 
 bool _isClicked = false;
-bool _isFinished = true;
+bool _isFinished = false;
 
 class _HomeAppState extends State<HomeApp> {
   void navigateToAccount(BuildContext context) {
@@ -31,30 +33,34 @@ class _HomeAppState extends State<HomeApp> {
 
   @override
   Widget build(BuildContext context) {
+    final businessName = context.watch<CategoryProvider>().categories.first.storeName;
     // ignore: no_leading_underscores_for_local_identifiers
-    final _auth = AuthService();
+    // final _auth = AuthService();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: primaryColor,
           centerTitle: true,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          title:  Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(width: 30,),
-              const Text('Omar\'s Eatery ',
-                  style: TextStyle(color: accentColor)),
-                  const SizedBox(width: 50,),
-                  Customsignout(
-                onPressed: () async {
-                  await _auth.signout();
-                  // ignore: use_build_context_synchronously
-                  goToLogin(context);
-                },
-                icon: const Icon(Icons.logout_sharp,
-                    color: Colors.white), // Add icon and color
+              const SizedBox(
+                width: 50,
               ),
+              Text(businessName, style: const TextStyle(color: accentColor)),
+              const SizedBox(
+                width: 50,
+              ),
+              //     Customsignout(
+              //   onPressed: () async {
+              //     await _auth.signout();
+              //     // ignore: use_build_context_synchronously
+              //     goToLogin(context);
+              //   },
+              //   icon: const Icon(Icons.logout_sharp,
+              //       color: Colors.white), // Add icon and color
+              // ),
             ],
           ),
         ),
@@ -117,16 +123,14 @@ class _HomeAppState extends State<HomeApp> {
         ),
       ),
     );
-    
-  }
-  
-    bool shouldPop(Route<dynamic> route) {
-    return false; // Always return false to prevent back navigation
   }
 
+  //   bool shouldPop(Route<dynamic> route) {
+  //   return false; // Always return false to prevent back navigation
+  // }
 
-  goToLogin(BuildContext context) => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
+  // goToLogin(BuildContext context) => Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const LoginScreen()),
+  //     );
 }
