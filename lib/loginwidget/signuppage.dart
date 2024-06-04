@@ -6,6 +6,7 @@ import 'package:flutter_application_1/loginwidget/custombutton.dart';
 import 'package:flutter_application_1/loginwidget/customtextfield.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
 import 'package:flutter_application_1/loginwidget/loginpage.dart';
+import 'package:flutter_application_1/screens/setuppage.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -105,13 +106,18 @@ class _SignupScreenState extends State<SignupScreen> {
         context,
         MaterialPageRoute(builder: (context) => const HomeApp(isFinished: true,)),
       );
+  
+  goToSetup(BuildContext context) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Setuppage()),
+      );
 
  _signup() async {
   final user = await _auth.createUserWithEmailAndPassword(_email.text, _password.text);
   if (user != null) {
     log("User Created Succesfully");
     if (mounted) { // Check if widget is still mounted
-      goToHome(context);
+      goToSetup(context);
     }
   }
 }
