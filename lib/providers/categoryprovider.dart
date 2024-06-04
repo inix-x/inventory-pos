@@ -7,7 +7,10 @@ class CategoryProvider extends ChangeNotifier {
     required this.categories,
   });
 
-  
+    void updateCategories(List<Category> newCategories) {
+    categories = newCategories;
+    notifyListeners();
+  }
 
   void addNewCat({
     // Renamed for clarity

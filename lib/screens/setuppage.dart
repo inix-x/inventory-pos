@@ -2,9 +2,9 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart';
+import 'package:flutter/foundation.dart' ;
+import 'package:flutter/material.dart'; 
+import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider ;
 import 'package:flutter_application_1/screens/additemspage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -41,7 +41,7 @@ class _SetuppageState extends State<Setuppage> {
     );
     if (categoryName != null && categoryName.isNotEmpty) {
       setState(() {
-        context.read<CategoryProvider>().addNewCat(
+        context.read<category_provider.CategoryProvider>().addNewCat(
             newCategoryNames: categoryName, newItems: [], newStoreName: storeName);
       });
     }
@@ -76,7 +76,7 @@ class _SetuppageState extends State<Setuppage> {
   void _removeCategory(int index) {
     // Get the CategoryProvider instance using Provider.of
     final categoryProvider =
-        Provider.of<CategoryProvider>(context, listen: false);
+        Provider.of<category_provider.CategoryProvider>(context, listen: false);
     // Remove the category at the specified index from the provider
     categoryProvider.removeCategory(index);
     setState(() {
@@ -87,7 +87,7 @@ class _SetuppageState extends State<Setuppage> {
 
   void outputData() async {
     final categoryProvider =
-        Provider.of<CategoryProvider>(context, listen: false);
+        Provider.of<category_provider.CategoryProvider>(context, listen: false);
     final categories = categoryProvider.categories;
 
     if (categories.isNotEmpty) {
@@ -117,6 +117,30 @@ class _SetuppageState extends State<Setuppage> {
       }
     }
   }
+void fetchData() async {
+  const appDocPath = '/data/user/0/com.example.flutter_application_1/app_flutter/categories.json';
+  final data = await _readDataFromFile(appDocPath);
+  if (data != null) {
+    final decodedData = jsonDecode(data) as List<dynamic>;
+     final categories = decodedData.map((categoryData) => Category(categoryData as List<String>)).toList();
+    // ignore: use_build_context_synchronously
+    context.read<category_provider.CategoryProvider>().updateCategories(categories.cast<category_provider.Category>()); // Update provider with alias
+  }
+}
+
+
+Future<String?> _readDataFromFile(String filePath) async {
+  try {
+    final file = File(filePath);
+    final contents = await file.readAsString();
+    return contents;
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error reading file: $e');
+    }
+    return null;
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -137,15 +161,15 @@ class _SetuppageState extends State<Setuppage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              context.watch<CategoryProvider>().categories.isNotEmpty
+              context.watch<category_provider.CategoryProvider>().categories.isNotEmpty
                //change this make an empty final variable to hold the textfield value and make it the isEmtpy 
                   ? ListView.builder(
                       shrinkWrap: true,
                       itemCount:
-                          context.watch<CategoryProvider>().categories.length,
+                          context.watch<category_provider.CategoryProvider>().categories.length,
                       itemBuilder: (context, index) {
                         final category =
-                            context.watch<CategoryProvider>().categories[index];
+                            context.watch<category_provider.CategoryProvider>().categories[index];
                         return Dismissible(
                           key: Key(category.name), // Unique key for each card
                           background: Container(
@@ -196,6 +220,17 @@ class _SetuppageState extends State<Setuppage> {
                 },
                 child: const Text('Save Category and Items'),
               ),
+              MaterialButton(
+                onPressed: () async {
+                    final appDocDir = await getApplicationDocumentsDirectory();
+                    final appDocPath = appDocDir.path;
+                    if (kDebugMode) {
+                      print('This is the app directory: $appDocPath');
+                    }
+                }, 
+                child: const Text('Get Local path')
+
+              )
             ],
           ),
         ),

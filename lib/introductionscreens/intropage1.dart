@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+
 void main() {
   runApp(const IntroPage1());
 }
+
 
 class IntroPage1 extends StatelessWidget {
   const IntroPage1({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Container(
+      height: screenHeight,
       color: Colors.white,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, right: 20, left: 20),
+            padding: const EdgeInsets.all(20),
             child: Container(
               alignment: const Alignment(0, 0),
               color: Colors.transparent,
@@ -51,8 +55,8 @@ class IntroPage1 extends StatelessWidget {
           Container(
             color: Colors.transparent,
             child: Center(
-              child: Lottie.network(
-                  'https://lottie.host/2573fc79-06ac-4d2e-8bf8-5ba6ca16d87d/LCLRgou6iW.json'),
+              child: Lottie.asset(
+                  'assets/animations/checkoutcart.json'),
             ),
           ),
         ],

@@ -6,6 +6,7 @@ import 'package:flutter_application_1/loginwidget/custombutton.dart';
 import 'package:flutter_application_1/loginwidget/customtextfield.dart';
 import 'package:flutter_application_1/loginwidget/signuppage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
+import 'package:flutter_application_1/screens/setuppage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -88,6 +89,11 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const HomeApp(isFinished: true,)),
       );
 
+    goToSetup(BuildContext context) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Setuppage()),
+      );
+
   _login() async {
     final user =
         await _auth.loginUserWithEmailAndPassword(_email.text, _password.text);
@@ -97,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print("User Logged In");
       }
       // ignore: use_build_context_synchronously
-      goToHome(context);
+      goToSetup(context);
     }
   }
 }

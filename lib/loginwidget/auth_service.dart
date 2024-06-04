@@ -36,4 +36,9 @@ class AuthService {
       log("Something went wrong");
     }
   }
+
+  // New function to check login status
+  bool isLoggedIn() {
+    return _auth.currentUser != null;
+  }
 }
