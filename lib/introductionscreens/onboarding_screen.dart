@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/introductionscreens/intropage1.dart';
 import 'package:flutter_application_1/introductionscreens/intropage2.dart';
 import 'package:flutter_application_1/introductionscreens/intropage3.dart';
-import 'package:flutter_application_1/loginwidget/loginpage.dart';
+import 'package:flutter_application_1/loginwidget/signuppage.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 void main() {
@@ -67,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onLastPage ? GestureDetector(
                   onTap: () {
                    Navigator.push(context, MaterialPageRoute(builder: (context){
-                    return  const LoginScreen();
+                    return  const SignupScreen();
                    }));
                   },
                   child: const Text('Done'),

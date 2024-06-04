@@ -12,9 +12,9 @@ class IntroPage1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
-      height: screenHeight,
+    
       color: Colors.white,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -25,9 +25,9 @@ class IntroPage1 extends StatelessWidget {
               alignment: const Alignment(0, 0),
               color: Colors.transparent,
               child: const Text(
-                'Make your Business Easy and Professional.',
+                'Make your Business Easy & Professional.',
                 style: TextStyle(
-                  fontSize: 44,
+                  fontSize: 40,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -43,7 +43,7 @@ class IntroPage1 extends StatelessWidget {
                   Text(
                     'The best POS Application that you can use to help all your business needs!',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 17,
                       fontWeight: FontWeight.w600,
                       color: Colors.grey,
                     ),
@@ -56,7 +56,10 @@ class IntroPage1 extends StatelessWidget {
             color: Colors.transparent,
             child: Center(
               child: Lottie.asset(
-                  'assets/animations/checkoutcart.json'),
+                  'assets/animations/checkoutcart.json', 
+                  width: 350,
+                  height: 350,
+                  ),
             ),
           ),
         ],

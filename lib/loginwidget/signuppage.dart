@@ -21,7 +21,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
-
+  bool isVisible = false;
+  
   @override
   void dispose() {
     super.dispose();
@@ -29,6 +30,12 @@ class _SignupScreenState extends State<SignupScreen> {
     _email.dispose();
     _password.dispose();
   }
+   void isPasswordVisible(){
+    setState(() {
+      isVisible = !isVisible;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +62,19 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _email, obscure: false,
             ),
             const SizedBox(height: 20),
-            CustomTextField(
-              hint: "Enter Password",
-              label: "Password",
-              isPassword: true,
-              controller: _password, obscure: true,
+            TextField(
+              obscureText: isVisible,
+              controller: _password,
+              decoration: InputDecoration(
+                hintText: "Enter your Password",
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                label: const Text('Password'),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.grey, width: 1)),
+                suffixIcon: IconButton(onPressed: isPasswordVisible, icon: isVisible ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off)),
+              ),
             ),
             const SizedBox(height: 30),
             CustomButton(

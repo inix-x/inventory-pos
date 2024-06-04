@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
@@ -17,15 +16,21 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _auth = AuthService();
-
   final _email = TextEditingController();
   final _password = TextEditingController();
+  bool isVisible = false;
 
   @override
   void dispose() {
     super.dispose();
     _email.dispose();
     _password.dispose();
+  }
+
+  void isPasswordVisible(){
+    setState(() {
+      isVisible = !isVisible;
+    });
   }
 
   @override
@@ -46,11 +51,19 @@ class _LoginScreenState extends State<LoginScreen> {
               obscure: false,
             ),
             const SizedBox(height: 20),
-            CustomTextField(
-              hint: "Enter Password",
-              label: "Password",
+            TextField(
+              obscureText: isVisible,
               controller: _password,
-              obscure: true,
+              decoration: InputDecoration(
+                hintText: "Enter your Password",
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                label: const Text('Password'),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.grey, width: 1)),
+                suffixIcon: IconButton(onPressed: isPasswordVisible, icon: isVisible ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off)),
+              ),
             ),
             const SizedBox(height: 30),
             CustomButton(
@@ -67,11 +80,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(width: 5),
               InkWell(
-                onTap: () => const HomeApp(isFinished: true,),
+                onTap: () => const HomeApp(
+                  isFinished: true,
+                ),
                 child: const Text('Use Offline'),
               )
-            ]
-            ),
+            ]),
             const Spacer()
           ],
         ),
@@ -81,15 +95,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   goToSignup(BuildContext context) => Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>  const SignupScreen()),
+        MaterialPageRoute(builder: (context) => const SignupScreen()),
       );
 
   goToHome(BuildContext context) => Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const HomeApp(isFinished: true,)),
+        MaterialPageRoute(
+            builder: (context) => const HomeApp(
+                  isFinished: true,
+                )),
       );
 
-    goToSetup(BuildContext context) => Navigator.push(
+  goToSetup(BuildContext context) => Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const Setuppage()),
       );
