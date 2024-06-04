@@ -36,7 +36,7 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       appBar: AppBar(
         title:  Padding(
-          padding: const EdgeInsets.only(top: 8.0, right: 70, left: 60, bottom: 8.0),
+          padding: const EdgeInsets.only(top: 8.0, right: 50, left: 50, bottom: 8.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
