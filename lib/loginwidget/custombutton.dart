@@ -8,13 +8,18 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: 180,
-        height: 42,
-        child: ElevatedButton(
-            onPressed: onPressed,
-            child: Text(
-              label,
-              style: const TextStyle(fontSize: 18),
-            )));
+      width: 180,
+      height: 42,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue, // Set button color
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 18, color: Colors.white),
+        ),
+      ),
+    );
   }
 }

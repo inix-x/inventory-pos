@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/custombutton.dart';
-import 'package:flutter_application_1/loginwidget/customtextfield.dart';
 import 'package:flutter_application_1/loginwidget/signuppage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
 import 'package:flutter_application_1/screens/setuppage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _auth = AuthService();
   final _email = TextEditingController();
   final _password = TextEditingController();
-  bool isVisible = false;
+  bool isVisible = true;
 
   @override
   void dispose() {
@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _password.dispose();
   }
 
-  void isPasswordVisible(){
+  void isPasswordVisible() {
     setState(() {
       isVisible = !isVisible;
     });
@@ -37,35 +37,68 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center, // Center elements horizontally
+            mainAxisSize: MainAxisSize.min,
           children: [
             const Spacer(),
-            const Text("Login",
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500)),
-            const SizedBox(height: 50),
-            CustomTextField(
-              hint: "Enter Email",
-              label: "Email",
+            const SizedBox(
+              // color: Colors.red,
+              height: 250,
+              width: 250,
+              child: Image(
+                image: AssetImage('assets/animations/loginscreenpic.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 5,),
+            Text(
+              "Welcome back!",
+              style: GoogleFonts.roboto(
+                textStyle: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Spacer(),
+            TextField(
+              obscureText: false,
               controller: _email,
-              obscure: false,
+              decoration: InputDecoration(
+                  hintText: "Enter your email",
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  label: const Text('Email'),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1)),
+                  prefixIcon: const Icon(Icons.email)),
             ),
             const SizedBox(height: 20),
             TextField(
               obscureText: isVisible,
               controller: _password,
               decoration: InputDecoration(
-                hintText: "Enter your Password",
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                label: const Text('Password'),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: Colors.grey, width: 1)),
-                suffixIcon: IconButton(onPressed: isPasswordVisible, icon: isVisible ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off)),
-              ),
+                  hintText: "Enter your Password",
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  label: const Text('Password'),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1)),
+                  suffixIcon: IconButton(
+                      onPressed: isPasswordVisible,
+                      icon: isVisible
+                          ? const Icon(Icons.visibility_off)
+                          : const Icon(Icons.visibility)),
+                  prefixIcon: const Icon(Icons.key)),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             CustomButton(
               label: "Login",
               onPressed: _login,
@@ -79,12 +112,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Text("Signup", style: TextStyle(color: Colors.red)),
               ),
               const SizedBox(width: 5),
-              InkWell(
-                onTap: () => const HomeApp(
-                  isFinished: true,
-                ),
-                child: const Text('Use Offline'),
-              )
             ]),
             const Spacer()
           ],

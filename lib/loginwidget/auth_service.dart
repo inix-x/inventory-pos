@@ -24,7 +24,7 @@ class AuthService {
           email: email, password: password);
       return cred.user;
     } catch (e) {
-      log("Something went wrong");
+      log('$e');
     }
     return null;
   }

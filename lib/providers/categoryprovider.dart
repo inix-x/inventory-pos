@@ -34,8 +34,6 @@ class CategoryProvider extends ChangeNotifier {
   notifyListeners(); // Notify listeners in your Setuppage class about the change
 }
 
-
-
 }
 
 class Category {

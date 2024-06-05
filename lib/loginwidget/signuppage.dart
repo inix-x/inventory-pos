@@ -3,10 +3,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/custombutton.dart';
-import 'package:flutter_application_1/loginwidget/customtextfield.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
 import 'package:flutter_application_1/loginwidget/loginpage.dart';
 import 'package:flutter_application_1/screens/setuppage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -22,7 +22,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
-  bool isVisible = false;
+  bool isVisible = true;
   
   @override
   void dispose() {
@@ -42,47 +42,85 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center, // Center elements horizontally
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Spacer(),
-            const Text("Signup",
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500)),
             const SizedBox(
-              height: 50,
+              // color: Colors.red,
+              height: 220,
+              width: 250,
+              child: Image(
+                image: AssetImage('assets/animations/signupscreenpic.jpg'),
+                fit: BoxFit.cover,
+              ),
             ),
-            CustomTextField(
-              hint: "Enter Name",
-              label: "Name",
-              controller: _name, obscure: false,
+            const SizedBox(height: 5,),
+            Text(
+              "Join us today! ",
+              style: GoogleFonts.roboto(
+                textStyle: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-            const SizedBox(height: 20),
-            CustomTextField(
-              hint: "Enter Email",
-              label: "Email",
-              controller: _email, obscure: false,
+            const Spacer(),
+            TextField(
+              obscureText: false,
+              controller: _name,
+              decoration: InputDecoration(
+                  hintText: "Enter your name",
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  label: const Text('Name'),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1)),
+                  prefixIcon: const Icon(Icons.person)),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            TextField(
+              obscureText: false,
+              controller: _email,
+              decoration: InputDecoration(
+                  hintText: "Enter your email",
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  label: const Text('Email'),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1)),
+                  prefixIcon: const Icon(Icons.email)),
+            ),
+            const SizedBox(height: 10),
             TextField(
               obscureText: isVisible,
               controller: _password,
               decoration: InputDecoration(
                 hintText: "Enter your Password",
                 contentPadding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 label: const Text('Password'),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
                     borderSide: const BorderSide(color: Colors.grey, width: 1)),
-                suffixIcon: IconButton(onPressed: isPasswordVisible, icon: isVisible ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off)),
+                prefixIcon: const Icon(Icons.key),
+                suffixIcon: IconButton(onPressed: isPasswordVisible, icon: isVisible ? const Icon(Icons.visibility_off) :  const Icon(Icons.visibility)),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
             CustomButton(
               label: "Signup",
               onPressed: _signup,
             ),
-            const SizedBox(height: 5),
+            
+             const SizedBox(height: 10),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               const Text("Already have an account? "),
               InkWell(
