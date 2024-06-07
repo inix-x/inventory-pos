@@ -3,7 +3,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart' ;
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/colors.dart';
+import 'package:flutter_application_1/loginwidget/auth_service.dart';
+import 'package:flutter_application_1/loginwidget/customersignout.dart';
+import 'package:flutter_application_1/loginwidget/loginpage.dart'; 
 import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider ;
 import 'package:flutter_application_1/screens/additemspage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
@@ -141,20 +145,40 @@ Future<String?> _readDataFromFile(String filePath) async {
     return null;
   }
 }
-
   @override
   Widget build(BuildContext context) {
-   
+   // ignore: no_leading_underscores_for_local_identifiers
+   final _auth = AuthService();
     return Scaffold(
       appBar: AppBar(
-          title: Row(
-        children: [ 
-          //try to make a new class for the store name instead in the categoryprovider.dart
-          storeName.isEmpty ? 
-          const Text('Business Name') :  Text('$storeName'), 
-          IconButton(onPressed: _addNewStoreName, icon: const Icon(Icons.edit)),
-        ],
-      )),
+        automaticallyImplyLeading: false, //removing the automatic back to screen button
+          backgroundColor: primaryColor,
+          centerTitle: true,
+          title:   Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Customsignout(
+                onPressed: () async {
+                  await _auth.signout();
+                  // ignore: use_build_context_synchronously
+                  goToLogin(context);
+                },
+                icon: const Icon(Icons.arrow_back_ios,
+                    color: Colors.white), // Add icon and color
+              ),
+              const Spacer(),
+              // Text(businessName.isEmpty ? 'Nothing\'s here ' : 'Yep', style: const TextStyle(color: accentColor)),
+               storeName.isEmpty ? 
+          const Text('Business Name', style: TextStyle(color: accentColor),) :  Text('$storeName', style: const TextStyle(color: accentColor),), 
+          IconButton(onPressed: _addNewStoreName, icon: const Icon(Icons.edit,color: accentColor,)),
+               const Spacer(),
+                  
+               const SizedBox(
+                width: 10,
+              ),
+            ],
+          ),
+        ),
       body: Container(
         color: Colors.white,
         child: Center(
@@ -238,6 +262,11 @@ Future<String?> _readDataFromFile(String filePath) async {
     );
   }
 }
+
+ goToLogin(BuildContext context) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
 
 
 // void outputData() async {

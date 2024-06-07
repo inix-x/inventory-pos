@@ -53,6 +53,7 @@ class IntroPage1 extends StatelessWidget {
             ),
           ),
           Container(
+            height: 350,
             color: Colors.transparent,
             child: Center(
               child: Lottie.asset(

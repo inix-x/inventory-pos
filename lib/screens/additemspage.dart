@@ -15,6 +15,7 @@ class _AddItemspageState extends State<AddItemspage> {
   void showInputDialog() async{
     final itemNameController = TextEditingController();
     final itemPriceController = TextEditingController();
+    final itemCountController = TextEditingController();
     await showDialog(
       context: context,
       builder: (context) {
@@ -24,12 +25,18 @@ class _AddItemspageState extends State<AddItemspage> {
             children: [
               TextField(
                 controller: itemNameController,
+                keyboardType: TextInputType.name,
                 decoration: const InputDecoration(hintText: 'Enter item name'),
               ),
               TextField(
                 controller: itemPriceController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(hintText: 'Enter item price'),
+              ),
+              TextField(
+                controller: itemCountController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(hintText: 'Enter item stock'),
               ),
             ],
           ),
@@ -42,11 +49,12 @@ class _AddItemspageState extends State<AddItemspage> {
               onPressed: () {
                 final itemName = itemNameController.text;
                 final itemPrice = double.parse(itemPriceController.text);
+                final itemStock = int.parse(itemCountController.text);
                 final newItem = Item(
                   name: itemName,
                   price: itemPrice,
                   imagePath: '',
-                  count: 0,
+                  count: itemStock,
                   max: 10,
                 );
                 context
@@ -113,7 +121,8 @@ class _AddItemspageState extends State<AddItemspage> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text(item.name),
-                                Text(item.price.toString()),
+                                Text('Price: ${item.price.toString()}'),
+                                Text('Stocks: ${item.count.toString()}'),
                               ],
                             ),
                             IconButton(

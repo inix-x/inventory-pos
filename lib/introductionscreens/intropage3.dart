@@ -49,10 +49,13 @@ class IntroPage3 extends StatelessWidget {
             ),
           ),
           Container(
+            height: 400,
             color: Colors.transparent,
             child: Center(
               child: Lottie.asset(
-                  'assets/animations/checkouthand.json'),
+                  'assets/animations/checkouthand.json',
+                  width: 350,
+                  height: 350,),
             ),
           ),
         ],

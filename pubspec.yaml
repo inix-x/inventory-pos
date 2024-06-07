@@ -49,8 +49,7 @@ dependencies:
   cloud_firestore:
   firebase_storage:
   provider: ^6.1.2
-  
-
+  fluttertoast: ^8.2.6
 
 
 

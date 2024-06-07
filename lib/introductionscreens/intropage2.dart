@@ -49,10 +49,14 @@ class IntroPage2 extends StatelessWidget {
             ),
           ),
           Container(
+            height: 350,
             color: Colors.transparent,
             child: Center(
               child: Lottie.asset(
-                  'assets/animations/inventoryanimation.json'),
+                  'assets/animations/inventoryanimation.json',
+                  width: 350,
+                  height: 350,),
+                  
             ),
           ),
         ],

@@ -4,6 +4,8 @@ import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/customersignout.dart';
 import 'package:flutter_application_1/loginwidget/loginpage.dart';
+import 'package:flutter_application_1/providers/categoryprovider.dart';
+import 'package:provider/provider.dart';
 // import 'package:flutter_application_1/loginwidget/customersignout.dart';
 import '../screens/menupage.dart';
 import '../screens/accountpage.dart';
@@ -34,7 +36,12 @@ class _HomeAppState extends State<HomeApp> {
 
   @override
   Widget build(BuildContext context) {
-    // final businessName = context.watch<CategoryProvider>().categories.first.storeName;
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final categories = categoryProvider.categories;
+
+    // Extract the storeName from the list
+    final businessName = categories.isNotEmpty ? categories.first.storeName : '';
+
     // ignore: no_leading_underscores_for_local_identifiers
     final _auth = AuthService();
     return MaterialApp(
@@ -44,16 +51,15 @@ class _HomeAppState extends State<HomeApp> {
           backgroundColor: primaryColor,
           centerTitle: true,
           title:   Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(
-                width: 50,
+                width: 30,
               ),
+              const Spacer(),
               // Text(businessName.isEmpty ? 'Nothing\'s here ' : 'Yep', style: const TextStyle(color: accentColor)),
-              const Text('Nothing\'s here ', style: TextStyle(color: accentColor)),
-              const SizedBox(
-                width: 50,
-              ),
+               Text('$businessName ', style: const TextStyle(color: accentColor)),
+               const Spacer(),
                   Customsignout(
                 onPressed: () async {
                   await _auth.signout();
@@ -62,6 +68,9 @@ class _HomeAppState extends State<HomeApp> {
                 },
                 icon: const Icon(Icons.logout_sharp,
                     color: Colors.white), // Add icon and color
+              ),
+               const SizedBox(
+                width: 10,
               ),
             ],
           ),

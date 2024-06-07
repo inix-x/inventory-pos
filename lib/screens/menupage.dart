@@ -174,7 +174,7 @@ double calculateTotalPrice(List<SelectedItem> selectedItems) {
             children: [
               Text('Menu', style: GoogleFonts.lato(),
               ),
-              IconButton(onPressed: (){}, icon: const Icon(Icons.edit)),
+              // IconButton(onPressed: (){}, icon: const Icon(Icons.edit)),
             ],
           )
         ),

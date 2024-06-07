@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       ChangeNotifierProvider(create: (context) => CategoryProvider(categories: []),
       ),
     ],
-    child:  const MaterialApp(
+    child:  const MaterialApp( 
       debugShowCheckedModeBanner: false, // Optional: Hide debug banner in all modes
       home: GetStarted(),
     ), 
