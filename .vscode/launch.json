@@ -14,7 +14,7 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "debug",  // Change here to "debug"
-            "program": "./lib/main.dart",
+            "program": "${workspaceFolder}/lib/main.dart",
             "cwd": "${workspaceFolder}"
           }
           ,

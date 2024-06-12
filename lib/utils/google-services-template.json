@@ -1,6 +1,6 @@
 {
     "project_info": {
-      "project_number": "465781859784",
+      "project_number": "${PROJECT_NUMBER}",
       "project_id": "${PROJECT_ID}",
       "storage_bucket": "${PROJECT_ID}.appspot.com"
     },
