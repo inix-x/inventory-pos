@@ -52,6 +52,7 @@ dependencies:
   fluttertoast: ^8.2.6
   sqflite: ^2.3.3+1
   path: ^1.9.0
+  flutter_dotenv: ^5.1.0
 
 
 
