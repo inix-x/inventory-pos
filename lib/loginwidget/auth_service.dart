@@ -16,6 +16,7 @@
           showToast(message: 'The email is already in use.');
         }else{
           showToast(message: 'An error occured: ${e.code}');
+          print(e);
         }
       }
       return null;

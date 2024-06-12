@@ -28,8 +28,6 @@ class Setuppage extends StatefulWidget {
 String storeName = '';
 
 class _SetuppageState extends State<Setuppage> {
-  // ignore: prefer_final_fields
-
   void _addNewCategory() async {
     final categoryName = await showDialog(
       context: context,
@@ -123,6 +121,8 @@ class _SetuppageState extends State<Setuppage> {
         print('--- Saved File Content ---');
         print(fileContent);
       }
+
+      
     } else {
       showToast(message: 'No categories found!');
       
@@ -130,23 +130,30 @@ class _SetuppageState extends State<Setuppage> {
   }
 
   void fetchData() async {
-    const appDocPath =
-        '/data/user/0/com.example.flutter_application_1/app_flutter/categories.json';
-    final data = await _readDataFromFile(appDocPath);
-    if (data != null) {
-      final decodedData = jsonDecode(data) as List<dynamic>;
-      final categories = decodedData
-          .map((categoryData) => Category(categoryData as List<String>))
-          .toList();
-      // ignore: use_build_context_synchronously
-      context.read<category_provider.CategoryProvider>().updateCategories(
-          categories.cast<
-              category_provider.Category>()); // Update provider with alias
-    }
+
+    //fetchData for Sqflite
+    context.watch<category_provider.CategoryProvider>().fetchDatabase();
+
+    //fetchdata for Path_provider
+
+    // const appDocPath =
+    //     '/data/user/0/com.example.flutter_application_1/app_flutter/categories.json';
+    // final data = await _readDataFromFile(appDocPath);
+    // if (data != null) {
+    //   final decodedData = jsonDecode(data) as List<dynamic>;
+    //   final categories = decodedData
+    //       .map((categoryData) => Category(categoryData as List<String>))
+    //       .toList();
+    //   // ignore: use_build_context_synchronously
+    //   context.read<category_provider.CategoryProvider>().updateCategories(
+    //       categories.cast<
+    //           category_provider.Category>()); // Update provider with alias
+    // }
   }
 
+  // ignore: unused_element
   Future<String?> _readDataFromFile(String filePath) async {
-    try {
+    try { 
       final file = File(filePath);
       final contents = await file.readAsString();
       return contents;
@@ -171,6 +178,7 @@ class _SetuppageState extends State<Setuppage> {
     final DatabaseService _databaseService = DatabaseService.instance;
     // ignore: no_leading_underscores_for_local_identifiers
     final _auth = AuthService();
+    _databaseService.fetchData();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading:
@@ -283,6 +291,7 @@ class _SetuppageState extends State<Setuppage> {
                   if(categoryName == '') return;
                   outputData();
                   _databaseService.addToDatabase(businessName, categoryName, itemList as List<category_provider.Item>);
+                  
                   Navigator.push(
                       context,
                       MaterialPageRoute(

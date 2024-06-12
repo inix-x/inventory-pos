@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_application_1/providers/categoryprovider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -45,6 +45,8 @@ class DatabaseService {
   //   return database;
   // }
 
+
+//open database
 Future<Database> getDatabase() async {
   final databaseDirPath = await getDatabasesPath();
   final databasePath = join(databaseDirPath, 'master_db.db');
@@ -53,7 +55,7 @@ Future<Database> getDatabase() async {
       CREATE TABLE $_menuTableName (
         $_menuIdColumnName INTEGER PRIMARY KEY, 
         $_menuStoreNameContent TEXT NOT NULL, 
-        $_menuCategoryNameContent TEXT NOT NULL, 
+        $_menuCategoryNameContent TEXT NOT NULL,  
         $_menuItemsListContent TEXT NOT NULL, 
         $_menuStatusColumn INTEGER NOT NULL
       )
@@ -62,7 +64,7 @@ Future<Database> getDatabase() async {
   return database;
 }
 
-
+//adding data to database
 void addToDatabase(String storeName, String name, List<Item> items) async {
   try {
     final db = await database;
@@ -80,6 +82,17 @@ void addToDatabase(String storeName, String name, List<Item> items) async {
   }
 }
 
+//fetching data for output
+Future<List<Map<String, Object?>>> fetchData() async{
+  final db = await database;
+  final data = await db.query(_menuTableName);
+  if (kDebugMode) {
+    print(data);
+  }
+  return data;
+}
+
+
 
 //   void addToDatabase(String storeName, String name, List<Item> items) async {
 //   final db = await database;
@@ -94,12 +107,3 @@ void addToDatabase(String storeName, String name, List<Item> items) async {
 
 
 }
-// void addToDatabase(String storeName, String name, String items) async {
-  //   final db = await database;
-  //   await db.insert(_menuTableName, {
-  //     _menuStoreNameContent: storeName,
-  //     _menuCategoryNameContent: name,
-  //     _menuItemsListContent: items,
-  //     _menuStatusColumn: 0,
-  //   });
-  // }
