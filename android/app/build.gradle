@@ -51,6 +51,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        
     }
 
     buildTypes {
@@ -67,4 +68,7 @@ flutter {
 }
 
 
-dependencies {}
+
+dependencies {
+    implementation 'com.google.firebase:firebase-appcheck-playintegrity:16.0.0'
+}

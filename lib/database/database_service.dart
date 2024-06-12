@@ -1,0 +1,105 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_application_1/providers/categoryprovider.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+// ignore: unnecessary_import
+import 'package:sqflite/sqlite_api.dart';
+
+class DatabaseService {
+  static Database? _db;
+  static final DatabaseService instance = DatabaseService._constructor();
+
+  final String _menuTableName = "menu";
+  final String _menuIdColumnName = "id";
+  final String _menuStoreNameContent = "storeNameContent";
+  final String _menuCategoryNameContent = "CategoryNameContent";
+  final String _menuItemsListContent = "ItemsListContent";
+  final String _menuStatusColumn = "status";
+
+  DatabaseService._constructor();
+
+  Future<Database> get database async {
+    if (_db != null) return _db!;
+    _db = await getDatabase();
+    return _db!;
+  }
+
+  // Future<Database> getDatabase() async {
+  //   final databaseDirPath = await getDatabasesPath();
+  //   final databasePath = join(databaseDirPath, 'master_db.db');
+  //   final database =
+  //       await openDatabase(databasePath, version: 1, onCreate: (db, version) {
+  //     db.execute('''
+  //     CREATE TABLE $_menuTableName (
+  //       $_menuIdColumnName INTEGER PRIMARY KEY, 
+  //       $_menuStoreNameContent TEXT NOT NULL, 
+  //       $_menuCategoryNameContent TEXT NOT NULL, 
+  //       $_menuItemsListContent TEXT NOT NULL, 
+  //       $_menuStatusColumn INTEGER NOT NULL,
+
+  //     )
+  //     ''');
+  //   });
+  //   return database;
+  // }
+
+Future<Database> getDatabase() async {
+  final databaseDirPath = await getDatabasesPath();
+  final databasePath = join(databaseDirPath, 'master_db.db');
+  final database = await openDatabase(databasePath, version: 1, onCreate: (db, version) async {
+   await db.execute('''
+      CREATE TABLE $_menuTableName (
+        $_menuIdColumnName INTEGER PRIMARY KEY, 
+        $_menuStoreNameContent TEXT NOT NULL, 
+        $_menuCategoryNameContent TEXT NOT NULL, 
+        $_menuItemsListContent TEXT NOT NULL, 
+        $_menuStatusColumn INTEGER NOT NULL
+      )
+    ''');
+  });
+  return database;
+}
+
+
+void addToDatabase(String storeName, String name, List<Item> items) async {
+  try {
+    final db = await database;
+    final encodedItems = jsonEncode(items); // Encode List as JSON string
+    await db.insert(_menuTableName, {
+      _menuStoreNameContent: storeName,
+      _menuCategoryNameContent: name,
+      _menuItemsListContent: encodedItems,
+      _menuStatusColumn: 0,
+    });
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error adding data to database: $e');
+    }
+  }
+}
+
+
+//   void addToDatabase(String storeName, String name, List<Item> items) async {
+//   final db = await database;
+//   final encodedItems = jsonEncode(items); // Encode List as JSON string
+//   await db.insert(_menuTableName, {
+//     _menuStoreNameContent: storeName,
+//     _menuCategoryNameContent: name,
+//     _menuItemsListContent: encodedItems,
+//     _menuStatusColumn: 0,
+//   });
+// }
+
+
+}
+// void addToDatabase(String storeName, String name, String items) async {
+  //   final db = await database;
+  //   await db.insert(_menuTableName, {
+  //     _menuStoreNameContent: storeName,
+  //     _menuCategoryNameContent: name,
+  //     _menuItemsListContent: items,
+  //     _menuStatusColumn: 0,
+  //   });
+  // }

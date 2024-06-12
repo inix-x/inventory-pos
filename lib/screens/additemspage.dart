@@ -22,21 +22,26 @@ class _AddItemspageState extends State<AddItemspage> {
         return AlertDialog(
           title: const Text('Add Item'),
           content: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               TextField(
                 controller: itemNameController,
                 keyboardType: TextInputType.name,
-                decoration: const InputDecoration(hintText: 'Enter item name'),
+                decoration: const InputDecoration( border: OutlineInputBorder(), hintText: 'Enter item name'),
               ),
+              const SizedBox(height: 10,),
               TextField(
                 controller: itemPriceController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(hintText: 'Enter item price'),
+                decoration: const InputDecoration( border: OutlineInputBorder(), hintText: 'Enter item price'),
               ),
+              const SizedBox(height: 10,),
               TextField(
+                
                 controller: itemCountController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(hintText: 'Enter item stock'),
+                decoration: const InputDecoration( border: OutlineInputBorder(), hintText: 'Enter item stock'),
               ),
             ],
           ),

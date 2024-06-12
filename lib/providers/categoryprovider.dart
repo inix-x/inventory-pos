@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+
+//provider 
 class CategoryProvider extends ChangeNotifier {
+  // ignore: unused_field
+  
   List<Category> categories = [];
 
   CategoryProvider({
@@ -36,10 +40,12 @@ class CategoryProvider extends ChangeNotifier {
 
 }
 
+//data model
 class Category {
+  final String storeName;
   final String name;
   final List<Item> items;
-  final String storeName;
+
 
   Category({ required this.name,  required this.items, required this.storeName, });
   Map<String, dynamic> toJson() => {

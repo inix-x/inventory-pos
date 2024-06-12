@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       if (user != null) {
         if (kDebugMode) {
-          print("User Logged In");
+          showToast(message: 'Successfully Logged In!');
         }
         // ignore: use_build_context_synchronously
         goToSetup(context);
