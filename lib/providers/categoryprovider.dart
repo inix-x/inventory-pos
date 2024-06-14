@@ -1,13 +1,14 @@
 import 'package:flutter/foundation.dart';
 // ignore: unnecessary_import
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/database/database_service.dart';
 
 
 //provider 
 class CategoryProvider extends ChangeNotifier {
   //needs a conditional here to check if the sqflite table is not empty then make assign it to the categories List
   //else proceed with the original code below.
-  //  final DatabaseService _databaseService = DatabaseService.instance; 
+   final DatabaseService _databaseService = DatabaseService.instance; 
   List<Category> categories = [];
 
   CategoryProvider({
@@ -40,14 +41,14 @@ class CategoryProvider extends ChangeNotifier {
   categories[index].items.removeAt(index);
   notifyListeners(); // Notify listeners in your Setuppage class about the change
 }
-  // void fetchDatabase()  async {
-  //   //get the database by fetching 
-  //   List <Category> categories1 =  await _databaseService.fetchData() ;
-  //   if (kDebugMode) {
-  //     print(categories1.toList());
-  //   }
-  //   notifyListeners();
-  // }
+  void fetchDatabase()  async {
+    //get the database by fetching 
+    List  categories1 =  await _databaseService.fetchData() ;
+    if (kDebugMode) {
+      print(categories1.toList());
+    }
+    notifyListeners();
+  }
 
 }
 

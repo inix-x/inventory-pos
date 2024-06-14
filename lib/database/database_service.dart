@@ -64,10 +64,10 @@ void addToDatabase(String storeName, String name, List<Item> items) async {
 }
 
 //fetching data for output
-Future<List<Category>> fetchData() async {
+Future<List<Map<String, Object?>>> fetchData() async {
   final db = await DatabaseService.instance.database;
   final maps = await db.query('menu');
-   return maps.cast<Category>(); // Cast the list to List<Category>
+   return maps.toList(); // Cast the list to List<Category>
 }
 
 // Future<List<Map<String, Object?>>> fetchData() async{

@@ -28,6 +28,7 @@ class Setuppage extends StatefulWidget {
 
 class _SetuppageState extends State<Setuppage> {
   String storeName = '';
+  String categoryName = '';
   void _addNewCategory() async {
   final categoryNameController = TextEditingController();
 
@@ -51,12 +52,14 @@ class _SetuppageState extends State<Setuppage> {
             ),
             TextButton(
               onPressed: () {
-                final categoryName = categoryNameController.text;
+                 setState(() {
+                   categoryName = categoryNameController.text;
+                 });
                 if (categoryName.isNotEmpty) {
                   context
                       .read<category_provider.CategoryProvider>()
                       .addNewCat(
-                          newCategoryNames: categoryName, newItems: [], newStoreName: '');
+                          newCategoryNames: categoryName, newItems: [], newStoreName: storeName);
                   Navigator.pop(context);
                 }
               },
@@ -139,6 +142,13 @@ void _addNewStoreName() async {
 //   );
 // }
 
+//fetching data for output
+Future<List<Map<String, Object?>>> fetchData() async {
+  final db = await DatabaseService.instance.database;
+  final maps = await db.query('menu');
+  return maps.toList();
+}
+
 
   void _removeCategory(int index) {
     // Get the CategoryProvider instance using Provider.of
@@ -173,8 +183,12 @@ void _addNewStoreName() async {
 
         // Read the saved file content
         final fileContent = await file.readAsString();
-        print('--- Saved File Content ---');
+        print('--- Saved File Content below is from JSON ---');
         print(fileContent);
+        print('------------------');
+        print('--- Saved File Content below is from SQFLITE ---');
+         // ignore: use_build_context_synchronously
+         context.read<category_provider.CategoryProvider>().fetchDatabase();
       }
 
       
@@ -211,11 +225,12 @@ void _addNewStoreName() async {
         Provider.of<category_provider.CategoryProvider>(context);
     final categories = categoryProvider.categories;
     final businessName = categories.isNotEmpty ? categories.first.storeName : '';
-    final categoryName = categories.isNotEmpty && categories.first.name.length > 1 ? categories.first.name[1] : '';
+    final categoryName = categories.isNotEmpty ? categories.first.name : '';
+    // final categoryName = categories.isNotEmpty && categories.first.name.length > 1 ? categories.first.name[1] : '';
     final itemList = categories.isNotEmpty ? categories.first.items : [];
 
     
-    // ignore: unused_field, no_leading_underscores_for_local_identifiers
+    // ignore: unused_field, no_leading_underscores_for_local_identifiers, unused_local_variable
     final DatabaseService _databaseService = DatabaseService.instance;
     // ignore: no_leading_underscores_for_local_identifiers
     final _auth = AuthService();
@@ -228,6 +243,7 @@ void _addNewStoreName() async {
         centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Customsignout(
               onPressed: () async {
@@ -299,7 +315,7 @@ void _addNewStoreName() async {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        AddItemspage(itemIndex: index)),
+                                        AddItemspage(itemIndex: index, catName: categoryName, storeName: businessName, items: itemList  as List<category_provider.Item>)),
                               );
                               //show another dialouge
                             },
@@ -332,8 +348,6 @@ void _addNewStoreName() async {
                 onPressed: () {
                   if(categoryName == '') return;
                   outputData();
-                  _databaseService.addToDatabase(businessName, categoryName, itemList as List<category_provider.Item>);
-                  
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -343,6 +357,7 @@ void _addNewStoreName() async {
                 child: const Text('Save Category and Items'),
               ),
               MaterialButton(
+               
                   onPressed: () async {
                     final appDocDir = await getApplicationDocumentsDirectory();
                     final appDocPath = appDocDir.path;
