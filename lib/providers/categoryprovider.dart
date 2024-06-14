@@ -1,19 +1,19 @@
+import 'package:flutter/foundation.dart';
+// ignore: unnecessary_import
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/database/database_service.dart';
 
 
 //provider 
 class CategoryProvider extends ChangeNotifier {
-  final DatabaseService _databaseService = DatabaseService.instance;
   //needs a conditional here to check if the sqflite table is not empty then make assign it to the categories List
   //else proceed with the original code below.
-  
+  //  final DatabaseService _databaseService = DatabaseService.instance; 
   List<Category> categories = [];
 
   CategoryProvider({
     required this.categories,
   });
-
+    //para saan to?
     void updateCategories(List<Category> newCategories) {
     categories = newCategories;
     notifyListeners();
@@ -36,15 +36,18 @@ class CategoryProvider extends ChangeNotifier {
   notifyListeners(); // Notify listeners in your Setuppage class about the change
 }
 
-  void removeItem(int index) {
+  void removeItem(int index) {  
   categories[index].items.removeAt(index);
   notifyListeners(); // Notify listeners in your Setuppage class about the change
 }
-  void fetchDatabase()  {
-    //get the database by fetching 
-    categories =  _databaseService.fetchData() as List<Category>;
-    notifyListeners();
-  }
+  // void fetchDatabase()  async {
+  //   //get the database by fetching 
+  //   List <Category> categories1 =  await _databaseService.fetchData() ;
+  //   if (kDebugMode) {
+  //     print(categories1.toList());
+  //   }
+  //   notifyListeners();
+  // }
 
 }
 
@@ -54,7 +57,7 @@ class Category {
   final String name;
   final List<Item> items;
 
-
+  
   Category({ required this.name,  required this.items, required this.storeName, });
   Map<String, dynamic> toJson() => {
     'storeName' :  storeName,
@@ -85,5 +88,7 @@ class Item {
     'count': count,
     'max': max,
   };
+
+ 
 }
 

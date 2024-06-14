@@ -19,5 +19,5 @@ void main() {
   final outputFile = File('android/app/google-services.json');
   outputFile.writeAsStringSync(template);
 
-  print('google-services.json generated successfully.');
+  // print('google-services.json generated successfully.');
 }

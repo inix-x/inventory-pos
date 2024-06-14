@@ -26,25 +26,6 @@ class DatabaseService {
     return _db!;
   }
 
-  // Future<Database> getDatabase() async {
-  //   final databaseDirPath = await getDatabasesPath();
-  //   final databasePath = join(databaseDirPath, 'master_db.db');
-  //   final database =
-  //       await openDatabase(databasePath, version: 1, onCreate: (db, version) {
-  //     db.execute('''
-  //     CREATE TABLE $_menuTableName (
-  //       $_menuIdColumnName INTEGER PRIMARY KEY, 
-  //       $_menuStoreNameContent TEXT NOT NULL, 
-  //       $_menuCategoryNameContent TEXT NOT NULL, 
-  //       $_menuItemsListContent TEXT NOT NULL, 
-  //       $_menuStatusColumn INTEGER NOT NULL,
-
-  //     )
-  //     ''');
-  //   });
-  //   return database;
-  // }
-
 
 //open database
 Future<Database> getDatabase() async {
@@ -83,27 +64,18 @@ void addToDatabase(String storeName, String name, List<Item> items) async {
 }
 
 //fetching data for output
-Future<List<Map<String, Object?>>> fetchData() async{
-  final db = await database;
-  final data = await db.query(_menuTableName);
-  if (kDebugMode) {
-    print(data);
-  }
-  return data;
+Future<List<Category>> fetchData() async {
+  final db = await DatabaseService.instance.database;
+  final maps = await db.query('menu');
+   return maps.cast<Category>(); // Cast the list to List<Category>
 }
 
-
-
-//   void addToDatabase(String storeName, String name, List<Item> items) async {
+// Future<List<Map<String, Object?>>> fetchData() async{
 //   final db = await database;
-//   final encodedItems = jsonEncode(items); // Encode List as JSON string
-//   await db.insert(_menuTableName, {
-//     _menuStoreNameContent: storeName,
-//     _menuCategoryNameContent: name,
-//     _menuItemsListContent: encodedItems,
-//     _menuStatusColumn: 0,
-//   });
+//   final data = await db.query(_menuTableName);
+//   if (kDebugMode) {
+//     print(data);
+//   }
+//   return data;
 // }
-
-
 }

@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_string_interpolations
 
 import 'dart:convert';
 import 'dart:io';
@@ -25,65 +24,121 @@ class Setuppage extends StatefulWidget {
   State<Setuppage> createState() => _SetuppageState();
 }
 
-String storeName = '';
+
 
 class _SetuppageState extends State<Setuppage> {
+  String storeName = '';
   void _addNewCategory() async {
-    final categoryName = await showDialog(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Add Category'),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Category Name',
-              ),
-              onSubmitted: (value) => Navigator.pop(context, value),
-            ),
-          ),
-        ],
-      ),
-    );
-    if (categoryName != null && categoryName.isNotEmpty) {
-      setState(() {
-        if (categoryName == null || categoryName == '') return;
-        context.read<category_provider.CategoryProvider>().addNewCat(
-            newCategoryNames: categoryName,
-            newItems: [],
-            newStoreName: storeName);
-        // _databaseService.addToDatabase(storeName, categoryName, [] as String);
-      });
-    }
-  }
+  final categoryNameController = TextEditingController();
 
-  void _addNewStoreName() async {
-    final businessName = await showDialog(
+  await showDialog(
       context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Add Business Name'),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Business Name',
-              ),
-              onSubmitted: (value) => Navigator.pop(context, value),
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add Category'),
+          content: TextField(
+            autofocus: true,
+            keyboardType: TextInputType.name,
+            controller: categoryNameController,
+            decoration: const InputDecoration(
+              labelText: 'Category Name',
             ),
           ),
-        ],
-      ),
-    );
-    if (businessName != null && businessName.isNotEmpty) {
-      setState(() {
-        storeName = businessName;
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final categoryName = categoryNameController.text;
+                if (categoryName.isNotEmpty) {
+                  context
+                      .read<category_provider.CategoryProvider>()
+                      .addNewCat(
+                          newCategoryNames: categoryName, newItems: [], newStoreName: '');
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
       });
-    }
-  }
+}
+
+void _addNewStoreName() async {
+  final storeNameController = TextEditingController();
+
+  await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add Category'),
+          content: TextField(
+            autofocus: true,
+            keyboardType: TextInputType.name,
+            controller: storeNameController,
+            decoration: const InputDecoration(
+              labelText: 'Category Name',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final storeNameHolder = storeNameController.text;
+                if (storeNameHolder.isNotEmpty) {
+                  setState(() {
+                    storeName = storeNameHolder;
+                  });
+                  Navigator.pop(context);
+                }
+              }, 
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      });
+}
+//   void _addNewStoreName() async {
+//   final businessNameController = TextEditingController();
+
+//     await showDialog(
+//     context: context,
+//     builder: (context) => AlertDialog(
+//       title: const Text('Add Business Name'),
+//       content: TextField(
+//         controller: businessNameController,
+//         autofocus: true,
+//         decoration: const InputDecoration(
+//           labelText: 'Business Name',
+//         ),
+//       ),
+//       actions: [
+//         TextButton(
+//           onPressed: () => Navigator.pop(context), // Cancel button
+//           child: const Text('Cancel'),
+//         ),
+//         TextButton(
+//           onPressed: () {
+//             if (businessNameController.text.isNotEmpty) {
+//               setState(() {
+//                 storeName = businessNameController.text;
+//               });
+//               Navigator.pop(context); // Save button
+//             }
+//           },
+//           child: const Text('Save'),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
 
   void _removeCategory(int index) {
     // Get the CategoryProvider instance using Provider.of
@@ -129,27 +184,12 @@ class _SetuppageState extends State<Setuppage> {
     }
   }
 
-  void fetchData() async {
+  // void fetchData() async {
 
-    //fetchData for Sqflite
-    context.watch<category_provider.CategoryProvider>().fetchDatabase();
-
-    //fetchdata for Path_provider
-
-    // const appDocPath =
-    //     '/data/user/0/com.example.flutter_application_1/app_flutter/categories.json';
-    // final data = await _readDataFromFile(appDocPath);
-    // if (data != null) {
-    //   final decodedData = jsonDecode(data) as List<dynamic>;
-    //   final categories = decodedData
-    //       .map((categoryData) => Category(categoryData as List<String>))
-    //       .toList();
-    //   // ignore: use_build_context_synchronously
-    //   context.read<category_provider.CategoryProvider>().updateCategories(
-    //       categories.cast<
-    //           category_provider.Category>()); // Update provider with alias
-    // }
-  }
+  //   //fetchData for Sqflite
+  //   context.watch<category_provider.CategoryProvider>().fetchDatabase();
+    
+  // }
 
   // ignore: unused_element
   Future<String?> _readDataFromFile(String filePath) async {
@@ -174,11 +214,12 @@ class _SetuppageState extends State<Setuppage> {
     final categoryName = categories.isNotEmpty && categories.first.name.length > 1 ? categories.first.name[1] : '';
     final itemList = categories.isNotEmpty ? categories.first.items : [];
 
+    
     // ignore: unused_field, no_leading_underscores_for_local_identifiers
     final DatabaseService _databaseService = DatabaseService.instance;
     // ignore: no_leading_underscores_for_local_identifiers
     final _auth = AuthService();
-    _databaseService.fetchData();
+    // fetchData();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading:
@@ -198,18 +239,19 @@ class _SetuppageState extends State<Setuppage> {
                   color: Colors.white), // Add icon and color
             ),
             const Spacer(),
-            // Text(businessName.isEmpty ? 'Nothing\'s here ' : 'Yep', style: const TextStyle(color: accentColor)),
+           
             storeName.isEmpty
                 ? const Text(
                     'Business Name',
                     style: TextStyle(color: accentColor),
                   )
                 : Text(
-                    '$storeName',
+                    storeName,
                     style: const TextStyle(color: accentColor),
                   ),
             IconButton(
-                onPressed: _addNewStoreName,
+              onPressed: _addNewStoreName,  
+                // onPressed: _addNewStoreName,
                 icon: const Icon(
                   Icons.edit,
                   color: accentColor,
