@@ -197,7 +197,7 @@ class _AddItemspageState extends State<AddItemspage> {
                 if (kDebugMode) {
                   print('--- Saved File Content below is from SQFLITE ---');
                 }
-                // ignore: use_build_context_synchronously
+                
                 context
                     .read<category_provider.CategoryProvider>()
                     .fetchDatabase();

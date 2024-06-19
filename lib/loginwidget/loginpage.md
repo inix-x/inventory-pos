@@ -24,9 +24,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    super.dispose();
     _email.dispose();
     _password.dispose();
-    super.dispose();
   }
 
   void isPasswordVisible() {
@@ -190,27 +190,18 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         isSigningIn = true;
       });
+      final user = await _auth.loginUserWithEmailAndPassword(
+          _email.text, _password.text);
 
-      try {
-        final user = await _auth.loginUserWithEmailAndPassword(
-            _email.text, _password.text);
-
-        if (user != null) {
-          if (kDebugMode) {
-            showToast(message: 'Successfully Logged In!');
-          }
-          if (mounted) {
-            goToSetup(context);
-          }
+      setState(() {
+        isSigningIn = false;
+      });
+      if (user != null) {
+        if (kDebugMode) {
+          showToast(message: 'Successfully Logged In!');
         }
-      } catch (e) {
-        showToast(message: 'Login failed. Please try again.');
-      } finally {
-        if (mounted) {
-          setState(() {
-            isSigningIn = false;
-          });
-        }
+        // ignore: use_build_context_synchronously
+        goToSetup(context);
       }
     }
   }

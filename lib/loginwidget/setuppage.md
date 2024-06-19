@@ -136,25 +136,15 @@ class _SetuppageState extends State<Setuppage> {
         print('--- Saved File Content ---');
         print(fileContent);
         print('-------------------------');
-       
+        // ignore: use_build_context_synchronously
+        context.read<category_provider.CategoryProvider>().fetchDatabase();
       }
-        if (mounted) {
-      context.read<category_provider.CategoryProvider>().fetchDatabase();
-    }
     } else {
       showToast(message: 'No categories found!');
     }
   }
 
-  //signout
-   Future<void> _handleSignOut() async {
-    // ignore: no_leading_underscores_for_local_identifiers
-    final _auth = AuthService();
-    await _auth.signout();
-    if (mounted) {
-      goToLogin(context);
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +154,8 @@ class _SetuppageState extends State<Setuppage> {
     final businessName = categories.isNotEmpty ? categories.first.storeName : '';
     final categoryName = categories.isNotEmpty ? categories.first.name : '';
     final itemList = categories.isNotEmpty ? categories.first.items : [];
-// ignore: no_leading_underscores_for_local_identifiers
+    // ignore: no_leading_underscores_for_local_identifiers
+    final _auth = AuthService();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -175,7 +166,11 @@ class _SetuppageState extends State<Setuppage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Customsignout(
-              onPressed: _handleSignOut,
+              onPressed: () async {
+                await _auth.signout();
+                // ignore: use_build_context_synchronously
+                goToLogin(context);
+              },
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             ),
             const Spacer(),
@@ -209,7 +204,7 @@ class _SetuppageState extends State<Setuppage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               context.watch<category_provider.CategoryProvider>().categories.isNotEmpty
-                  ? Flexible(
+                  ? Expanded(
                       child: ListView.builder(
                         itemCount: context.watch<category_provider.CategoryProvider>().categories.length,
                         itemBuilder: (context, index) {
