@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/database/database_service.dart';
+import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
 import 'package:flutter_application_1/providers/categoryprovider.dart'
     as category_provider;
@@ -189,7 +189,7 @@ class _AddItemspageState extends State<AddItemspage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                 elevation: 10,
+                elevation: 10,
               ),
               onPressed: () {
                 _databaseService.addToDatabase(
@@ -197,11 +197,11 @@ class _AddItemspageState extends State<AddItemspage> {
                 if (kDebugMode) {
                   print('--- Saved File Content below is from SQFLITE ---');
                 }
-                
+
                 context
                     .read<category_provider.CategoryProvider>()
                     .fetchDatabase();
-                    Navigator.pop(context);
+                Navigator.pop(context);
                 showToast(message: 'Items Successfully Saved');
               },
               child: const Text('Save'),
