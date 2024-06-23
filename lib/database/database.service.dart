@@ -90,19 +90,21 @@ class DatabaseService {
   }
 
   Future<void> addCategoryWithItems(
-      String storeName, String categoryName, List<Item> items) async {
+      String categoryName, List<Item> items) async {
     final db = await database;
     try {
       await db.transaction((txn) async {
         // Insert the category
         int categoryId = await txn.insert('categories', {
-          'storeName': storeName,
           'categoryName': categoryName,
         });
-
-        // Insert the items
-        for (var item in items) {
-          await txn.insert('items', item.toMap(categoryId));
+        if (categoryId == 0) {
+          throw ('Error adding category with items to database');
+        }
+        if (items.isNotEmpty && !(categoryId.isNaN)) {
+          for (var item in items) {
+            await txn.insert('items', item.toMap(categoryId));
+          }
         }
       });
     } catch (e) {
@@ -112,16 +114,103 @@ class DatabaseService {
     }
   }
 
+  Future<void> addItems(int categoryId, List<Item> items) async {
+    final db = await database;
+    try {
+      await db.transaction((txn) async {
+        // Insert the items
+        if (items.isNotEmpty && !(categoryId.isNaN)) {
+          for (var item in items) {
+            await txn.insert('items', item.toMap(categoryId));
+          }
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error adding category with items to database: $e');
+      }
+    }
+  }
+
+  Future<Map<String, Object?>?> addCategory(String categoryName) async {
+    final db = await database;
+    try {
+      int categoryId = -1;
+      await db.transaction((txn) async {
+        categoryId = await txn.insert('categories', {
+          'categoryName': categoryName,
+        });
+      });
+
+      if (categoryId != -1) {
+        final List<Map<String, Object?>> maps = await db.query(
+          'categories',
+          where: 'id = ?',
+          whereArgs: [categoryId],
+        );
+        if (maps.isNotEmpty) {
+          return maps.first;
+        }
+      } else {
+        return null;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error adding category with items to database: $e');
+      }
+      return null;
+    }
+    return null;
+  }
+
   Future<List<Map<String, Object?>>> fetchCategories() async {
     final db = await database;
     final maps = await db.query('categories');
     return maps.toList();
   }
 
+  Future<Map<String, Object?>> fetchCategoryById(int categoryId) async {
+    final db = await database;
+    final maps =
+        await db.query('categories', where: 'id = ?', whereArgs: [categoryId]);
+
+    if (maps.isNotEmpty) {
+      return maps.first;
+    } else {
+      return {};
+    }
+  }
+
+  Future<Map<String, Object?>> fetchCategoryByName(String categoryName) async {
+    final db = await database;
+    final maps = await db.query('categories',
+        where: 'categoryName = ?', whereArgs: [categoryName]);
+
+    if (maps.isNotEmpty) {
+      return maps.first;
+    } else {
+      return {};
+    }
+  }
+
   Future<List<Map<String, Object?>>> fetchItems(int categoryId) async {
     final db = await database;
     final maps = await db
         .query('items', where: 'categoryId = ?', whereArgs: [categoryId]);
+    return maps.toList();
+  }
+
+  Future<List<Map<String, Object?>>> fetchItemById(int itemId) async {
+    final db = await database;
+    final maps = await db.query('items', where: 'id = ?', whereArgs: [itemId]);
+    return maps.toList();
+  }
+
+  Future<List<Map<String, Object?>>> fetchItemByIdAndCategoryId(
+      int categoryId, int itemId) async {
+    final db = await database;
+    final maps = await db.query('items',
+        where: 'id = ? AND categoryId = ?', whereArgs: [categoryId, itemId]);
     return maps.toList();
   }
 

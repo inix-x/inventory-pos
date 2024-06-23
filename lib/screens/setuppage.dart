@@ -56,10 +56,7 @@ class _SetuppageState extends State<Setuppage> {
                   if (categoryName.isNotEmpty) {
                     context
                         .read<category_provider.CategoryProvider>()
-                        .addNewCat(
-                            newCategoryNames: categoryName,
-                            newItems: [],
-                            newStoreName: storeName);
+                        .addNewCat(newCategoryNames: categoryName);
                     Navigator.pop(context);
                   }
                 },
