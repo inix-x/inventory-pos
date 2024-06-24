@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/database/database_service.dart';
+import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
+import 'package:flutter_application_1/providers/categoryprovider.dart'
+    as category_provider;
 import 'package:provider/provider.dart';
 
 class AddItemspage extends StatefulWidget {
@@ -10,7 +11,9 @@ class AddItemspage extends StatefulWidget {
 
   const AddItemspage({
     super.key,
-    required this.itemIndex, required String catName, required List<category_provider.Item> items,
+    required this.itemIndex,
+    required String catName,
+    required List<category_provider.Item> items,
   });
 
   @override
@@ -79,12 +82,14 @@ class _AddItemspageState extends State<AddItemspage> {
                 );
 
                 // Update provider state
-                final categoryProvider = context.read<category_provider.CategoryProvider>();
+                final categoryProvider =
+                    context.read<category_provider.CategoryProvider>();
                 final category = categoryProvider.categories[widget.itemIndex];
                 category.items.add(newItem);
 
                 // Add item to database with dynamic category handling
-                await _databaseService.addItemToDatabase(category.name, newItem);
+                await _databaseService.addItemToDatabase(
+                    category.name, newItem);
 
                 // Fetch and print stored data
                 final storedData = await _databaseService.fetchData();
@@ -110,7 +115,8 @@ class _AddItemspageState extends State<AddItemspage> {
 
   void _removeItem(int index) {
     // Get the CategoryProvider instance using Provider.of
-    final categoryProvider = Provider.of<category_provider.CategoryProvider>(context, listen: false);
+    final categoryProvider =
+        Provider.of<category_provider.CategoryProvider>(context, listen: false);
     // Remove the category at the specified index from the provider
     categoryProvider.removeItem(index);
     // No need to modify _categories (local list) or setState
@@ -118,10 +124,14 @@ class _AddItemspageState extends State<AddItemspage> {
 
   @override
   Widget build(BuildContext context) {
-    final category = context.watch<category_provider.CategoryProvider>()
-        .categories[widget.itemIndex].name;
-    final items = context.watch<category_provider.CategoryProvider>()
-        .categories[widget.itemIndex].items;
+    final category = context
+        .watch<category_provider.CategoryProvider>()
+        .categories[widget.itemIndex]
+        .name;
+    final items = context
+        .watch<category_provider.CategoryProvider>()
+        .categories[widget.itemIndex]
+        .items;
 
     return Scaffold(
       appBar: AppBar(
@@ -137,43 +147,44 @@ class _AddItemspageState extends State<AddItemspage> {
           children: [
             items.isNotEmpty
                 ? ListView.builder(
-              shrinkWrap: true,
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return Dismissible(
-                  // Set a unique key for each item
-                  key: ValueKey(item.name),
-                  background: Container(
-                    color: Colors.red,
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  onDismissed: (_) => _removeItem(index),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(item.name),
-                              Text('Price: ${item.price.toString()}'),
-                              Text('Stocks: ${item.count.toString()}'),
-                            ],
+                    shrinkWrap: true,
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return Dismissible(
+                        // Set a unique key for each item
+                        key: ValueKey(item.name),
+                        background: Container(
+                          color: Colors.red,
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (_) => _removeItem(index),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text(item.name),
+                                    Text('Price: ${item.price.toString()}'),
+                                    Text('Stocks: ${item.count.toString()}'),
+                                  ],
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () => _removeItem(index),
+                                ),
+                              ],
+                            ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _removeItem(index),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            )
+                        ),
+                      );
+                    },
+                  )
                 : Text('Please add items for $category'),
             const SizedBox(height: 10),
             ElevatedButton(

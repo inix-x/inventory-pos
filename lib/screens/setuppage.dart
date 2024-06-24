@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
-import 'package:flutter_application_1/database/database_service.dart';
+import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/customersignout.dart';
 import 'package:flutter_application_1/loginwidget/loginpage.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
+import 'package:flutter_application_1/providers/categoryprovider.dart'
+    as category_provider;
 
 import 'package:flutter_application_1/screens/additemspage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
@@ -55,7 +56,8 @@ class _SetuppageState extends State<Setuppage> {
                   if (categoryName.isNotEmpty) {
                     context
                         .read<category_provider.CategoryProvider>()
-                        .addNewCat(newCategoryNames: categoryName, newItems: []);
+                        .addNewCat(
+                            newCategoryNames: categoryName, newItems: []);
                     Navigator.pop(context);
                   }
                 },
@@ -65,8 +67,6 @@ class _SetuppageState extends State<Setuppage> {
           );
         });
   }
-
-  
 
   Future<List<Map<String, Object?>>> fetchData() async {
     final db = await DatabaseService.instance.database;
@@ -91,7 +91,8 @@ class _SetuppageState extends State<Setuppage> {
       final filePath = '${appDocDir.path}/categories.json';
 
       final file = File(filePath);
-      final jsonData = jsonEncode(categories.map((category) => category.toJson()).toList());
+      final jsonData =
+          jsonEncode(categories.map((category) => category.toJson()).toList());
       await file.writeAsString(jsonData);
 
       if (kDebugMode) {
@@ -100,18 +101,17 @@ class _SetuppageState extends State<Setuppage> {
         print('--- Saved File Content ---');
         print(fileContent);
         print('-------------------------');
-       
       }
-        if (mounted) {
-      context.read<category_provider.CategoryProvider>().fetchDatabase();
-    }
+      if (mounted) {
+        context.read<category_provider.CategoryProvider>().fetchDatabase();
+      }
     } else {
       showToast(message: 'No categories found!');
     }
   }
 
   //signout
-   Future<void> _handleSignOut() async {
+  Future<void> _handleSignOut() async {
     // ignore: no_leading_underscores_for_local_identifiers
     final _auth = AuthService();
     await _auth.signout();
@@ -125,7 +125,7 @@ class _SetuppageState extends State<Setuppage> {
     final categoryProvider =
         Provider.of<category_provider.CategoryProvider>(context);
     final categories = categoryProvider.categories;
-   
+
     final categoryName = categories.isNotEmpty ? categories.first.name : '';
     final itemList = categories.isNotEmpty ? categories.first.items : [];
 // ignore: no_leading_underscores_for_local_identifiers
@@ -143,11 +143,10 @@ class _SetuppageState extends State<Setuppage> {
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             ),
             const Spacer(),
-             const Text(
-                    'Business Name',
-                    style: TextStyle(color: accentColor),
-                  )
-               ,
+            const Text(
+              'Business Name',
+              style: TextStyle(color: accentColor),
+            ),
             const Spacer(),
             const SizedBox(
               width: 10,
@@ -161,17 +160,26 @@ class _SetuppageState extends State<Setuppage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              context.watch<category_provider.CategoryProvider>().categories.isNotEmpty
+              context
+                      .watch<category_provider.CategoryProvider>()
+                      .categories
+                      .isNotEmpty
                   ? Flexible(
                       child: ListView.builder(
-                        itemCount: context.watch<category_provider.CategoryProvider>().categories.length,
+                        itemCount: context
+                            .watch<category_provider.CategoryProvider>()
+                            .categories
+                            .length,
                         itemBuilder: (context, index) {
-                          final category = context.watch<category_provider.CategoryProvider>().categories[index];
+                          final category = context
+                              .watch<category_provider.CategoryProvider>()
+                              .categories[index];
                           return Dismissible(
                             key: Key(category.name),
                             background: Container(
                               color: Colors.red,
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child:
+                                  const Icon(Icons.delete, color: Colors.white),
                             ),
                             onDismissed: (_) => _removeCategory(index),
                             child: GestureDetector(
@@ -182,8 +190,8 @@ class _SetuppageState extends State<Setuppage> {
                                     builder: (context) => AddItemspage(
                                       itemIndex: index,
                                       catName: categoryName,
-                                    
-                                      items: itemList as List<category_provider.Item>,
+                                      items: itemList
+                                          as List<category_provider.Item>,
                                     ),
                                   ),
                                 );
@@ -192,7 +200,8 @@ class _SetuppageState extends State<Setuppage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(category.name),
                                       IconButton(
