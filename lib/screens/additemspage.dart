@@ -2,21 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/database/database_service.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart'
-    as category_provider;
+import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
 import 'package:provider/provider.dart';
 
 class AddItemspage extends StatefulWidget {
   final int itemIndex;
-  final String catName;
-  final String storeName;
-  final List<category_provider.Item> items;
-  const AddItemspage(
-      {super.key,
-      required this.itemIndex,
-      required this.catName,
-      required this.storeName,
-      required this.items});
+
+  const AddItemspage({
+    super.key,
+    required this.itemIndex, required String catName, required List<category_provider.Item> items,
+  });
 
   @override
   State<AddItemspage> createState() => _AddItemspageState();
@@ -27,6 +22,9 @@ class _AddItemspageState extends State<AddItemspage> {
     final itemNameController = TextEditingController();
     final itemPriceController = TextEditingController();
     final itemCountController = TextEditingController();
+    // ignore: no_leading_underscores_for_local_identifiers
+    final DatabaseService _databaseService = DatabaseService.instance;
+
     await showDialog(
       context: context,
       builder: (context) {
@@ -68,7 +66,7 @@ class _AddItemspageState extends State<AddItemspage> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 final itemName = itemNameController.text;
                 final itemPrice = double.parse(itemPriceController.text);
                 final itemStock = int.parse(itemCountController.text);
@@ -79,12 +77,26 @@ class _AddItemspageState extends State<AddItemspage> {
                   count: itemStock,
                   max: 10,
                 );
-                context
-                    .read<category_provider.CategoryProvider>()
-                    .categories[widget.itemIndex]
-                    .items
-                    .add(newItem);
 
+                // Update provider state
+                final categoryProvider = context.read<category_provider.CategoryProvider>();
+                final category = categoryProvider.categories[widget.itemIndex];
+                category.items.add(newItem);
+
+                // Add item to database with dynamic category handling
+                await _databaseService.addItemToDatabase(category.name, newItem);
+
+                // Fetch and print stored data
+                final storedData = await _databaseService.fetchData();
+                if (kDebugMode) {
+                  print('--- Stored Data in Database ---');
+                  for (var data in storedData) {
+                    print(data);
+                  }
+                }
+
+                showToast(message: 'Item Successfully Saved');
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context);
                 setState(() {});
               },
@@ -98,8 +110,7 @@ class _AddItemspageState extends State<AddItemspage> {
 
   void _removeItem(int index) {
     // Get the CategoryProvider instance using Provider.of
-    final categoryProvider =
-        Provider.of<category_provider.CategoryProvider>(context, listen: false);
+    final categoryProvider = Provider.of<category_provider.CategoryProvider>(context, listen: false);
     // Remove the category at the specified index from the provider
     categoryProvider.removeItem(index);
     // No need to modify _categories (local list) or setState
@@ -107,16 +118,11 @@ class _AddItemspageState extends State<AddItemspage> {
 
   @override
   Widget build(BuildContext context) {
-    final category = context
-        .watch<category_provider.CategoryProvider>()
-        .categories[widget.itemIndex]
-        .name;
-    final items = context
-        .watch<category_provider.CategoryProvider>()
-        .categories[widget.itemIndex]
-        .items;
-    // ignore: no_leading_underscores_for_local_identifiers
-    final DatabaseService _databaseService = DatabaseService.instance;
+    final category = context.watch<category_provider.CategoryProvider>()
+        .categories[widget.itemIndex].name;
+    final items = context.watch<category_provider.CategoryProvider>()
+        .categories[widget.itemIndex].items;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -131,44 +137,43 @@ class _AddItemspageState extends State<AddItemspage> {
           children: [
             items.isNotEmpty
                 ? ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      return Dismissible(
-                        // Set a unique key for each item
-                        key: ValueKey(item.name),
-                        background: Container(
-                          color: Colors.red,
-                          child: const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        onDismissed: (_) => _removeItem(index),
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text(item.name),
-                                    Text('Price: ${item.price.toString()}'),
-                                    Text('Stocks: ${item.count.toString()}'),
-                                  ],
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () => _removeItem(index),
-                                ),
-                              ],
-                            ),
+              shrinkWrap: true,
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return Dismissible(
+                  // Set a unique key for each item
+                  key: ValueKey(item.name),
+                  background: Container(
+                    color: Colors.red,
+                    child: const Icon(Icons.delete, color: Colors.white),
+                  ),
+                  onDismissed: (_) => _removeItem(index),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(item.name),
+                              Text('Price: ${item.price.toString()}'),
+                              Text('Stocks: ${item.count.toString()}'),
+                            ],
                           ),
-                        ),
-                      );
-                    },
-                  )
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () => _removeItem(index),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            )
                 : Text('Please add items for $category'),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -183,28 +188,6 @@ class _AddItemspageState extends State<AddItemspage> {
             ),
             const SizedBox(
               height: 10,
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                 elevation: 10,
-              ),
-              onPressed: () {
-                _databaseService.addToDatabase(
-                    widget.storeName, widget.catName, widget.items);
-                if (kDebugMode) {
-                  print('--- Saved File Content below is from SQFLITE ---');
-                }
-                
-                context
-                    .read<category_provider.CategoryProvider>()
-                    .fetchDatabase();
-                    Navigator.pop(context);
-                showToast(message: 'Items Successfully Saved');
-              },
-              child: const Text('Save'),
             ),
           ],
         ),

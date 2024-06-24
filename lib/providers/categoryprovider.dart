@@ -14,18 +14,13 @@ class CategoryProvider extends ChangeNotifier {
   CategoryProvider({
     required this.categories,
   });
-    //para saan to?
-    void updateCategories(List<Category> newCategories) {
-    categories = newCategories;
-    notifyListeners();
-  }
 
   void addNewCat({
     // Renamed for clarity
-    required List<Item> newItems, required String newCategoryNames, required String newStoreName,
+    required List<Item> newItems, required String newCategoryNames, 
   }) async {
     categories.add(Category(
-      storeName: newStoreName,
+
       name: newCategoryNames,
       items: newItems, // Directly assign the provided newItems list
     ));
@@ -54,14 +49,14 @@ class CategoryProvider extends ChangeNotifier {
 
 //data model
 class Category {
-  final String storeName;
+  
   final String name;
   final List<Item> items;
 
   
-  Category({ required this.name,  required this.items, required this.storeName, });
+  Category({ required this.name,  required this.items,  });
   Map<String, dynamic> toJson() => {
-    'storeName' :  storeName,
+
     'name': name,
     'items': items.map((item) => item.toJson()).toList(), // Recursively convert items
   };
@@ -73,6 +68,7 @@ class Item {
   final String imagePath;
   int count; // Added for tracking item count
   final int max; // Added for setting maximum allowed
+ 
 
   Item({
     required this.name,

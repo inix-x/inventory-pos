@@ -55,7 +55,7 @@ class _SetuppageState extends State<Setuppage> {
                   if (categoryName.isNotEmpty) {
                     context
                         .read<category_provider.CategoryProvider>()
-                        .addNewCat(newCategoryNames: categoryName, newItems: [], newStoreName: storeName);
+                        .addNewCat(newCategoryNames: categoryName, newItems: []);
                     Navigator.pop(context);
                   }
                 },
@@ -66,43 +66,7 @@ class _SetuppageState extends State<Setuppage> {
         });
   }
 
-  void _addNewStoreName() async {
-    final storeNameController = TextEditingController();
-
-    await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Add Store Name'),
-            content: TextField(
-              autofocus: true,
-              keyboardType: TextInputType.name,
-              controller: storeNameController,
-              decoration: const InputDecoration(
-                labelText: 'Store Name',
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  final storeNameHolder = storeNameController.text;
-                  if (storeNameHolder.isNotEmpty) {
-                    setState(() {
-                      storeName = storeNameHolder;
-                    });
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text('Save'),
-              ),
-            ],
-          );
-        });
-  }
+  
 
   Future<List<Map<String, Object?>>> fetchData() async {
     final db = await DatabaseService.instance.database;
@@ -161,7 +125,7 @@ class _SetuppageState extends State<Setuppage> {
     final categoryProvider =
         Provider.of<category_provider.CategoryProvider>(context);
     final categories = categoryProvider.categories;
-    final businessName = categories.isNotEmpty ? categories.first.storeName : '';
+   
     final categoryName = categories.isNotEmpty ? categories.first.name : '';
     final itemList = categories.isNotEmpty ? categories.first.items : [];
 // ignore: no_leading_underscores_for_local_identifiers
@@ -179,22 +143,11 @@ class _SetuppageState extends State<Setuppage> {
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             ),
             const Spacer(),
-            storeName.isEmpty
-                ? const Text(
+             const Text(
                     'Business Name',
                     style: TextStyle(color: accentColor),
                   )
-                : Text(
-                    storeName,
-                    style: const TextStyle(color: accentColor),
-                  ),
-            IconButton(
-              onPressed: _addNewStoreName,
-              icon: const Icon(
-                Icons.edit,
-                color: accentColor,
-              ),
-            ),
+               ,
             const Spacer(),
             const SizedBox(
               width: 10,
@@ -229,7 +182,7 @@ class _SetuppageState extends State<Setuppage> {
                                     builder: (context) => AddItemspage(
                                       itemIndex: index,
                                       catName: categoryName,
-                                      storeName: businessName,
+                                    
                                       items: itemList as List<category_provider.Item>,
                                     ),
                                   ),
