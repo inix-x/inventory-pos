@@ -8,12 +8,14 @@ import 'package:provider/provider.dart';
 
 class AddItemspage extends StatefulWidget {
   final int itemIndex;
+  final String catName;
+  final List<Item> items;
 
   const AddItemspage({
     super.key,
     required this.itemIndex,
-    required String catName,
-    required List<category_provider.Item> items,
+    required this.catName,
+    required this.items,
   });
 
   @override
@@ -21,105 +23,226 @@ class AddItemspage extends StatefulWidget {
 }
 
 class _AddItemspageState extends State<AddItemspage> {
+  // void showInputDialog() async {
+  //   final itemNameController = TextEditingController();
+  //   final itemPriceController = TextEditingController();
+  //   final itemCountController = TextEditingController();
+  //   // ignore: no_leading_underscores_for_local_identifiers
+  //   final DatabaseService _databaseService = DatabaseService.instance;
+
+  //   await showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: const Text('Add Item'),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //           children: [
+  //             TextField(
+  //               controller: itemNameController,
+  //               keyboardType: TextInputType.name,
+  //               decoration: const InputDecoration(
+  //                   border: OutlineInputBorder(), hintText: 'Enter item name'),
+  //             ),
+  //             const SizedBox(
+  //               height: 10,
+  //             ),
+  //             TextField(
+  //               controller: itemPriceController,
+  //               keyboardType: TextInputType.number,
+  //               decoration: const InputDecoration(
+  //                   border: OutlineInputBorder(), hintText: 'Enter item price'),
+  //             ),
+  //             const SizedBox(
+  //               height: 10,
+  //             ),
+  //             TextField(
+  //               controller: itemCountController,
+  //               keyboardType: TextInputType.number,
+  //               decoration: const InputDecoration(
+  //                   border: OutlineInputBorder(), hintText: 'Enter item stock'),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: const Text('Cancel'),
+  //           ),
+  //           TextButton(
+  //             onPressed: () async {
+  //               final itemName = itemNameController.text;
+  //               final itemPrice = double.parse(itemPriceController.text);
+  //               final itemStock = int.parse(itemCountController.text);
+  //               Item newItem = Item(
+  //                 name: itemName,
+  //                 price: itemPrice,
+  //                 imagePath: '',
+  //                 count: itemStock,
+  //                 max: 10,
+  //               );
+
+  //               try {
+  //                 // Fetch the categoryId using the category name each time before adding the item
+  //                 final categoryId = await _databaseService.fetchCategoryIdByName(widget.catName);
+
+  //                 // ignore: unrelated_type_equality_checks
+  //                 if (categoryId != -1) {
+               
+
+  //                   // Add item to database with fetched categoryId
+  //                   await _databaseService.addItems(categoryId, [newItem]);
+
+  //                   // Fetch and print stored data
+  //                   final storedData = await _databaseService.fetchCategories();
+  //                   if (kDebugMode) {
+  //                     print('--- Stored Data in Database ---');
+  //                     for (var data in storedData) {
+  //                       print(data);
+  //                     }
+  //                   }
+  //                   final storedItems = await _databaseService.fetchItems();
+  //                   if (kDebugMode) {
+  //                     print('--- Stored Data in Database ---');
+  //                     for (var data in storedItems) {
+  //                       print(data);
+  //                     }
+  //                   }
+
+  //                   showToast(message: 'Item Successfully Saved');
+  //                 } else {
+  //                   showToast(message: 'Category not found');
+  //                 }
+  //               } catch (e) {
+  //                 if (kDebugMode) {
+  //                   print('Error adding item to database: $e');
+  //                 }
+  //               }
+
+  //               // ignore: use_build_context_synchronously
+  //               Navigator.pop(context);
+  //               setState(() {});
+  //             },
+  //             child: const Text('Add'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
   void showInputDialog() async {
-    final itemNameController = TextEditingController();
-    final itemPriceController = TextEditingController();
-    final itemCountController = TextEditingController();
-    // ignore: no_leading_underscores_for_local_identifiers
-    final DatabaseService _databaseService = DatabaseService.instance;
+  final itemNameController = TextEditingController();
+  final itemPriceController = TextEditingController();
+  final itemCountController = TextEditingController();
+  // ignore: no_leading_underscores_for_local_identifiers
+  final DatabaseService _databaseService = DatabaseService.instance;
 
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Item'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TextField(
-                controller: itemNameController,
-                keyboardType: TextInputType.name,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Enter item name'),
+  final categoryProvider = context.read<category_provider.CategoryProvider>();
+  final category = categoryProvider.categories[widget.itemIndex];
+
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Add Item'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextField(
+              controller: itemNameController,
+              keyboardType: TextInputType.name,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter item name',
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextField(
-                controller: itemPriceController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Enter item price'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextField(
-                controller: itemCountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Enter item stock'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
             ),
-            TextButton(
-              onPressed: () async {
-                final itemName = itemNameController.text;
-                final itemPrice = double.parse(itemPriceController.text);
-                final itemStock = int.parse(itemCountController.text);
-                final newItem = category_provider.Item(
-                  name: itemName,
-                  price: itemPrice,
-                  imagePath: '',
-                  count: itemStock,
-                  max: 10,
-                );
+            const SizedBox(height: 10),
+            TextField(
+              controller: itemPriceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter item price',
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: itemCountController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter item stock',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final itemName = itemNameController.text;
+              final itemPrice = double.parse(itemPriceController.text);
+              final itemStock = int.parse(itemCountController.text);
+              final newItem = Item(
+                name: itemName,
+                price: itemPrice,
+                imagePath: '',
+                count: itemStock,
+                max: 10,
+              );
 
-                // Update provider state
-                final categoryProvider =
-                    context.read<category_provider.CategoryProvider>();
-                final category = categoryProvider.categories[widget.itemIndex];
-                category.items.add(newItem);
+              // Fetch the categoryId using the category name
+              final categoryId =
+                  await _databaseService.fetchCategoryIdByName(category.name);
 
-                // Add item to database with dynamic category handling
-                await _databaseService.addItemToDatabase(
-                    category.name, newItem);
+              if (categoryId != -1) {
+                // Add item to database with fetched categoryId
+                await _databaseService.addItems(categoryId, [newItem]);
 
                 // Fetch and print stored data
-                final storedData = await _databaseService.fetchData();
+                final storedData = await _databaseService.fetchCategories();
                 if (kDebugMode) {
                   print('--- Stored Data in Database ---');
                   for (var data in storedData) {
                     print(data);
                   }
                 }
+                final storedItems = await _databaseService.fetchItems();
+                if (kDebugMode) {
+                  print('--- Stored Data in Database ---');
+                  for (var data in storedItems) {
+                    print(data);
+                  }
+                }
 
                 showToast(message: 'Item Successfully Saved');
-                // ignore: use_build_context_synchronously
-                Navigator.pop(context);
-                setState(() {});
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+              } else {
+                showToast(message: 'Category not found');
+              }
+
+              // ignore: use_build_context_synchronously
+              Navigator.pop(context);
+              setState(() {});
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   void _removeItem(int index) {
-    // Get the CategoryProvider instance using Provider.of
     final categoryProvider =
         Provider.of<category_provider.CategoryProvider>(context, listen: false);
-    // Remove the category at the specified index from the provider
     categoryProvider.removeItem(index);
-    // No need to modify _categories (local list) or setState
   }
 
   @override
@@ -152,7 +275,6 @@ class _AddItemspageState extends State<AddItemspage> {
                     itemBuilder: (context, index) {
                       final item = items[index];
                       return Dismissible(
-                        // Set a unique key for each item
                         key: ValueKey(item.name),
                         background: Container(
                           color: Colors.red,

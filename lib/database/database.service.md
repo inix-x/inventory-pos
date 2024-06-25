@@ -60,7 +60,7 @@ final items = [
   Item(name: 'Item2', price: 20.0, imagePath: 'path/to/image2', count: 3, max: 5),
 ];
 
-await databaseService.addCategoryWithItems('StoreName', 'CategoryName', items);
+await databaseService.addCategoryWithItems( 'CategoryName', items);
 ```
 
 #### Fetch Categories
@@ -162,7 +162,7 @@ final newItems = [
   Item(name: 'ItemB', price: 40.0, imagePath: 'path/to/imageB', count: 5, max: 20),
 ];
 
-await databaseService.addCategoryWithItems('New Store', 'New Category', newItems);
+await databaseService.addCategoryWithItems( 'New Category', newItems);
 ```
 
 #### Fetching All Categories

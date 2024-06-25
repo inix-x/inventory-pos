@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 // ignore: unnecessary_import
 import 'package:flutter/material.dart';
@@ -18,12 +20,13 @@ class CategoryProvider extends ChangeNotifier {
     // Renamed for clarity
     required List<Item> newItems,
     required String newCategoryNames,
-    required String newStoreName,
+
   }) async {
     categories.add(Category(
       name: newCategoryNames,
       items: newItems, // Directly assign the provided newItems list
     ));
+    _databaseService.addCategory(newCategoryNames);
     notifyListeners();
   }
 
@@ -39,7 +42,7 @@ class CategoryProvider extends ChangeNotifier {
 
   void fetchDatabase() async {
     //get the database by fetching
-    List categories1 = await _databaseService.fetchData();
+    List categories1 = await _databaseService.fetchCategories();
     if (kDebugMode) {
       print(categories1.toList());
     }
@@ -68,22 +71,48 @@ class Item {
   final String name;
   final double price;
   final String imagePath;
-  int count; // Added for tracking item count
-  final int max; // Added for setting maximum allowed
+  final int count;
+  final int max;
 
   Item({
     required this.name,
     required this.price,
     required this.imagePath,
-    this.count = 0, // Set default count to 0
+    required this.count,
     required this.max,
   });
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'price': price,
-        'imagePath': imagePath,
-        'count': count,
-        'max': max,
-      };
+  Map<String, dynamic> toMap(int categoryId) {
+    return {
+      'name': name,
+      'price': price,
+      'imagePath': imagePath,
+      'count': count,
+      'max': max,
+      'categoryId': categoryId,
+    };
+  }
+
+  static String encode(List<Item> items, int categoryId) => json.encode(
+        items
+            .map<Map<String, dynamic>>((item) => item.toMap(categoryId))
+            .toList(),
+      );
+
+  static List<Item> decode(String items) =>
+      (json.decode(items) as List<dynamic>)
+          .map<Item>((item) => Item.fromMap(item))
+          .toList();
+
+  factory Item.fromMap(Map<String, dynamic> map) {
+    return Item(
+      name: map['name'],
+      price: map['price'],
+      imagePath: map['imagePath'],
+      count: map['count'],
+      max: map['max'],
+    );
+  }
+  
+  toJson() {}
 }

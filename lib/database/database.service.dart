@@ -66,7 +66,7 @@ class DatabaseService {
   Future<Database> getDatabase() async {
     final databaseDirPath = await getDatabasesPath();
     final databasePath = join(databaseDirPath, 'master_db.db');
-    final database = await openDatabase(databasePath, version: 1,
+    final database = await openDatabase(databasePath, version: 2, // Incremented version number
         onCreate: (db, version) async {
       await db.execute('''
         CREATE TABLE categories (
@@ -81,10 +81,16 @@ class DatabaseService {
           price REAL NOT NULL,
           imagePath TEXT,
           count INTEGER NOT NULL,
+          max INTEGER NOT NULL,
           categoryId INTEGER NOT NULL,
           FOREIGN KEY (categoryId) REFERENCES categories (id) ON DELETE CASCADE
         )
       ''');
+    },
+    onUpgrade: (db, oldVersion, newVersion) async {
+      if (oldVersion < 2) {
+        await db.execute('ALTER TABLE items ADD COLUMN max INTEGER NOT NULL DEFAULT 10');
+      }
     });
     return database;
   }
@@ -162,10 +168,18 @@ class DatabaseService {
     }
     return null;
   }
+  
+  
 
   Future<List<Map<String, Object?>>> fetchCategories() async {
     final db = await database;
     final maps = await db.query('categories');
+    return maps.toList();
+  }
+
+    Future<List<Map<String, Object?>>> fetchItems() async {
+    final db = await database;
+    final maps = await db.query('items');
     return maps.toList();
   }
 
@@ -193,12 +207,28 @@ class DatabaseService {
     }
   }
 
-  Future<List<Map<String, Object?>>> fetchItems(int categoryId) async {
-    final db = await database;
-    final maps = await db
-        .query('items', where: 'categoryId = ?', whereArgs: [categoryId]);
-    return maps.toList();
+Future<int> fetchCategoryIdByName(String categoryName) async {
+  final db = await database;
+  final maps = await db.query('categories',
+      columns: ['id'],
+      where: 'categoryName = ?',
+      whereArgs: [categoryName]);
+
+  if (maps.isNotEmpty) {
+    return maps.first['id'] as int;
+  } else {
+    return -1;
   }
+}
+
+
+
+  // Future<List<Map<String, Object?>>> fetchItems(int categoryId) async {
+  //   final db = await database;
+  //   final maps = await db
+  //       .query('items', where: 'categoryId = ?', whereArgs: [categoryId]);
+  //   return maps.toList();
+  // }
 
   Future<List<Map<String, Object?>>> fetchItemById(int itemId) async {
     final db = await database;

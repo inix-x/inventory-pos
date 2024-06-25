@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:flutter/foundation.dart' hide Category;
-import 'package:flutter_application_1/providers/categoryprovider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -40,21 +37,21 @@ class DatabaseService {
   }
 
   // Adding item to database
-  Future<void> addItemToDatabase(String name, Item item) async {
-    try {
-      final db = await database;
-      final encodedItem = jsonEncode(item.toJson()); // Encode Item as JSON string
-      await db.insert(_menuTableName, {
-        _menuCategoryNameContent: name,
-        _menuItemsListContent: encodedItem,
-        _menuStatusColumn: 0,
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error adding data to database: $e');
-      }
-    }
-  }
+  // Future<void> addItemToDatabase(String name, Item item) async {
+  //   try {
+  //     final db = await database;
+  //     final encodedItem = jsonEncode(item.toJson()); // Encode Item as JSON string
+  //     await db.insert(_menuTableName, {
+  //       _menuCategoryNameContent: name,
+  //       _menuItemsListContent: encodedItem,
+  //       _menuStatusColumn: 0,
+  //     });
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error adding data to database: $e');
+  //     }
+  //   }
+  // }
 
   // Fetching data for output
   Future<List<Map<String, Object?>>> fetchData() async {

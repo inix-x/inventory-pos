@@ -127,7 +127,7 @@ class _SetuppageState extends State<Setuppage> {
     final categories = categoryProvider.categories;
 
     final categoryName = categories.isNotEmpty ? categories.first.name : '';
-    final itemList = categories.isNotEmpty ? categories.first.items : [];
+    final List<Item> itemList = [];
 // ignore: no_leading_underscores_for_local_identifiers
     return Scaffold(
       appBar: AppBar(
@@ -191,7 +191,7 @@ class _SetuppageState extends State<Setuppage> {
                                       itemIndex: index,
                                       catName: categoryName,
                                       items: itemList
-                                          as List<category_provider.Item>,
+                                        ,  //di mna click to kase yung itemList is
                                     ),
                                   ),
                                 );
