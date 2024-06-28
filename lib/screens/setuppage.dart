@@ -128,7 +128,7 @@ class _SetuppageState extends State<Setuppage> {
 
     final categoryName = categories.isNotEmpty ? categories.first.name : '';
     final List<Item> itemList = [];
-// ignore: no_leading_underscores_for_local_identifiers
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,

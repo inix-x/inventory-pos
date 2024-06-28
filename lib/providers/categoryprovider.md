@@ -5,7 +5,6 @@ import 'package:flutter_application_1/database/database.service.dart';
 class CategoryProvider extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
   List<Category> categories = [];
-  Map<int, List<Item>> placeholderItemsMap = {};
 
   CategoryProvider({required List categories}) {
     _initializeCategories();
@@ -49,31 +48,24 @@ class CategoryProvider extends ChangeNotifier {
     final categoryId = categories[index].id;
     _databaseService.deleteCategory(categoryId);
     categories.removeAt(index);
-    placeholderItemsMap.remove(categoryId);
     notifyListeners();
   }
 
-  void removeItem(int categoryIndex, int itemIndex) {
-    final categoryId = categories[categoryIndex].id;
-    if (placeholderItemsMap.containsKey(categoryId)) {
-      placeholderItemsMap[categoryId]!.removeAt(itemIndex);
-      notifyListeners();
-    }
-  }
+void removeItem(int categoryIndex, int itemIndex) async {
+  final category = categories[categoryIndex];
+  final item = category.items[itemIndex];
 
-  void addItemToPlaceholder(int categoryIndex, Item newItem) {
-    final categoryId = categories[categoryIndex].id;
-    if (!placeholderItemsMap.containsKey(categoryId)) {
-      placeholderItemsMap[categoryId] = [];
-    }
-    placeholderItemsMap[categoryId]!.add(newItem);
+  if (item.id != null) {
+    await _databaseService.deleteItem(item.id!);
+    category.items.removeAt(itemIndex);
     notifyListeners();
+  } else {
+    if (kDebugMode) {
+      print('Item ID is null, cannot remove item from database');
+    }
   }
+}
 
-  List<Item> getPlaceholderItems(int categoryIndex) {
-    final categoryId = categories[categoryIndex].id;
-    return placeholderItemsMap[categoryId] ?? [];
-  }
 
   void fetchDatabase() async {
     List categoriesFromDb = await _databaseService.fetchCategories();

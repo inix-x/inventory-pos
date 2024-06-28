@@ -26,11 +26,8 @@ class _AddItemspageState extends State<AddItemspage> {
     final itemNameController = TextEditingController();
     final itemPriceController = TextEditingController();
     final itemCountController = TextEditingController();
-    // ignore: no_leading_underscores_for_local_identifiers
-    final DatabaseService _databaseService = DatabaseService.instance;
 
     final categoryProvider = context.read<category_provider.CategoryProvider>();
-    final category = categoryProvider.categories[widget.itemIndex];
 
     await showDialog(
       context: context,
@@ -75,53 +72,28 @@ class _AddItemspageState extends State<AddItemspage> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () async {
+              onPressed: () {
                 final itemName = itemNameController.text;
-                final itemPrice = double.parse(itemPriceController.text);
-                final itemStock = int.parse(itemCountController.text);
-                final newItem = Item(
-                  name: itemName,
-                  price: itemPrice,
-                  imagePath: '',
-                  count: itemStock,
-                  max: 10,
-                );
+                if (itemName.isNotEmpty &&
+                    itemPriceController.text.isNotEmpty &&
+                    itemCountController.text.isNotEmpty) {
+                  final itemPrice = double.parse(itemPriceController.text);
+                  final itemStock = int.parse(itemCountController.text);
+                  final newItem = Item(
+                    name: itemName,
+                    price: itemPrice,
+                    imagePath: '',
+                    count: itemStock,
+                    max: 10,
+                  );
 
-                // Fetch the categoryId using the category name
-                final categoryId = await _databaseService.fetchCategoryIdByName(category.name);
+                  // Add item to the placeholder list
+                  categoryProvider.addItemToPlaceholder(widget.itemIndex, newItem);
 
-                if (categoryId != -1) {
-                  // Add item to database with fetched categoryId
-                  await _databaseService.addItems(categoryId, [newItem]);
-
-                  // Fetch and print stored data
-                  final storedData = await _databaseService.fetchCategories();
-                  if (kDebugMode) {
-                    print('--- Stored Data in Database ---');
-                    for (var data in storedData) {
-                      print(data);
-                    }
-                  }
-                  final storedItems = await _databaseService.fetchItems();
-                  if (kDebugMode) {
-                    print('--- Stored Data in Database ---');
-                    for (var data in storedItems) {
-                      print(data);
-                    }
-                  }
-
-                  showToast(message: 'Item Successfully Saved');
-
-                  // Update the items in the provider
-                  setState(() {
-                    categoryProvider.categories[widget.itemIndex].items.add(newItem);
-                  });
+                  Navigator.pop(context);
                 } else {
-                  showToast(message: 'Category not found');
+                  showToast(message: 'Please fill in all fields');
                 }
-
-                // ignore: use_build_context_synchronously
-                Navigator.pop(context);
               },
               child: const Text('Add'),
             ),
@@ -131,29 +103,66 @@ class _AddItemspageState extends State<AddItemspage> {
     );
   }
 
-  void _removeItem(int index) async {
+  void saveItemsDb() async {
     final categoryProvider = context.read<category_provider.CategoryProvider>();
-    final item = categoryProvider.categories[widget.itemIndex].items[index];
-
+    final category = categoryProvider.categories[widget.itemIndex];
     // ignore: no_leading_underscores_for_local_identifiers
     final DatabaseService _databaseService = DatabaseService.instance;
-    await _databaseService.deleteItem(item.id!);
 
-    setState(() {
-      categoryProvider.categories[widget.itemIndex].items.removeAt(index);
-    });
+    // Fetch the categoryId using the category name
+    final categoryId = await _databaseService.fetchCategoryIdByName(category.name);
+
+    if (categoryId != -1) {
+      final placeholderItems = categoryProvider.getPlaceholderItems(widget.itemIndex);
+
+      // Add each item to the database with fetched categoryId from the placeholder
+      for (var item in placeholderItems) {
+        await _databaseService.addItems(categoryId, [item]);
+      }
+
+      // Fetch and print stored data
+      final storedData = await _databaseService.fetchCategories();
+      if (kDebugMode) {
+        print('--- Stored Data in Database ---');
+        for (var data in storedData) {
+          print(data);
+        }
+      }
+      final storedItems = await _databaseService.fetchItems();
+      if (kDebugMode) {
+        print('--- Stored Data in Database ---');
+        for (var data in storedItems) {
+          print(data);
+        }
+      }
+
+      showToast(message: 'Items Successfully Saved');
+
+      // Update the items in the provider
+      setState(() {
+        categoryProvider.categories[widget.itemIndex].items.addAll(placeholderItems);
+      });
+    } else {
+      showToast(message: 'Category not found');
+    }
+  }
+
+  void _removeItem(int index) {
+    final categoryProvider = context.read<category_provider.CategoryProvider>();
+    categoryProvider.removeItem(widget.itemIndex, index);
   }
 
   @override
   Widget build(BuildContext context) {
-    final category = context.watch<category_provider.CategoryProvider>().categories[widget.itemIndex].name;
-    final items = context.watch<category_provider.CategoryProvider>().categories[widget.itemIndex].items;
+    final categoryProvider = context.watch<category_provider.CategoryProvider>();
+    final category = categoryProvider.categories[widget.itemIndex];
+    final placeholderItems = categoryProvider.getPlaceholderItems(widget.itemIndex);
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Text(category),
+            Text(category.name),
           ],
         ),
       ),
@@ -161,12 +170,12 @@ class _AddItemspageState extends State<AddItemspage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            items.isNotEmpty
+            placeholderItems.isNotEmpty
                 ? ListView.builder(
                     shrinkWrap: true,
-                    itemCount: items.length,
+                    itemCount: placeholderItems.length,
                     itemBuilder: (context, index) {
-                      final item = items[index];
+                      final item = placeholderItems[index];
                       return Dismissible(
                         key: ValueKey(item.id),
                         background: Container(
@@ -190,7 +199,9 @@ class _AddItemspageState extends State<AddItemspage> {
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete),
-                                  onPressed: () => _removeItem(index),
+                                  onPressed: () {
+                                    _removeItem(index);
+                                  },
                                 ),
                               ],
                             ),
@@ -199,7 +210,7 @@ class _AddItemspageState extends State<AddItemspage> {
                       );
                     },
                   )
-                : Text('Please add items for $category'),
+                : Text('Please add items for ${category.name}'),
             const SizedBox(height: 10),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -213,6 +224,16 @@ class _AddItemspageState extends State<AddItemspage> {
             ),
             const SizedBox(
               height: 10,
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 5,
+              ),
+              onPressed: saveItemsDb,
+              child: const Text('Save items'),
             ),
           ],
         ),
