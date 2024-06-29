@@ -22,13 +22,15 @@ class AddItemspage extends StatefulWidget {
 }
 
 class _AddItemspageState extends State<AddItemspage> {
+  //do not allow user to go back until the items in each category is saved
+  bool isSaved = true;
   void showInputDialog() async {
     final itemNameController = TextEditingController();
     final itemPriceController = TextEditingController();
     final itemCountController = TextEditingController();
 
     final categoryProvider = context.read<category_provider.CategoryProvider>();
-
+    
     await showDialog(
       context: context,
       builder: (context) {
@@ -90,6 +92,11 @@ class _AddItemspageState extends State<AddItemspage> {
                   // Add item to the placeholder list
                   categoryProvider.addItemToPlaceholder(widget.itemIndex, newItem);
 
+                  //RESET the isSaved Bool if there's a new Item to prompt the user to save before going back
+                  setState(() {
+                    isSaved = false;
+                  });
+                  showToast(message: 'Please save the items first.');
                   Navigator.pop(context);
                 } else {
                   showToast(message: 'Please fill in all fields');
@@ -141,6 +148,7 @@ class _AddItemspageState extends State<AddItemspage> {
       // Update the items in the provider
       setState(() {
         categoryProvider.categories[widget.itemIndex].items.addAll(placeholderItems);
+        isSaved = true;
       });
     } else {
       showToast(message: 'Category not found');
@@ -160,7 +168,10 @@ class _AddItemspageState extends State<AddItemspage> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: isSaved ? true : false,
         title: Row(
+          mainAxisAlignment: isSaved ? MainAxisAlignment.start : MainAxisAlignment.center,
+
           children: [
             Text(category.name),
           ],
@@ -171,45 +182,47 @@ class _AddItemspageState extends State<AddItemspage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             placeholderItems.isNotEmpty
-                ? ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: placeholderItems.length,
-                    itemBuilder: (context, index) {
-                      final item = placeholderItems[index];
-                      return Dismissible(
-                        key: ValueKey(item.id),
-                        background: Container(
-                          color: Colors.red,
-                          child: const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        onDismissed: (_) => _removeItem(index),
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text(item.name),
-                                    Text('Price: ${item.price.toString()}'),
-                                    Text('Stocks: ${item.count.toString()}'),
-                                  ],
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () {
-                                    _removeItem(index);
-                                  },
-                                ),
-                              ],
+                ? Flexible(
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: placeholderItems.length,
+                      itemBuilder: (context, index) {
+                        final item = placeholderItems[index];
+                        return Dismissible(
+                          key: ValueKey(item.id),
+                          background: Container(
+                            color: Colors.red,
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          onDismissed: (_) => _removeItem(index),
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(item.name),
+                                      Text('Price: ${item.price.toString()}'),
+                                      Text('Stocks: ${item.count.toString()}'),
+                                    ],
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {
+                                      _removeItem(index);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  )
+                        );
+                      },
+                    ),
+                )
                 : Text('Please add items for ${category.name}'),
             const SizedBox(height: 10),
             ElevatedButton(
