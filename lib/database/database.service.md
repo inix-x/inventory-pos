@@ -1,5 +1,3 @@
-Sure! Here is the usage for each function in your `DatabaseService` class, along with scenarios to demonstrate how to use them.
-
 ### `Item` Class Methods
 
 - `Map<String, dynamic> toMap(int categoryId)`: Converts an `Item` instance to a map for database storage.
