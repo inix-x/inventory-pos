@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -120,6 +122,30 @@ class _SetuppageState extends State<Setuppage> {
     }
   }
 
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Confirm Logout'),
+            content: const Text('Do you really want to log out?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('No'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  _handleSignOut();
+                },
+                child: const Text('Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final categoryProvider =
@@ -129,123 +155,124 @@ class _SetuppageState extends State<Setuppage> {
     final categoryName = categories.isNotEmpty ? categories.first.name : '';
     final List<Item> itemList = [];
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: primaryColor,
-        centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Customsignout(
-              onPressed: _handleSignOut,
-              icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-            ),
-            const Spacer(),
-            const Text(
-              'Business Name',
-              style: TextStyle(color: accentColor),
-            ),
-            const Spacer(),
-            const SizedBox(
-              width: 10,
-            ),
-          ],
-        ),
-      ),
-      body: Container(
-        color: Colors.white,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: primaryColor,
+          centerTitle: true,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              context
-                      .watch<category_provider.CategoryProvider>()
-                      .categories
-                      .isNotEmpty
-                  ? Flexible(
-                      child: ListView.builder(
-                        itemCount: context
-                            .watch<category_provider.CategoryProvider>()
-                            .categories
-                            .length,
-                        itemBuilder: (context, index) {
-                          final category = context
+              Customsignout(
+                onPressed: _onWillPop,
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+              ),
+              const Spacer(),
+              const Text(
+                'Business Name',
+                style: TextStyle(color: accentColor),
+              ),
+              const Spacer(),
+              const SizedBox(
+                width: 10,
+              ),
+            ],
+          ),
+        ),
+        body: Container(
+          color: Colors.white,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                context
+                        .watch<category_provider.CategoryProvider>()
+                        .categories
+                        .isNotEmpty
+                    ? Flexible(
+                        child: ListView.builder(
+                          itemCount: context
                               .watch<category_provider.CategoryProvider>()
-                              .categories[index];
-                          return Dismissible(
-                            key: Key(category.name),
-                            background: Container(
-                              color: Colors.red,
-                              child:
-                                  const Icon(Icons.delete, color: Colors.white),
-                            ),
-                            onDismissed: (_) => _removeCategory(index),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddItemspage(
-                                      itemIndex: index,
-                                      catName: categoryName,
-                                      items: itemList
-                                        ,  //di mna click to kase yung itemList is
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(category.name),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete),
-                                        onPressed: () => _removeCategory(index),
+                              .categories
+                              .length,
+                          itemBuilder: (context, index) {
+                            final category = context
+                                .watch<category_provider.CategoryProvider>()
+                                .categories[index];
+                            return Dismissible(
+                              key: Key(category.name),
+                              background: Container(
+                                color: Colors.red,
+                                child: const Icon(Icons.delete, color: Colors.white),
+                              ),
+                              onDismissed: (_) => _removeCategory(index),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddItemspage(
+                                        itemIndex: index,
+                                        catName: categoryName,
+                                        items: itemList, //di mna click to kase yung itemList is
                                       ),
-                                    ],
+                                    ),
+                                  );
+                                },
+                                child: Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(category.name),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () => _removeCategory(index),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
+                      )
+                    : const Text('Add Categories here'),
+                MaterialButton(
+                  onPressed: _addNewCategory,
+                  child: const Text('Add'),
+                ),
+                MaterialButton(
+                  onPressed: () {
+                    if (categoryName == '') return;
+                    outputData();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const HomeApp(isFinished: true),
                       ),
-                    )
-                  : const Text('Add Categories here'),
-              MaterialButton(
-                onPressed: _addNewCategory,
-                child: const Text('Add'),
-              ),
-              MaterialButton(
-                onPressed: () {
-                  if (categoryName == '') return;
-                  outputData();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const HomeApp(isFinished: true),
-                    ),
-                  );
-                },
-                child: const Text('Save Category and Items'),
-              ),
-              MaterialButton(
-                onPressed: () async {
-                  final appDocDir = await getApplicationDocumentsDirectory();
-                  final appDocPath = appDocDir.path;
-                  if (kDebugMode) {
-                    print('This is the app directory: $appDocPath');
-                  }
-                },
-                child: const Text('Get Local path'),
-              ),
-            ],
+                    );
+                  },
+                  child: const Text('Save Category and Items'),
+                ),
+                MaterialButton(
+                  onPressed: () async {
+                    final appDocDir = await getApplicationDocumentsDirectory();
+                    final appDocPath = appDocDir.path;
+                    if (kDebugMode) {
+                      print('This is the app directory: $appDocPath');
+                    }
+                  },
+                  child: const Text('Get Local path'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

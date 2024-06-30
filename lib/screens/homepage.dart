@@ -32,17 +32,49 @@ class _HomeAppState extends State<HomeApp> {
     });
   }
 
+   //signout
+  Future<void> _handleSignOut() async {
+    // ignore: no_leading_underscores_for_local_identifiers
+    final _auth = AuthService();
+    await _auth.signout();
+    if (mounted) {
+      goToLogin(context);
+    }
+  }
+
+    Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Confirm Logout'),
+            content: const Text('Do you really want to log out?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('No'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  _handleSignOut();
+                },
+                child: const Text('Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
   
-
-
-
     // ignore: no_leading_underscores_for_local_identifiers
     final _auth = AuthService();
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
         appBar: AppBar(
           backgroundColor: primaryColor,
           centerTitle: true,
