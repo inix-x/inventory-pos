@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/introductionscreens/onboarding_screen.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/providers/categoryprovider.dart';
-import 'package:flutter_application_1/screens/homepage.dart';
+import 'package:flutter_application_1/screens/fetchdatascreen.dart';
 import 'package:provider/provider.dart';
 
 class GetStarted extends StatefulWidget {
@@ -22,7 +22,7 @@ class _GetStartedState extends State<GetStarted> {
     return ChangeNotifierProvider<CategoryProvider>(
       create: (context) => CategoryProvider(categories: []),
       child: Scaffold(
-        body: _auth.isLoggedIn() ? const HomeApp(isFinished: true) : const OnboardingScreen(),
+        body: _auth.isLoggedIn() ? const FetchDataScreen(): const OnboardingScreen(),
       ),
     );
   }

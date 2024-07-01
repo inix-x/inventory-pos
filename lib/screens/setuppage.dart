@@ -1,8 +1,5 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/database/database.service.dart';
@@ -15,7 +12,6 @@ import 'package:flutter_application_1/providers/categoryprovider.dart'
 
 import 'package:flutter_application_1/screens/additemspage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class Setuppage extends StatefulWidget {
@@ -70,46 +66,17 @@ class _SetuppageState extends State<Setuppage> {
         });
   }
 
-  Future<List<Map<String, Object?>>> fetchData() async {
-    final db = await DatabaseService.instance.database;
-    final maps = await db.query('menu');
-    return maps.toList();
-  }
+  // Future<List<Map<String, Object?>>> fetchData() async {
+  //   final db = await DatabaseService.instance.database;
+  //   final maps = await db.query('menu');
+  //   return maps.toList();
+  // }
 
   void _removeCategory(int index) {
     final categoryProvider =
         Provider.of<category_provider.CategoryProvider>(context, listen: false);
     categoryProvider.removeCategory(index);
     setState(() {});
-  }
-
-  void outputData() async {
-    final categoryProvider =
-        Provider.of<category_provider.CategoryProvider>(context, listen: false);
-    final categories = categoryProvider.categories;
-
-    if (categories.isNotEmpty) {
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final filePath = '${appDocDir.path}/categories.json';
-
-      final file = File(filePath);
-      final jsonData =
-          jsonEncode(categories.map((category) => category.toJson()).toList());
-      await file.writeAsString(jsonData);
-
-      if (kDebugMode) {
-        print('Successfully saved categories to $filePath');
-        final fileContent = await file.readAsString();
-        print('--- Saved File Content ---');
-        print(fileContent);
-        print('-------------------------');
-      }
-      if (mounted) {
-        context.read<category_provider.CategoryProvider>().fetchDatabase();
-      }
-    } else {
-      showToast(message: 'No categories found!');
-    }
   }
 
   //signout
@@ -177,7 +144,7 @@ class _SetuppageState extends State<Setuppage> {
               ),
               const Spacer(),
               const SizedBox(
-                width: 10,
+                width: 20,
               ),
             ],
           ),
@@ -186,7 +153,8 @@ class _SetuppageState extends State<Setuppage> {
           color: Colors.white,
           child: Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 context
                         .watch<category_provider.CategoryProvider>()
@@ -206,7 +174,8 @@ class _SetuppageState extends State<Setuppage> {
                               key: Key(category.name),
                               background: Container(
                                 color: Colors.red,
-                                child: const Icon(Icons.delete, color: Colors.white),
+                                child: const Icon(Icons.delete,
+                                    color: Colors.white),
                               ),
                               onDismissed: (_) => _removeCategory(index),
                               child: GestureDetector(
@@ -217,7 +186,8 @@ class _SetuppageState extends State<Setuppage> {
                                       builder: (context) => AddItemspage(
                                         itemIndex: index,
                                         catName: categoryName,
-                                        items: itemList, //di mna click to kase yung itemList is
+                                        items:
+                                            itemList, //di mna click to kase yung itemList is
                                       ),
                                     ),
                                   );
@@ -232,7 +202,8 @@ class _SetuppageState extends State<Setuppage> {
                                         Text(category.name),
                                         IconButton(
                                           icon: const Icon(Icons.delete),
-                                          onPressed: () => _removeCategory(index),
+                                          onPressed: () =>
+                                              _removeCategory(index),
                                         ),
                                       ],
                                     ),
@@ -243,34 +214,30 @@ class _SetuppageState extends State<Setuppage> {
                           },
                         ),
                       )
-                    : const Text('Add Categories here'),
+                    : 
+                const Text('Add Categories here'),
+                const Spacer(),
                 MaterialButton(
                   onPressed: _addNewCategory,
                   child: const Text('Add'),
                 ),
                 MaterialButton(
                   onPressed: () {
-                    if (categoryName == '') return;
-                    outputData();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const HomeApp(isFinished: true),
-                      ),
-                    );
-                  },
-                  child: const Text('Save Category and Items'),
-                ),
-                MaterialButton(
-                  onPressed: () async {
-                    final appDocDir = await getApplicationDocumentsDirectory();
-                    final appDocPath = appDocDir.path;
-                    if (kDebugMode) {
-                      print('This is the app directory: $appDocPath');
+                    if (categoryName == '') {
+                      showToast(message: 'No categories found!');
+                      return;
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HomeApp(isFinished: true),
+                        ),
+                      );
                     }
                   },
-                  child: const Text('Get Local path'),
+                  child: const Text('Save Changes'),
                 ),
+                const Spacer(),
               ],
             ),
           ),

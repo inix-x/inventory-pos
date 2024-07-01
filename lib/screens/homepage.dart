@@ -68,9 +68,7 @@ class _HomeAppState extends State<HomeApp> {
 
   @override
   Widget build(BuildContext context) {
-  
-    // ignore: no_leading_underscores_for_local_identifiers
-    final _auth = AuthService();
+
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -89,11 +87,7 @@ class _HomeAppState extends State<HomeApp> {
                const Text('Home', style: TextStyle(color: accentColor)),
                const Spacer(),
                   Customsignout(
-                onPressed: () async {
-                  await _auth.signout();
-                  // ignore: use_build_context_synchronously
-                  goToLogin(context);
-                },
+                onPressed: _onWillPop,
                 icon: const Icon(Icons.logout_sharp,
                     color: Colors.white), // Add icon and color
               ),

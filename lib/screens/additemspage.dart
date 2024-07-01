@@ -150,6 +150,7 @@ class _AddItemspageState extends State<AddItemspage> {
       setState(() {
         categoryProvider.categories[widget.itemIndex].items.addAll(placeholderItems);
         isSaved = true;
+          Navigator.of(context).pop(true);
       });
     } else {
       showToast(message: 'Category not found');

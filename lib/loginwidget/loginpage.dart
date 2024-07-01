@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
+import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/signuppage.dart';
-import 'package:flutter_application_1/screens/homepage.dart';
+import 'package:flutter_application_1/screens/fetchdatascreen.dart';
 import 'package:flutter_application_1/screens/setuppage.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -34,6 +35,13 @@ class _LoginScreenState extends State<LoginScreen> {
       isVisible = !isVisible;
     });
   }
+
+    Future<List<Map<String, Object?>>> fetchData() async {
+    final db = await DatabaseService.instance.database;
+    final maps = await db.query('categories');
+    return maps.toList();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -168,12 +176,11 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const SignupScreen()),
       );
 
-  goToHome(BuildContext context) => Navigator.push(
+  goToFetchData(BuildContext context) => Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => const HomeApp(
-                  isFinished: true,
-                )),
+            builder: (context) => const FetchDataScreen()
+                ),
       );
 
   goToSetup(BuildContext context) => Navigator.push(
@@ -200,7 +207,16 @@ class _LoginScreenState extends State<LoginScreen> {
             showToast(message: 'Successfully Logged In!');
           }
           if (mounted) {
-            goToSetup(context);
+            final checkDb = await fetchData();
+            if(checkDb.isEmpty){
+              // ignore: use_build_context_synchronously
+              goToSetup(context);
+            }else{
+              // ignore: use_build_context_synchronously
+              goToFetchData(context);
+            }
+            
+            
           }
         }
       } catch (e) {
