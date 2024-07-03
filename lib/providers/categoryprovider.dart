@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 
-// Provider
 class CategoryProvider extends ChangeNotifier {
   final DatabaseService _databaseService = DatabaseService.instance;
   List<Category> categories = [];
@@ -34,14 +33,16 @@ class CategoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<List<Item>> fetchItemByCategoryId(int categoryId) async {
+    final fetchedItems = await _databaseService.fetchItemsByCategoryId(categoryId);
+    return fetchedItems.map((itemData) => Item.fromMap(itemData)).toList();
+  }
+
   void addNewCat({
     required List<Item> newItems,
     required String newCategoryNames,
   }) async {
-    // Save to the database
     await _databaseService.addCategoryWithItems(newCategoryNames, newItems);
-
-    // Fetch the updated list of categories from the database
     _initializeCategories();
   }
 
@@ -77,10 +78,27 @@ class CategoryProvider extends ChangeNotifier {
 
   void fetchDatabase() async {
     List categoriesFromDb = await _databaseService.fetchCategories();
+    List itemsFromDb = await _databaseService.fetchItems();
     if (kDebugMode) {
       print(categoriesFromDb.toList());
+      print(itemsFromDb.toList());
     }
     notifyListeners();
+  }
+
+  Future<List<Category>> fetchCategory() async {
+    List categoriesFromDb = await _databaseService.fetchCategories();
+    return categoriesFromDb.map((categoryData) {
+      final categoryId = categoryData['id'] as int;
+      final categoryItems = categories
+          .firstWhere((category) => category.id == categoryId)
+          .items;
+      return Category(
+        id: categoryId,
+        name: categoryData['categoryName'] as String,
+        items: categoryItems,
+      );
+    }).toList();
   }
 }
 

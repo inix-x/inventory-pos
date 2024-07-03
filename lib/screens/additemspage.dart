@@ -163,7 +163,8 @@ class _AddItemspageState extends State<AddItemspage> {
   }
 
    Future<bool> _onWillPop() async {
-    return (await showDialog(
+    return (
+      await showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('There are items that are not saved to the database'),
@@ -175,10 +176,11 @@ class _AddItemspageState extends State<AddItemspage> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(true);
+                 
                   saveItemsDb();
                   setState(() {
                     isSaved = true;
+                     Navigator.pop(context);
                   });
                 },
                 child: const Text('Yes'),
@@ -198,7 +200,7 @@ class _AddItemspageState extends State<AddItemspage> {
 
     // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: !isSaved ? _onWillPop : null,
+      onWillPop: isSaved ? _onWillPop : _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: isSaved ? true : false,

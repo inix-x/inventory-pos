@@ -118,7 +118,6 @@ class _SetuppageState extends State<Setuppage> {
     final categoryProvider =
         Provider.of<category_provider.CategoryProvider>(context);
     final categories = categoryProvider.categories;
-
     final categoryName = categories.isNotEmpty ? categories.first.name : '';
     final List<Item> itemList = [];
 
@@ -153,13 +152,14 @@ class _SetuppageState extends State<Setuppage> {
           color: Colors.white,
           child: Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: categories.isNotEmpty ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceEvenly,
               mainAxisSize: MainAxisSize.min,
               children: [
-                context
-                        .watch<category_provider.CategoryProvider>()
-                        .categories
-                        .isNotEmpty
+                // context
+                //         .watch<category_provider.CategoryProvider>()
+                //         .categories
+                //         .isNotEmpty
+                categories.isNotEmpty
                     ? Flexible(
                         child: ListView.builder(
                           itemCount: context
@@ -214,9 +214,8 @@ class _SetuppageState extends State<Setuppage> {
                           },
                         ),
                       )
-                    : 
-                const Text('Add Categories here'),
-                const Spacer(),
+                    : const Center(child: Text('Add Categories here')),
+            
                 MaterialButton(
                   onPressed: _addNewCategory,
                   child: const Text('Add'),
@@ -237,7 +236,7 @@ class _SetuppageState extends State<Setuppage> {
                   },
                   child: const Text('Save Changes'),
                 ),
-                const Spacer(),
+              
               ],
             ),
           ),

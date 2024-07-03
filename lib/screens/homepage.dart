@@ -74,6 +74,7 @@ class _HomeAppState extends State<HomeApp> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
+           automaticallyImplyLeading: false,
           backgroundColor: primaryColor,
           centerTitle: true,
           title:   Row(

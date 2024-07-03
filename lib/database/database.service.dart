@@ -5,11 +5,11 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Item {
-  final int? id; // Added id property, it's nullable for new items
+  final int? id;
   final String name;
   final double price;
   final String imagePath;
-  final int count;
+  late final int count;
   final int max;
 
   Item({
@@ -36,11 +36,11 @@ class Item {
   factory Item.fromMap(Map<String, dynamic> map) {
     return Item(
       id: map['id'] as int?,
-      name: map['name'],
-      price: map['price'],
-      imagePath: map['imagePath'],
-      count: map['count'],
-      max: map['max'],
+      name: map['name'] as String,
+      price: map['price'] as double,
+      imagePath: map['imagePath'] as String,
+      count: map['count'] as int,
+      max: map['max'] as int,
     );
   }
 
@@ -53,7 +53,6 @@ class Item {
         'max': max,
       };
 }
-
 
 class DatabaseService {
   static Database? _db;

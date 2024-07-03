@@ -14,12 +14,13 @@
       } on  FirebaseAuthException catch (e) {
         if( e.code == 'email-already-in-use'){
           showToast(message: 'The email is already in use.');
+          return null;
         }else{
           showToast(message: 'An error occured: ${e.code}');
-       
+        return null;
         }
       }
-      return null;
+      
     }
 
     Future<User?> loginUserWithEmailAndPassword(
@@ -31,11 +32,13 @@
       } on  FirebaseAuthException catch (e) {
         if( e.code == 'user-not-found' || e.code == 'wrong-password'){
           showToast(message: 'Invalid Email or Password.');
+           return null;
         }else{
           showToast(message: 'An error occured: ${e.code}');
+           return null;
         }
       }
-      return null;
+     
     }
 
     Future<void> signout() async {
