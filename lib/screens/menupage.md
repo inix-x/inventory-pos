@@ -1,12 +1,10 @@
-// Import the Category class from categories.dart
-// ignore: unused_import
 import 'package:flutter/foundation.dart' hide Category;
+// ignore: unused_import
 import 'package:flutter_application_1/cartscreen.dart';
-// import 'package:flutter_application_1/categories.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-// Import widgets for building the UI
+import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
+import 'package:provider/provider.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key, required this.isFinished});
@@ -17,63 +15,6 @@ class MenuScreen extends StatefulWidget {
   _MenuScreenState createState() => _MenuScreenState();
 }
 
-// Use the categories list directly
- List<Category> categories = [
-  Category(
-    name: "Entree",
-    items: [
-      Item(
-        name: "Pizza",
-        price: 10.00,
-        imagePath: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        count: 0, // Initial count
-        max: 10,  // Maximum allowed
-      ),
-      Item(
-        name: "Burger",
-        price: 12.00,
-        imagePath: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1998&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        count: 0,
-        max: 10,
-      ),
-      Item(
-        name: "Pasta",
-        price: 8.00,
-        imagePath: "https://images.unsplash.com/photo-1598866594230-a7c12756260f?q=80&w=2016&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        count: 0,
-        max: 10,
-      ),
-    ],
-  ),
-
-  // Add more categories and items as needed
-];
-
-class Category {
-  final String name;
-  final List<Item> items;
-
-  Category({required this.name, required this.items});
-}
-
-class Item {
-  final String name;
-  final double price;
-  final String imagePath;
-  int count; // Added for tracking item count
-  final int max; // Added for setting maximum allowed
-
-  Item({
-    required this.name,
-    required this.price,
-    required this.imagePath,
-    this.count = 0, // Set default count to 0
-    required this.max,
-  });
-}
-
-
-//create class for selectedItems for the List type
 class SelectedItem {
   final String name;
   final double price;
@@ -81,7 +22,6 @@ class SelectedItem {
 
   SelectedItem({required this.name, required this.price, required this.count});
 
-  // Add a method to convert to Map, using map to convert each property into a List.
   Map<String, dynamic> toMap() => {
         'name': name,
         'price': price,
@@ -90,249 +30,98 @@ class SelectedItem {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  List<SelectedItem> selectedItems = []; // New list to store selected items
+  Map<int, List<Item>> placeholderItemsMap = {};
+  int? selectedCategoryId;
 
-  // Add a method to update the count of an item
-  void updateItemCount(Item item, int change) {
-    setState(() {
-      item.count += change;
-      // Implement logic to handle max limit (optional)
-      if (item.count > item.max) {
-        item.count = item.max; // Reset to max if exceeded
-      } else if (item.count < 0) {
-        item.count = 0; // Reset to 0 if negative
-      }
-    });
-  }
-  
-  //Another add method to add the item to the selectedItems
-
-void addSelectedItem(Item item) {
-  final existingItemIndex = selectedItems.indexWhere(
-      (selectedItem) => selectedItem.name == item.name && selectedItem.count > 0);
-
-  if (existingItemIndex != -1) {
-    // Update count for existing item with count > 0
-    setState(() {
-      selectedItems[existingItemIndex].count += item.count;
-    });
-  } else {
-    // Add new item or existing item with count 0
-    setState(() {
-      selectedItems.add(SelectedItem(name: item.name, price: item.price, count: item.count));
-    });
-  }
-}
-
-
-//subtract method that will check if the item exists in the selectedItems and if the count is more than one reduce 
-//the count by one, else remove it from the selectedItems (count < 0)
-void reduceSelectedItems(Item item) {
-  final existingItem = selectedItems.firstWhere((selectedItem) => selectedItem.name == item.name);
-  setState(() {
-    if (existingItem.count > 1) {
-      existingItem.count--;
-    } else {
-      selectedItems.remove(existingItem);
-    }
-  });
-}
-
-//total method that will get each item's price and count in the selectedItems and multiply them together to add all
-//product of each items then add them together to get the total sum.
-double calculateTotalPrice(List<SelectedItem> selectedItems) {
-  double totalPrice = 0.0;
-  for (final item in selectedItems) {
-    totalPrice += item.price * item.count;
-  }
-  return totalPrice;
-}
-
-  void clearSelectedItems() {
-  if(widget.isFinished){
-    setState(() {
-      for (var item in selectedItems) {
-        item.count = 0;
-      }
-    selectedItems.clear();
-  });
-  }else{
-    return;
-  }
-}
-
-//main build/function that contains the structure of the menupage.dart
   @override
   Widget build(BuildContext context) {
-  clearSelectedItems();
+    final categoryProvider = context.read<category_provider.CategoryProvider>();
+    Future<List<category_provider.Category>> categoryList = categoryProvider.fetchCategory();
+
     return Scaffold(
-      appBar: AppBar(
-        title:  Center(
-          child: 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Menu', style: GoogleFonts.lato(),
-              ),
-              // IconButton(onPressed: (){}, icon: const Icon(Icons.edit)),
-            ],
-          )
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: categories
-              .map((category) => buildCategoryContainer(category))
-              .toList(),
-        ),
-      ),
-      floatingActionButton: Theme(
-      data: Theme.of(context).copyWith(
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      extendedSizeConstraints: BoxConstraints.tightFor(height: 60),
-    ),
-    ),
-      child: FloatingActionButton.extended(
-      icon: const Icon(Icons.shopping_basket),
-      label: Text(
-        // Update label with counter and totalPrice (assuming they are defined elsewhere)
-        'Your ${selectedItems.fold(0, (sum, item) => sum + item.count)} Added Items  \$${calculateTotalPrice(selectedItems)}',
-      ),
-      onPressed: () {
-         final convertedItems = selectedItems.map((item) => item.toMap()).toList();
-        if (selectedItems.isNotEmpty) {
-      // Navigate to CartScreen with converted items
-          // Navigate to CartScreen with selected items
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CartScreen(
-                selectedItems: convertedItems,
-              ),
-            ),
-          );
-        } else {
-          // Show alert dialog if cart is empty
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Cart is Empty'),
-              content: const Text(
-                  'Please add items to your cart before proceeding.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context), // Close dialog
-                  child: const Text('OK'),
-                ),
-              ],
-              
-            ),
-            
-          );
-        }
-      },
-      backgroundColor: Colors.black,
-      foregroundColor: Colors.white,
-    ),
-)
-,
-    );
-  }
+      body: FutureBuilder<List<category_provider.Category>>(
+        future: categoryList,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No categories available'));
+          } else {
+            if (selectedCategoryId == null && snapshot.hasData && snapshot.data!.isNotEmpty) {
+              selectedCategoryId = snapshot.data!.first.id;
+            }
 
-  //custom widget that takes 1 parameter called Category to access the categories.dart elements
-  Widget buildCategoryContainer(Category category) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
-      height: 480,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(color: Colors.grey),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            category.name, //outputs dynamically each category name in the categories.dart
-            style:  GoogleFonts.montserrat(
-              textStyle: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          buildItemList(category.items), // Call function to build dynamic list
-        ],
-      ),
-    );
-  }
-
-  Widget buildItemList(List<Item> items) {
-    return ListView.builder(
-      shrinkWrap: true, // Prevent list from overflowing
-      physics: const NeverScrollableScrollPhysics(), // Disable scrolling
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return buildItemCard(item);
-      },
-    );
-  }
-
-  Widget buildItemCard(Item item) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        
-        child: Row(
-          children: [
-            // Display image (optional)
-            Image.network(
-              item.imagePath,
-              width: 100.0,
-              height: 100.0,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(width: 16.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item.name, style: GoogleFonts.poppins(
-                    textStyle: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500)
-                  ),
-                  ),
-                  const SizedBox(height: 4.0),
-                  Text('\$${item.price.toStringAsFixed(2)}' , 
-                  style: GoogleFonts.raleway(
-                    textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)
-                  ),
-                  ), // Format price
-                ],
-              ),
-            ),
-
-            // Display and update item count (optional)
-            Row(
+            return Column(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: () {
-                    updateItemCount(item, -1);
-                    reduceSelectedItems(item);
-                  }
+                Row(
+                  children: snapshot.data!.map((category) {
+                    return Flexible(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedCategoryId = category.id;
+                          });
+                          if (kDebugMode) {
+                            print('Selected Category ID: $selectedCategoryId');
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            borderRadius: BorderRadius.circular(8),
+                            color: selectedCategoryId == category.id
+                                ? Colors.blueAccent
+                                : Colors.transparent,
+                          ),
+                          child: Center(
+                            child: Text(
+                              category.name,
+                              style: const TextStyle(fontSize: 16),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-                Text(selectedItems.isEmpty ? '0' : item.count.toString()), //may error dito.
-
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    updateItemCount(item, 1);
-                    addSelectedItem(item);
-                  },
-                ),
+                if (selectedCategoryId != null)
+                  FutureBuilder<List<Item>>(
+                    future: categoryProvider.fetchItemByCategoryId(selectedCategoryId!),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('No items available'));
+                      } else {
+                        return Flexible(
+                          child: ListView(
+                            children: snapshot.data!.map((item) {
+                              return Card(
+                                child: ListTile(
+                                  title: Text(item.name),
+                                  subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                                  leading: item.imagePath.isNotEmpty
+                                      ? Image.network(item.imagePath)
+                                      : null,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      }
+                    },
+                  ),
               ],
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
     );
   }

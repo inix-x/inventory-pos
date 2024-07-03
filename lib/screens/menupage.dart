@@ -32,6 +32,19 @@ class SelectedItem {
 class _MenuScreenState extends State<MenuScreen> {
   Map<int, List<Item>> placeholderItemsMap = {};
   int? selectedCategoryId;
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,53 +68,20 @@ class _MenuScreenState extends State<MenuScreen> {
 
             return Column(
               children: [
-                Row(
-                  children: snapshot.data!.map((category) {
-                    return Flexible(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategoryId = category.id;
-                          });
-                          if (kDebugMode) {
-                            print('Selected Category ID: $selectedCategoryId');
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
-                            borderRadius: BorderRadius.circular(8),
-                            color: selectedCategoryId == category.id
-                                ? Colors.blueAccent
-                                : Colors.transparent,
-                          ),
-                          child: Center(
-                            child: Text(
-                              category.name,
-                              style: const TextStyle(fontSize: 16),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
+                
                 if (selectedCategoryId != null)
-                  FutureBuilder<List<Item>>(
-                    future: categoryProvider.fetchItemByCategoryId(selectedCategoryId!),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(child: Text('No items available'));
-                      } else {
-                        return Flexible(
-                          child: ListView(
+                  Expanded( // Changed to Expanded to fill remaining space
+                    child: FutureBuilder<List<Item>>(
+                      future: categoryProvider.fetchItemByCategoryId(selectedCategoryId!),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return const Center(child: Text('No items available'));
+                        } else {
+                          return ListView(
                             children: snapshot.data!.map((item) {
                               return Card(
                                 child: ListTile(
@@ -113,11 +93,50 @@ class _MenuScreenState extends State<MenuScreen> {
                                 ),
                               );
                             }).toList(),
-                          ),
-                        );
-                      }
-                    },
+                          );
+                        }
+                      },
+                    ),
                   ),
+                  SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: _scrollController,
+                  key: const PageStorageKey('categoryRowScrollPosition'),
+                  child: Row(
+                    children: snapshot.data!.map((category) {
+                      return Container(
+                        width: 100, // Fixed width for each container
+                        height: 50, // Fixed height for each container
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(8),
+                          color: selectedCategoryId == category.id
+                              ? Colors.blueAccent
+                              : Colors.transparent,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedCategoryId = category.id;
+                            });
+                            if (kDebugMode) {
+                              print('Selected Category ID: $selectedCategoryId');
+                            }
+                          },
+                          child: Center(
+                            child: Text(
+                              category.name,
+                              style: const TextStyle(fontSize: 16),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ],
             );
           }
