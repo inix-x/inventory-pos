@@ -100,6 +100,15 @@ class CategoryProvider extends ChangeNotifier {
       );
     }).toList();
   }
+    Future<List<Item>> fetchItemsByName(String name) async {
+    final db = await _databaseService.database;
+    final result = await db.query(
+      'items',
+      where: 'name LIKE ?',
+      whereArgs: ['%$name%'],
+    );
+    return result.map((itemData) => Item.fromMap(itemData)).toList();
+  }
 }
 
 class Category {

@@ -1,6 +1,5 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart' hide Category;
-// ignore: unused_import
-import 'package:flutter_application_1/cartscreen.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
@@ -33,18 +32,47 @@ class _MenuScreenState extends State<MenuScreen> {
   Map<int, List<Item>> placeholderItemsMap = {};
   int? selectedCategoryId;
   late ScrollController _scrollController;
+  final TextEditingController _searchController = TextEditingController(); // Initialize _searchController here
+  Timer? _debounce;
+  List<Item> _searchResults = [];
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _searchController.addListener(_onSearchChanged); // Add listener after initialization
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose(); // Dispose of _searchController properly
+    _debounce?.cancel();
     super.dispose();
   }
+
+void _onSearchChanged() {
+  if (_debounce?.isActive ?? false) _debounce?.cancel();
+  _debounce = Timer(const Duration(seconds: 1), () {
+    if (_searchController.text.isNotEmpty) {
+      _lazySearch(_searchController.text);
+    } else {
+      setState(() {
+        _searchResults.clear();
+      });
+    }
+  });
+}
+
+Future<void> _lazySearch(String query) async {
+  final categoryProvider = context.read<category_provider.CategoryProvider>();
+  final items = await categoryProvider.fetchItemsByName(query);
+
+  setState(() {
+    _searchResults = items;
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +96,44 @@ class _MenuScreenState extends State<MenuScreen> {
 
             return Column(
               children: [
-                
-                if (selectedCategoryId != null)
+                // Search Bar
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search for items',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                if (_searchResults.isNotEmpty)
+                  Expanded(
+                    child: ListView(
+                      children: _searchResults.map((item) {
+                        return Card(
+                          child: ListTile(
+                            title: Text(item.name),
+                            subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                            leading: item.imagePath.isNotEmpty
+                                ? Image.network(item.imagePath)
+                                : null,
+                            onTap: () {
+                              setState(() {
+                                selectedCategoryId = item.id;
+                                _searchController.clear();
+                                _searchResults.clear();
+                              });
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  )
+                else if (selectedCategoryId != null)
                   Expanded( // Changed to Expanded to fill remaining space
                     child: FutureBuilder<List<Item>>(
                       future: categoryProvider.fetchItemByCategoryId(selectedCategoryId!),
@@ -98,7 +162,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       },
                     ),
                   ),
-                  SingleChildScrollView(
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   controller: _scrollController,
                   key: const PageStorageKey('categoryRowScrollPosition'),
@@ -127,7 +191,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           },
                           child: Center(
                             child: Text(
-                              category.name,
+                              category.name,  
                               style: const TextStyle(fontSize: 16),
                               textAlign: TextAlign.center,
                             ),
