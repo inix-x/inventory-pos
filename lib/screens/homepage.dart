@@ -1,3 +1,4 @@
+// ignore: unused_import
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
@@ -18,6 +19,7 @@ class HomeApp extends StatefulWidget {
   State<HomeApp> createState() => _HomeAppState();
 }
 
+// ignore: unused_element
 bool _isClicked = false;
 bool _isFinished = false;
 
@@ -101,60 +103,60 @@ class _HomeAppState extends State<HomeApp> {
         body: MenuScreen(
           isFinished: _isFinished,
         ),
-        bottomNavigationBar: Container(
-          height: 70,
-          color: Colors.black,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    color: !_isClicked ? accentColor : primaryColor,
-                    child: MaterialButton(
-                      onPressed: () {
-                        setState(() {
-                          _isClicked = !_isClicked;
-                        });
-                      },
-                      child: Icon(
-                        Icons.menu_book,
-                        color: _isClicked ? accentColor : primaryColor,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-                // const SizedBox(
-                //   width: 15,
-                // ),
-                const DottedLine(
-                  direction: Axis.vertical,
-                  alignment: WrapAlignment.center,
-                  dashLength: 5,
-                  lineLength: double.infinity,
-                  lineThickness: 1.0,
-                  dashColor: Colors.white,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Container(
-                      color: _isClicked ? accentColor : primaryColor,
-                      child: MaterialButton(
-                          onPressed: () => navigateToAccount(
-                              context), // Pass context explicitly
-                          child: Icon(
-                            Icons.account_circle,
-                            color: !_isClicked ? accentColor : primaryColor,
-                            size: 25,
-                          ))),
-                )
-              ],
-            ),
-          ),
-        ),
+        // bottomNavigationBar: Container(
+        //   height: 70,
+        //   color: Colors.black,
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(10.0),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //       children: [
+        //         Padding(
+        //           padding: const EdgeInsets.all(8.0),
+        //           child: Container(
+        //             color: !_isClicked ? accentColor : primaryColor,
+        //             child: MaterialButton(
+        //               onPressed: () {
+        //                 setState(() {
+        //                   _isClicked = !_isClicked;
+        //                 });
+        //               },
+        //               child: Icon(
+        //                 Icons.menu_book,
+        //                 color: _isClicked ? accentColor : primaryColor,
+        //                 size: 20,
+        //               ),
+        //             ),
+        //           ),
+        //         ),
+        //         // const SizedBox(
+        //         //   width: 15,
+        //         // ),
+        //         const DottedLine(
+        //           direction: Axis.vertical,
+        //           alignment: WrapAlignment.center,
+        //           dashLength: 5,
+        //           lineLength: double.infinity,
+        //           lineThickness: 1.0,
+        //           dashColor: Colors.white,
+        //         ),
+        //         Padding(
+        //           padding: const EdgeInsets.all(8),
+        //           child: Container(
+        //               color: _isClicked ? accentColor : primaryColor,
+        //               child: MaterialButton(
+        //                   onPressed: () => navigateToAccount(
+        //                       context), // Pass context explicitly
+        //                   child: Icon(
+        //                     Icons.account_circle,
+        //                     color: !_isClicked ? accentColor : primaryColor,
+        //                     size: 25,
+        //                   ))),
+        //         )
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ),
     );
   }

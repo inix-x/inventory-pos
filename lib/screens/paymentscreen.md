@@ -34,7 +34,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
   void handleCashPayment() {
   double change = calculateChange();
-  if (change >= 0 ) {
+  if (change >= 0 && cashAmount != null ) {
     // Show success message and change amount (if any)
     if (kDebugMode) {
       print('Payment successful! Change: \$${change.toStringAsFixed(2)}');

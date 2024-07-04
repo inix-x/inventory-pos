@@ -1,6 +1,5 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart' hide Category;
-// ignore: unused_import
-import 'package:flutter_application_1/cartscreen.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
@@ -33,17 +32,94 @@ class _MenuScreenState extends State<MenuScreen> {
   Map<int, List<Item>> placeholderItemsMap = {};
   int? selectedCategoryId;
   late ScrollController _scrollController;
+  final TextEditingController _searchController = TextEditingController(); // Initialize _searchController here
+  Timer? _debounce;
+  List<Item> _searchResults = [];
+  List<SelectedItem> selectedItems = [];
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _searchController.addListener(_onSearchChanged); // Add listener after initialization
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose(); // Dispose of _searchController properly
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(seconds: 1), () {
+      if (_searchController.text.isNotEmpty) {
+        _lazySearch(_searchController.text);
+      } else {
+        setState(() {
+          _searchResults.clear();
+        });
+      }
+    });
+  }
+
+  Future<void> _lazySearch(String query) async {
+    final categoryProvider = context.read<category_provider.CategoryProvider>();
+    final items = await categoryProvider.fetchItemsByName(query);
+
+    setState(() {
+      _searchResults = items;
+    });
+  }
+
+  void _incrementItemCount(Item item) {
+    setState(() {
+      final selectedItem = selectedItems.firstWhere(
+        (selectedItem) => selectedItem.name == item.name,
+        orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+      );
+
+      if (selectedItem.count == 0) {
+        selectedItems.add(selectedItem);
+      }
+
+      selectedItem.count += 1;
+
+      if (kDebugMode) {
+        print(selectedItems.map((item) => item.toMap()).toList());
+      }
+    });
+  }
+
+  void _decrementItemCount(Item item) {
+    setState(() {
+      final selectedItem = selectedItems.firstWhere(
+        (selectedItem) => selectedItem.name == item.name,
+        orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+      );
+
+      if (selectedItem.count > 0) {
+        selectedItem.count -= 1;
+
+        if (selectedItem.count == 0) {
+          selectedItems.removeWhere((element) => element.name == item.name);
+        }
+      }
+
+      if (kDebugMode) {
+        print(selectedItems.map((item) => item.toMap()).toList());
+      }
+    });
+  }
+
+  int _getTotalItemCount() {
+    return selectedItems.fold(0, (total, item) => total + item.count);
+  }
+
+  double _getTotalPrice() {
+    return selectedItems.fold(0.0, (total, item) => total + (item.price * item.count));
   }
 
   @override
@@ -68,8 +144,44 @@ class _MenuScreenState extends State<MenuScreen> {
 
             return Column(
               children: [
-                
-                if (selectedCategoryId != null)
+                // Search Bar
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search for items',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                if (_searchResults.isNotEmpty)
+                  Expanded(
+                    child: ListView(
+                      children: _searchResults.map((item) {
+                        return Card(
+                          child: ListTile(
+                            title: Text(item.name),
+                            subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                            leading: item.imagePath.isNotEmpty
+                                ? Image.network(item.imagePath)
+                                : null,
+                            onTap: () {
+                              setState(() {
+                                selectedCategoryId = item.id;
+                                _searchController.clear();
+                                _searchResults.clear();
+                              });
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  )
+                else if (selectedCategoryId != null)
                   Expanded( // Changed to Expanded to fill remaining space
                     child: FutureBuilder<List<Item>>(
                       future: categoryProvider.fetchItemByCategoryId(selectedCategoryId!),
@@ -83,6 +195,11 @@ class _MenuScreenState extends State<MenuScreen> {
                         } else {
                           return ListView(
                             children: snapshot.data!.map((item) {
+                              final selectedItem = selectedItems.firstWhere(
+                                (selectedItem) => selectedItem.name == item.name,
+                                orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+                              );
+
                               return Card(
                                 child: ListTile(
                                   title: Text(item.name),
@@ -90,6 +207,20 @@ class _MenuScreenState extends State<MenuScreen> {
                                   leading: item.imagePath.isNotEmpty
                                       ? Image.network(item.imagePath)
                                       : null,
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.remove),
+                                        onPressed: () => _decrementItemCount(item),
+                                      ),
+                                      Text('${selectedItem.count}'),
+                                      IconButton(
+                                        icon: const Icon(Icons.add),
+                                        onPressed: () => _incrementItemCount(item),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -98,7 +229,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       },
                     ),
                   ),
-                  SingleChildScrollView(
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   controller: _scrollController,
                   key: const PageStorageKey('categoryRowScrollPosition'),
@@ -141,6 +272,24 @@ class _MenuScreenState extends State<MenuScreen> {
             );
           }
         },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total number of items: ${_getTotalItemCount()}',
+                style: const TextStyle(fontSize: 14),
+              ),
+              Text(
+                'Total price: \$${_getTotalPrice().toStringAsFixed(2)}',
+                style: const TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
