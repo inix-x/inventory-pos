@@ -4,10 +4,11 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart'
-    as category_provider;
+import 'package:flutter_application_1/global/common/toast.dart';
+import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_application_1/loginwidget/auth_service.dart';
 
 // Import the CartScreen
 import 'package:flutter_application_1/screens/cartscreen.dart';
@@ -35,12 +36,11 @@ class SelectedItem {
       };
 }
 
-class _MenuScreenState extends State<MenuScreen> {
+class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   Map<int, List<Item>> placeholderItemsMap = {};
-  int? selectedCategoryId;
+  final ValueNotifier<int?> selectedCategoryId = ValueNotifier<int?>(null);
   late ScrollController _scrollController;
-  final TextEditingController _searchController =
-      TextEditingController(); // Initialize _searchController here
+  final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   List<Item> _searchResults = [];
   List<SelectedItem> selectedItems = [];
@@ -49,16 +49,25 @@ class _MenuScreenState extends State<MenuScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    _searchController
-        .addListener(_onSearchChanged); // Add listener after initialization
+    _searchController.addListener(_onSearchChanged);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _searchController.dispose(); // Dispose of _searchController properly
+    _searchController.dispose();
     _debounce?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  // Implementing the observer method
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      AuthService().signout();
+    }
   }
 
   void _onSearchChanged() {
@@ -87,8 +96,7 @@ class _MenuScreenState extends State<MenuScreen> {
     setState(() {
       final selectedItem = selectedItems.firstWhere(
         (selectedItem) => selectedItem.name == item.name,
-        orElse: () =>
-            SelectedItem(name: item.name, price: item.price, count: 0),
+        orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
       );
 
       if (selectedItem.count == 0) {
@@ -107,8 +115,7 @@ class _MenuScreenState extends State<MenuScreen> {
     setState(() {
       final selectedItem = selectedItems.firstWhere(
         (selectedItem) => selectedItem.name == item.name,
-        orElse: () =>
-            SelectedItem(name: item.name, price: item.price, count: 0),
+        orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
       );
 
       if (selectedItem.count > 0) {
@@ -130,8 +137,7 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   double _getTotalPrice() {
-    return selectedItems.fold(
-        0.0, (total, item) => total + (item.price * item.count));
+    return selectedItems.fold(0.0, (total, item) => total + (item.price * item.count));
   }
 
   void _navigateToCartScreen() {
@@ -146,8 +152,7 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     final categoryProvider = context.read<category_provider.CategoryProvider>();
-    Future<List<category_provider.Category>> categoryList =
-        categoryProvider.fetchCategory();
+    Future<List<category_provider.Category>> categoryList = categoryProvider.fetchCategory();
 
     return Scaffold(
       body: FutureBuilder<List<category_provider.Category>>(
@@ -160,10 +165,8 @@ class _MenuScreenState extends State<MenuScreen> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No categories available'));
           } else {
-            if (selectedCategoryId == null &&
-                snapshot.hasData &&
-                snapshot.data!.isNotEmpty) {
-              selectedCategoryId = snapshot.data!.first.id;
+            if (selectedCategoryId.value == null && snapshot.hasData && snapshot.data!.isNotEmpty) {
+              selectedCategoryId.value = snapshot.data!.first.id;
             }
 
             return Column(
@@ -189,128 +192,88 @@ class _MenuScreenState extends State<MenuScreen> {
                         return Card(
                           child: ListTile(
                             title: Text(item.name),
-                            subtitle:
-                                Text('\$${item.price.toStringAsFixed(2)}'),
+                            subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
                             leading: item.imagePath.isNotEmpty
                                 ? Image.network(item.imagePath)
                                 : null,
                             onTap: () {
-                              setState(() {
-                                selectedCategoryId = item.id;
-                                _searchController.clear();
-                                _searchResults.clear();
-                              });
+                              selectedCategoryId.value = item.id;
+                              _searchController.clear();
+                              _searchResults.clear();
                             },
                           ),
                         );
                       }).toList(),
                     ),
                   )
-                else if (selectedCategoryId != null)
+                else
                   Expanded(
-                    // Changed to Expanded to fill remaining space
-                    child: FutureBuilder<List<Item>>(
-                      future: categoryProvider
-                          .fetchItemByCategoryId(selectedCategoryId!),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                              child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return const Center(
-                              child: Text('No items available'));
-                        } else {
-                          return ListView(
-                            children: snapshot.data!.map((item) {
-                              final selectedItem = selectedItems.firstWhere(
-                                (selectedItem) =>
-                                    selectedItem.name == item.name,
-                                orElse: () => SelectedItem(
-                                    name: item.name,
-                                    price: item.price,
-                                    count: 0),
-                              );
-
-                              return Card(
-                                child: ListTile(
-                                  title: Text(item.name),
-                                  subtitle: Text(
-                                      '\$${item.price.toStringAsFixed(2)}'),
-                                  leading: item.imagePath.isNotEmpty
-                                      ? Image.network(item.imagePath)
-                                      : null,
-                                  trailing: SizedBox(
-                                    // Wrapping Row in SizedBox
-                                    width: 120,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.remove),
-                                          onPressed: () =>
-                                              _decrementItemCount(item),
-                                        ),
-                                        Text('${selectedItem.count}'),
-                                        IconButton(
-                                          icon: const Icon(Icons.add),
-                                          onPressed: () =>
-                                              _incrementItemCount(item),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          );
+                    child: ValueListenableBuilder<int?>(
+                      valueListenable: selectedCategoryId,
+                      builder: (context, selectedCategoryIdValue, child) {
+                        if (selectedCategoryIdValue == null) {
+                          return const Center(child: Text('No items available'));
                         }
+
+                        return FutureBuilder<List<Item>>(
+                          future: categoryProvider.fetchItemByCategoryId(selectedCategoryIdValue),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return const Center(child: Text('No items available'));
+                            } else {
+                              return ListView(
+                                children: snapshot.data!.map((item) {
+                                  final selectedItem = selectedItems.firstWhere(
+                                    (selectedItem) => selectedItem.name == item.name,
+                                    orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+                                  );
+
+                                  return Card(
+                                    child: ListTile(
+                                      title: Text(item.name),
+                                      subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                                      leading: item.imagePath.isNotEmpty
+                                          ? Image.network(item.imagePath)
+                                          : null,
+                                      trailing: SizedBox(
+                                        width: 120,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(Icons.remove),
+                                              onPressed: () {
+                                                _decrementItemCount(item);
+                                              },
+                                            ),
+                                            Text('${selectedItem.count}'),
+                                            IconButton(
+                                              icon: const Icon(Icons.add),
+                                              onPressed: () {
+                                                _incrementItemCount(item);
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            }
+                          },
+                        );
                       },
                     ),
                   ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  controller: _scrollController,
-                  key: const PageStorageKey('categoryRowScrollPosition'),
-                  child: Row(
-                    children: snapshot.data!.map((category) {
-                      return Container(
-                        width: 100, // Fixed width for each container
-                        height: 50, // Fixed height for each container
-                        padding: const EdgeInsets.all(8),
-                        margin: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          borderRadius: BorderRadius.circular(8),
-                          color: selectedCategoryId == category.id
-                              ? Colors.blueAccent
-                              : Colors.transparent,
-                        ),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedCategoryId = category.id;
-                            });
-                            if (kDebugMode) {
-                              print(
-                                  'Selected Category ID: $selectedCategoryId');
-                            }
-                          },
-                          child: Center(
-                            child: Text(
-                              category.name,
-                              style: const TextStyle(fontSize: 16),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                CategoryScrollView(
+                  categoryList: snapshot.data!,
+                  selectedCategoryId: selectedCategoryId,
+                  scrollController: _scrollController,
                 ),
               ],
             );
@@ -344,10 +307,15 @@ class _MenuScreenState extends State<MenuScreen> {
                 lineThickness: 1.0,
                 dashColor: primaryColor,
               ),
-             
               Flexible(
                 child: MaterialButton(
-                  onPressed: _navigateToCartScreen,
+                  onPressed: () {
+                    if (selectedItems.isEmpty) {
+                      showToast(message: 'No items to checkout');
+                    } else {
+                      _navigateToCartScreen();
+                    }
+                  },
                   child: Text(
                     'Checkout',
                     style: GoogleFonts.quattrocento(
@@ -363,6 +331,63 @@ class _MenuScreenState extends State<MenuScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CategoryScrollView extends StatelessWidget {
+  final List<category_provider.Category> categoryList;
+  final ValueNotifier<int?> selectedCategoryId;
+  final ScrollController scrollController;
+
+  const CategoryScrollView({
+    super.key,
+    required this.categoryList,
+    required this.selectedCategoryId,
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      controller: scrollController,
+      key: const PageStorageKey('categoryRowScrollPosition'),
+      child: Row(
+        children: categoryList.map((category) {
+          return ValueListenableBuilder<int?>(
+            valueListenable: selectedCategoryId,
+            builder: (context, selectedCategoryIdValue, child) {
+              return Container(
+                width: 100,
+                height: 50,
+                padding: const EdgeInsets.all(8),
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.circular(8),
+                  color: selectedCategoryIdValue == category.id ? Colors.blueAccent : Colors.transparent,
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    selectedCategoryId.value = category.id;
+                    if (kDebugMode) {
+                      print('Selected Category ID: $selectedCategoryId');
+                    }
+                  },
+                  child: Center(
+                    child: Text(
+                      category.name,
+                      style: const TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }).toList(),
       ),
     );
   }

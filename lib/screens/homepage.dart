@@ -87,7 +87,7 @@ class _HomeAppState extends State<HomeApp> {
               ),
               const Spacer(),
               // Text(businessName.isEmpty ? 'Nothing\'s here ' : 'Yep', style: const TextStyle(color: accentColor)),
-               const Text('Home', style: TextStyle(color: accentColor)),
+               const Text('Menu', style: TextStyle(color: accentColor)),
                const Spacer(),
                   Customsignout(
                 onPressed: _onWillPop,

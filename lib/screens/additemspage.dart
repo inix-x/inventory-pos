@@ -1,19 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
+import 'package:flutter_application_1/providers/categoryprovider.dart'
+    as category_provider;
 import 'package:provider/provider.dart';
 
 class AddItemspage extends StatefulWidget {
   final int itemIndex;
-  final String catName;
+ 
   final List<Item> items;
 
   const AddItemspage({
     super.key,
     required this.itemIndex,
-    required this.catName,
+  
     required this.items,
   });
 
@@ -22,94 +24,132 @@ class AddItemspage extends StatefulWidget {
 }
 
 class _AddItemspageState extends State<AddItemspage> {
-  //do not allow user to go back until the items in each category is saved
   bool isSaved = true;
- 
+
   void showInputDialog() async {
-    final itemNameController = TextEditingController();
-    final itemPriceController = TextEditingController();
-    final itemCountController = TextEditingController();
+  final itemNameController = TextEditingController();
+  final itemPriceController = TextEditingController();
+  final itemCountController = TextEditingController();
 
-    final categoryProvider = context.read<category_provider.CategoryProvider>();
-    
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Item'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TextField(
-                controller: itemNameController,
-                keyboardType: TextInputType.name,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter item name',
-                ),
+  final categoryProvider = context.read<category_provider.CategoryProvider>();
+
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Add Item'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextField(
+              controller: itemNameController,
+              keyboardType: TextInputType.name,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter item name',
               ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: itemPriceController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter item price',
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: itemCountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter item stock',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
             ),
-            TextButton(
-              onPressed: () {
-                final itemName = itemNameController.text;
-                if (itemName.isNotEmpty &&
-                    itemPriceController.text.isNotEmpty &&
-                    itemCountController.text.isNotEmpty) {
-                  final itemPrice = double.parse(itemPriceController.text);
-                  final itemStock = int.parse(itemCountController.text);
-                  final newItem = Item(
-                    name: itemName,
-                    price: itemPrice,
-                    imagePath: '',
-                    count: itemStock,
-                    max: 10,
-                  );
-
-                  // Add item to the placeholder list
-                  categoryProvider.addItemToPlaceholder(widget.itemIndex, newItem);
-
-                  //RESET the isSaved Bool if there's a new Item to prompt the user to save before going back
-                  setState(() {
-                    isSaved = false;
-                  });
-                  showToast(message: 'Please save the items first.');
-                  Navigator.pop(context);
-                } else {
-                  showToast(message: 'Please fill in all fields');
-                }
-              },
-              child: const Text('Add'),
+            const SizedBox(height: 10),
+            TextField(
+              controller: itemPriceController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')), // Only numbers and decimal point
+              ],
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter item price',
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: itemCountController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly, // Only digits allowed
+              ],
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter item stock',
+              ),
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final itemName = itemNameController.text.trim();
+              final itemPriceText = itemPriceController.text.trim();
+              final itemCountText = itemCountController.text.trim();
+
+              // Regular expression to check for alphabets and spaces only
+              final validItemName = RegExp(r'^[a-zA-Z\s]+$');
+
+              if (itemName.isEmpty) {
+                showToast(message: 'Item name cannot be empty');
+              } else if (!validItemName.hasMatch(itemName)) {
+                showToast(message: 'Item name can only contain letters and spaces');
+              } else if (itemPriceText.isEmpty) {
+                showToast(message: 'Item price cannot be empty');
+              } else if (itemCountText.isEmpty) {
+                showToast(message: 'Item count cannot be empty');
+              } else {
+                try {
+                  final itemPrice = double.parse(itemPriceText);
+                  final itemStock = int.parse(itemCountText);
+
+                  // Check if item price is a positive number
+                  if (itemPrice <= 0) {
+                    showToast(message: 'Item price must be greater than 0');
+                  } else if (itemStock <= 0) {
+                    showToast(message: 'Item count must be greater than 0');
+                  } else {
+                    // ignore: no_leading_underscores_for_local_identifiers
+                    final DatabaseService _databaseService = DatabaseService.instance;
+                    final itemExists = await _databaseService.itemExists(itemName);
+
+                    if (itemExists) {
+                      showToast(message: 'The item already exists');
+                    } else {
+                      final newItem = Item(
+                        name: itemName,
+                        price: itemPrice,
+                        imagePath: '',
+                        count: itemStock,
+                        max: 10,
+                      );
+
+                      categoryProvider.addItemToPlaceholder(widget.itemIndex, newItem);
+
+                      if (mounted) {
+                        setState(() {
+                          isSaved = false;
+                        });
+                      }
+                      showToast(message: 'Please save the items first.');
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context);
+                    }
+                  }
+                } catch (e) {
+                  showToast(message: 'Invalid input for price or count');
+                }
+              }
+            },
+            child: const Text('Save Item'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
 
   void saveItemsDb() async {
     final categoryProvider = context.read<category_provider.CategoryProvider>();
@@ -117,18 +157,17 @@ class _AddItemspageState extends State<AddItemspage> {
     // ignore: no_leading_underscores_for_local_identifiers
     final DatabaseService _databaseService = DatabaseService.instance;
 
-    // Fetch the categoryId using the category name
-    final categoryId = await _databaseService.fetchCategoryIdByName(category.name);
+    final categoryId =
+        await _databaseService.fetchCategoryIdByName(category.name);
 
     if (categoryId != -1) {
-      final placeholderItems = categoryProvider.getPlaceholderItems(widget.itemIndex);
+      final placeholderItems =
+          categoryProvider.getPlaceholderItems(widget.itemIndex);
 
-      // Add each item to the database with fetched categoryId from the placeholder
       for (var item in placeholderItems) {
         await _databaseService.addItems(categoryId, [item]);
       }
 
-      // Fetch and print stored data
       final storedData = await _databaseService.fetchCategories();
       if (kDebugMode) {
         print('--- Stored Data in Database ---');
@@ -136,6 +175,7 @@ class _AddItemspageState extends State<AddItemspage> {
           print(data);
         }
       }
+
       final storedItems = await _databaseService.fetchItems();
       if (kDebugMode) {
         print('--- Stored Data in Database ---');
@@ -146,12 +186,15 @@ class _AddItemspageState extends State<AddItemspage> {
 
       showToast(message: 'Items Successfully Saved');
 
-      // Update the items in the provider
-      setState(() {
-        categoryProvider.categories[widget.itemIndex].items.addAll(placeholderItems);
-        isSaved = true;
-          Navigator.of(context).pop(true);
-      });
+      if (mounted) {
+        setState(() {
+          categoryProvider.categories[widget.itemIndex].items
+              .addAll(placeholderItems);
+          isSaved = true;
+        });
+
+        Navigator.pop(context);
+      }
     } else {
       showToast(message: 'Category not found');
     }
@@ -162,51 +205,54 @@ class _AddItemspageState extends State<AddItemspage> {
     categoryProvider.removeItem(widget.itemIndex, index);
   }
 
-   Future<bool> _onWillPop() async {
-    return (
-      await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('There are items that are not saved to the database'),
-            content: const Text('Would you like to save your items?'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('No'),
-              ),
-              TextButton(
-                onPressed: () {
-                 
-                  saveItemsDb();
-                  setState(() {
-                    isSaved = true;
-                     Navigator.pop(context);
-                  });
-                },
-                child: const Text('Yes'),
-              ),
-            ],
-          ),
-        )) ??
-        false;
+  Future<bool> _onWillPop() async {
+    if (!isSaved) {
+      return await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text(
+                  'There are items that are not saved to the database'),
+              content: const Text('Would you like to save your items?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('No'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    saveItemsDb();
+                    setState(() {
+                      isSaved = true;
+                    });
+                  },
+                  child: const Text('Yes'),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+    } else {
+      return true;
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
-    final categoryProvider = context.watch<category_provider.CategoryProvider>();
+    final categoryProvider =
+        context.watch<category_provider.CategoryProvider>();
     final category = categoryProvider.categories[widget.itemIndex];
-    final placeholderItems = categoryProvider.getPlaceholderItems(widget.itemIndex);
+    final placeholderItems =
+        categoryProvider.getPlaceholderItems(widget.itemIndex);
 
     // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: isSaved ? _onWillPop : _onWillPop,
+      onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: isSaved ? true : false,
           title: Row(
-            mainAxisAlignment: isSaved ? MainAxisAlignment.start : MainAxisAlignment.center,
-      
+            mainAxisAlignment:
+                isSaved ? MainAxisAlignment.start : MainAxisAlignment.center,
             children: [
               Text(category.name),
             ],
@@ -218,7 +264,7 @@ class _AddItemspageState extends State<AddItemspage> {
             children: [
               placeholderItems.isNotEmpty
                   ? Flexible(
-                    child: ListView.builder(
+                      child: ListView.builder(
                         shrinkWrap: true,
                         itemCount: placeholderItems.length,
                         itemBuilder: (context, index) {
@@ -227,21 +273,25 @@ class _AddItemspageState extends State<AddItemspage> {
                             key: ValueKey(item.id),
                             background: Container(
                               color: Colors.red,
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child:
+                                  const Icon(Icons.delete, color: Colors.white),
                             ),
                             onDismissed: (_) => _removeItem(index),
                             child: Card(
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Text(item.name),
                                         Text('Price: ${item.price.toString()}'),
-                                        Text('Stocks: ${item.count.toString()}'),
+                                        Text(
+                                            'Stocks: ${item.count.toString()}'),
                                       ],
                                     ),
                                     IconButton(
@@ -257,7 +307,7 @@ class _AddItemspageState extends State<AddItemspage> {
                           );
                         },
                       ),
-                  )
+                    )
                   : Text('Please add items for ${category.name}'),
               const SizedBox(height: 10),
               ElevatedButton(

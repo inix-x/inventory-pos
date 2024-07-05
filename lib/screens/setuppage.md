@@ -1,12 +1,11 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/customersignout.dart';
 import 'package:flutter_application_1/loginwidget/loginpage.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
+import 'package:flutter_application_1/providers/categoryprovider.dart'
+    as category_provider;
 import 'package:flutter_application_1/screens/additemspage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
 import 'package:provider/provider.dart';
@@ -43,67 +42,45 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
   }
 
   void _addNewCategory() async {
-  final categoryNameController = TextEditingController();
+    final categoryNameController = TextEditingController();
 
-  await showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Add Category'),
-        content: TextField(
-          autofocus: true,
-          keyboardType: TextInputType.name,
-          controller: categoryNameController,
-          decoration: const InputDecoration(
-            labelText: 'Category Name',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              setState(() {
-                categoryName = categoryNameController.text.trim();
-              });
-
-              // Regular expression to check for alphabets and spaces only
-              final validCategoryName = RegExp(r'^[a-zA-Z\s]+$');
-
-              if (categoryName.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Category name cannot be empty')),
-                );
-              } else if (!validCategoryName.hasMatch(categoryName)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Category name can only contain letters and spaces')),
-                );
-              } else {
-                final dbService = DatabaseService.instance;
-                final existingCategory = await dbService.fetchCategoryByNameChecker(categoryName);
-                if (existingCategory.isNotEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('The category name already exists')),
-                  );
-                } else {
-                  context.read<category_provider.CategoryProvider>().addNewCat(
-                    newCategoryNames: categoryName, 
-                    newItems: [],
-                  );
-                  Navigator.pop(context);
-                }
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Add Category'),
+            content: TextField(
+              autofocus: true,
+              keyboardType: TextInputType.name,
+              controller: categoryNameController,
+              decoration: const InputDecoration(
+                labelText: 'Category Name',
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    categoryName = categoryNameController.text;
+                  });
+                  if (categoryName.isNotEmpty) {
+                    context
+                        .read<category_provider.CategoryProvider>()
+                        .addNewCat(
+                            newCategoryNames: categoryName, newItems: []);
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        });
+  }
 
   void _removeCategory(int index) {
     final categoryProvider =
@@ -147,11 +124,12 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
   }
 
   Future<void> _checkItemsAndSaveChanges() async {
-    final dbService = DatabaseService.instance;
+    final DatabaseService dbService = DatabaseService.instance;
     final List<Map<String, Object?>> items = await dbService.fetchItems();
 
     if (items.isEmpty) {
       showDialog(
+        // ignore: use_build_context_synchronously
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -168,8 +146,9 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
           );
         },
       );
-    } else if(mounted){
+    } else {
       Navigator.push(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (_) => const HomeApp(isFinished: true),
@@ -183,6 +162,8 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
     final categoryProvider =
         Provider.of<category_provider.CategoryProvider>(context);
     final categories = categoryProvider.categories;
+    final categoryName = categories.isNotEmpty ? categories.first.name : '';
+    final List<Item> itemList = [];
 
     // ignore: deprecated_member_use
     return WillPopScope(
@@ -239,14 +220,15 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                               ),
                               onDismissed: (_) => _removeCategory(index),
                               child: GestureDetector(
-                                onTap: () async {
-                                  await Navigator.push(
+                                onTap: () {
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => AddItemspage(
                                         itemIndex: index,
-                                        
-                                        items: const [],
+                                        catName: categoryName,
+                                        items:
+                                            itemList, //di mna click to kase yung itemList is
                                       ),
                                     ),
                                   );
@@ -274,6 +256,7 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                         ),
                       )
                     : const Center(child: Text('Add Categories here')),
+            
                 MaterialButton(
                   onPressed: _addNewCategory,
                   child: const Text('Add'),
@@ -284,6 +267,7 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                   },
                   child: const Text('Save Changes'),
                 ),
+              
               ],
             ),
           ),

@@ -1,9 +1,18 @@
 import 'dart:async';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/foundation.dart' hide Category;
+import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
+import 'package:flutter_application_1/global/common/toast.dart';
+import 'package:flutter_application_1/providers/categoryprovider.dart'
+    as category_provider;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_application_1/loginwidget/auth_service.dart';
+
+// Import the CartScreen
+import 'package:flutter_application_1/screens/cartscreen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key, required this.isFinished});
@@ -28,11 +37,12 @@ class SelectedItem {
       };
 }
 
-class _MenuScreenState extends State<MenuScreen> {
+class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   Map<int, List<Item>> placeholderItemsMap = {};
   int? selectedCategoryId;
   late ScrollController _scrollController;
-  final TextEditingController _searchController = TextEditingController(); // Initialize _searchController here
+  final TextEditingController _searchController =
+      TextEditingController(); // Initialize _searchController here
   Timer? _debounce;
   List<Item> _searchResults = [];
   List<SelectedItem> selectedItems = [];
@@ -41,7 +51,9 @@ class _MenuScreenState extends State<MenuScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    _searchController.addListener(_onSearchChanged); // Add listener after initialization
+    _searchController
+        .addListener(_onSearchChanged); // Add listener after initialization
+    WidgetsBinding.instance.addObserver(this); // Add observer
   }
 
   @override
@@ -49,7 +61,17 @@ class _MenuScreenState extends State<MenuScreen> {
     _scrollController.dispose();
     _searchController.dispose(); // Dispose of _searchController properly
     _debounce?.cancel();
+    WidgetsBinding.instance.removeObserver(this); // Remove observer
     super.dispose();
+  }
+
+  // Implementing the observer method
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      AuthService().signout(); // Sign out user
+    }
   }
 
   void _onSearchChanged() {
@@ -78,7 +100,8 @@ class _MenuScreenState extends State<MenuScreen> {
     setState(() {
       final selectedItem = selectedItems.firstWhere(
         (selectedItem) => selectedItem.name == item.name,
-        orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+        orElse: () =>
+            SelectedItem(name: item.name, price: item.price, count: 0),
       );
 
       if (selectedItem.count == 0) {
@@ -97,7 +120,8 @@ class _MenuScreenState extends State<MenuScreen> {
     setState(() {
       final selectedItem = selectedItems.firstWhere(
         (selectedItem) => selectedItem.name == item.name,
-        orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+        orElse: () =>
+            SelectedItem(name: item.name, price: item.price, count: 0),
       );
 
       if (selectedItem.count > 0) {
@@ -119,13 +143,24 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   double _getTotalPrice() {
-    return selectedItems.fold(0.0, (total, item) => total + (item.price * item.count));
+    return selectedItems.fold(
+        0.0, (total, item) => total + (item.price * item.count));
+  }
+
+  void _navigateToCartScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CartScreen(selectedItems: selectedItems),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final categoryProvider = context.read<category_provider.CategoryProvider>();
-    Future<List<category_provider.Category>> categoryList = categoryProvider.fetchCategory();
+    Future<List<category_provider.Category>> categoryList =
+        categoryProvider.fetchCategory();
 
     return Scaffold(
       body: FutureBuilder<List<category_provider.Category>>(
@@ -138,7 +173,9 @@ class _MenuScreenState extends State<MenuScreen> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No categories available'));
           } else {
-            if (selectedCategoryId == null && snapshot.hasData && snapshot.data!.isNotEmpty) {
+            if (selectedCategoryId == null &&
+                snapshot.hasData &&
+                snapshot.data!.isNotEmpty) {
               selectedCategoryId = snapshot.data!.first.id;
             }
 
@@ -165,7 +202,8 @@ class _MenuScreenState extends State<MenuScreen> {
                         return Card(
                           child: ListTile(
                             title: Text(item.name),
-                            subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                            subtitle:
+                                Text('\$${item.price.toStringAsFixed(2)}'),
                             leading: item.imagePath.isNotEmpty
                                 ? Image.network(item.imagePath)
                                 : null,
@@ -182,44 +220,62 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   )
                 else if (selectedCategoryId != null)
-                  Expanded( // Changed to Expanded to fill remaining space
+                  Expanded(
+                    // Changed to Expanded to fill remaining space
                     child: FutureBuilder<List<Item>>(
-                      future: categoryProvider.fetchItemByCategoryId(selectedCategoryId!),
+                      future: categoryProvider
+                          .fetchItemByCategoryId(selectedCategoryId!),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(child: Text('No items available'));
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return const Center(
+                              child: Text('No items available'));
                         } else {
                           return ListView(
                             children: snapshot.data!.map((item) {
                               final selectedItem = selectedItems.firstWhere(
-                                (selectedItem) => selectedItem.name == item.name,
-                                orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+                                (selectedItem) =>
+                                    selectedItem.name == item.name,
+                                orElse: () => SelectedItem(
+                                    name: item.name,
+                                    price: item.price,
+                                    count: 0),
                               );
 
                               return Card(
                                 child: ListTile(
                                   title: Text(item.name),
-                                  subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                                  subtitle: Text(
+                                      '\$${item.price.toStringAsFixed(2)}'),
                                   leading: item.imagePath.isNotEmpty
                                       ? Image.network(item.imagePath)
                                       : null,
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove),
-                                        onPressed: () => _decrementItemCount(item),
-                                      ),
-                                      Text('${selectedItem.count}'),
-                                      IconButton(
-                                        icon: const Icon(Icons.add),
-                                        onPressed: () => _incrementItemCount(item),
-                                      ),
-                                    ],
+                                  trailing: SizedBox(
+                                    // Wrapping Row in SizedBox
+                                    width: 120,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.remove),
+                                          onPressed: () =>
+                                              _decrementItemCount(item),
+                                        ),
+                                        Text('${selectedItem.count}'),
+                                        IconButton(
+                                          icon: const Icon(Icons.add),
+                                          onPressed: () =>
+                                              _incrementItemCount(item),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
@@ -253,12 +309,13 @@ class _MenuScreenState extends State<MenuScreen> {
                               selectedCategoryId = category.id;
                             });
                             if (kDebugMode) {
-                              print('Selected Category ID: $selectedCategoryId');
+                              print(
+                                  'Selected Category ID: $selectedCategoryId');
                             }
                           },
                           child: Center(
                             child: Text(
-                              category.name,  
+                              category.name,
                               style: const TextStyle(fontSize: 16),
                               textAlign: TextAlign.center,
                             ),
@@ -279,13 +336,49 @@ class _MenuScreenState extends State<MenuScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Total number of items: ${_getTotalItemCount()}',
-                style: const TextStyle(fontSize: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Items: ${_getTotalItemCount()}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  Text(
+                    ' Total price: \$${_getTotalPrice().toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
               ),
-              Text(
-                'Total price: \$${_getTotalPrice().toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 14),
+              const DottedLine(
+                direction: Axis.vertical,
+                alignment: WrapAlignment.center,
+                dashLength: 5,
+                lineLength: double.infinity,
+                lineThickness: 1.0,
+                dashColor: primaryColor,
+              ),
+             
+              Flexible(
+                child: MaterialButton(
+                  onPressed: (){
+                    if(selectedItems.isEmpty){
+                      showToast(message: 'No items to checkout');
+                    }else{
+                       _navigateToCartScreen();
+                    }
+                   
+                  },
+                  child: Text(
+                    'Checkout',
+                    style: GoogleFonts.quattrocento(
+                      textStyle: const TextStyle(
+                        color: primaryColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

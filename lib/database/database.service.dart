@@ -194,6 +194,18 @@ class DatabaseService {
     }
   }
 
+  Future<Map<String, Object?>> fetchCategoryByNameChecker(String categoryName) async {
+  final db = await database;
+  final maps = await db.query('categories', where: 'categoryName = ?', whereArgs: [categoryName]);
+
+  if (maps.isNotEmpty) {
+    return maps.first;
+  } else {
+    return {};
+  }
+}
+
+
   Future<int> fetchCategoryIdByName(String categoryName) async {
     final db = await database;
     final maps = await db.query('categories', columns: ['id'], where: 'categoryName = ?', whereArgs: [categoryName]);
@@ -203,6 +215,17 @@ class DatabaseService {
     } else {
       return -1;
     }
+  }
+
+  Future<bool> itemExists(String name) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'items',
+      columns: ['name'],
+      where: 'name = ?',
+      whereArgs: [name],
+    );
+    return result.isNotEmpty;
   }
 
   Future<List<Map<String, Object?>>> fetchItemById(int itemId) async {
@@ -216,6 +239,8 @@ class DatabaseService {
     final maps = await db.query('items', where: 'categoryId = ?', whereArgs: [categoryId]);
     return maps.toList();
   }
+
+  
 
   Future<void> updateCategory(int categoryId, String newCategoryName) async {
     final db = await database;
