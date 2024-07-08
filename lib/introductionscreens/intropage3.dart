@@ -1,64 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-
-void main() {
-  runApp(const IntroPage3());
-}
+// ignore: unnecessary_import
+import 'package:flutter/widgets.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class IntroPage3 extends StatelessWidget {
-  const IntroPage3({super.key});
+  const IntroPage3 ({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, right: 20, left: 20),
-            child: Container(
-              alignment: const Alignment(0, 0),
-              color: Colors.transparent,
-              child: const Text(
-                'Your business in your pocket.',
-                style: TextStyle(
-                  fontSize: 45,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+    const String firstWord = 'Business ';
+    const String secondWord = 'pocket. ';
+
+    return Scaffold(
+      body: Center(
+        child: Container(
+          decoration: const BoxDecoration(
+              image: DecorationImage(
+            image: AssetImage('assets/animations/page3.jpg'), 
+            fit: BoxFit.cover,
+          )),
+          child: Stack(children: [
+            Container(
+              decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.center,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.black12, Colors.black87])),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, right: 20, left: 20),
-            child: Container(
-              alignment: const Alignment(0, 0),
-              color: Colors.transparent,
-              child: const Wrap(
-                children: [
-                  Text(
-                    'Manage sales, inventory, and customers - all on the go.',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey,
+            Container(
+              alignment: const Alignment(0, 0.55),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: RichText(
+                    text:  TextSpan(
+                  style:  GoogleFonts.robotoSerif(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 35,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                  children: const [
+                    TextSpan(text: 'Your '),
+                    TextSpan(
+                      text: firstWord,
+                      style: TextStyle(
+                       
+                        color: Colors.blueAccent, // Color for the first word
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                    TextSpan(text: 'in your '),
+                    TextSpan(
+                      text: secondWord,
+                      style: TextStyle(
+                        color: Colors.green, // Color for the second word
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    
+                  ],
+                )),
               ),
             ),
-          ),
-          Container(
-            height: 400,
-            color: Colors.transparent,
-            child: Center(
-              child: Lottie.asset(
-                  'assets/animations/checkouthand.json',
-                  width: 350,
-                  height: 350,),
+            Container(
+              alignment: const Alignment(0, 0.75),
+              color: Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: 
+                Text('Manage sales, inventory, and customers - all on the go.',
+                style: GoogleFonts.robotoSerif(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                )
+              
+              ),
             ),
-          ),
-        ],
+          ]),
+        ),
       ),
     );
   }

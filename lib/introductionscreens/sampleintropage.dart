@@ -3,21 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class IntroPage2 extends StatelessWidget {
-  const IntroPage2({super.key});
+class IntroPage extends StatelessWidget {
+  const IntroPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const String firstWord = 'Effortless ';
-    const String secondWord = 'Inventory ';
-    const String thirdWord = 'Management.';
+    const String firstWord = 'Business ';
+    const String secondWord = 'pocket. ';
 
     return Scaffold(
       body: Center(
         child: Container(
           decoration: const BoxDecoration(
               image: DecorationImage(
-            image: AssetImage('assets/animations/page2.jpg'),
+            image: AssetImage('assets/animations/page3.jpg'), 
             fit: BoxFit.cover,
           )),
           child: Stack(children: [
@@ -29,7 +28,7 @@ class IntroPage2 extends StatelessWidget {
                       colors: [Colors.black12, Colors.black87])),
             ),
             Container(
-              alignment: const Alignment(0, 0.5),
+              alignment: const Alignment(0, 0.55),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: RichText(
@@ -42,7 +41,7 @@ class IntroPage2 extends StatelessWidget {
                                 ),
                               ),
                   children: const [
-                    
+                    TextSpan(text: 'Your '),
                     TextSpan(
                       text: firstWord,
                       style: TextStyle(
@@ -51,21 +50,15 @@ class IntroPage2 extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  
+                    TextSpan(text: 'in your '),
                     TextSpan(
                       text: secondWord,
                       style: TextStyle(
-                        color: Colors.white, // Color for the second word
+                        color: Colors.green, // Color for the second word
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    TextSpan(
-                      text: thirdWord,
-                      style: TextStyle(
-                        color: Colors.blue, // Color for the second word
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    
                   ],
                 )),
               ),
@@ -76,7 +69,7 @@ class IntroPage2 extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: 
-                Text('Never run out of stock again. Stay organized with our app.',
+                Text('Manage sales, inventory, and customers - all on the go.',
                 style: GoogleFonts.robotoSerif(
                                 textStyle: const TextStyle(
                                   color: Colors.white,

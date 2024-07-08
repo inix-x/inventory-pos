@@ -1,69 +1,86 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-
-
-void main() {
-  runApp(const IntroPage1());
-}
-
+// ignore: unnecessary_import
+import 'package:flutter/widgets.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class IntroPage1 extends StatelessWidget {
   const IntroPage1({super.key});
 
   @override
   Widget build(BuildContext context) {
+    const String firstWord = 'Easy';
+    const String secondWord = 'Professional';
 
-    return Container(
-    
-      color: Colors.white,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Container(
-              alignment: const Alignment(0, 0),
-              color: Colors.transparent,
-              child: const Text(
-                'Make your Business Easy & Professional.',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+    return Scaffold(
+      body: Center(
+        child: Container(
+          decoration: const BoxDecoration(
+              image: DecorationImage(
+            image: AssetImage('assets/animations/page1.jpg'),
+            fit: BoxFit.cover,
+          )),
+          child: Stack(children: [
+            Container(
+              decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.center,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.black12, Colors.black87])),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, right: 20, left: 20),
-            child: Container(
-              alignment: const Alignment(0, 0),
-              color: Colors.transparent,
-              child: const Wrap(
-                children: [
-                  Text(
-                    'The best POS Application that you can use to help all your business needs!',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey,
+            Container(
+              alignment: const Alignment(0, 0.55),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: RichText(
+                    text:  TextSpan(
+                  style:  GoogleFonts.robotoSerif(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 35,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                  children: const [
+                    TextSpan(text: 'Make your Business '),
+                    TextSpan(
+                      text: firstWord,
+                      style: TextStyle(
+                       
+                        color: Colors.blueAccent, // Color for the first word
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                    TextSpan(text: ' & '),
+                    TextSpan(
+                      text: secondWord,
+                      style: TextStyle(
+                        color: Colors.green, // Color for the second word
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextSpan(text: '.'),
+                  ],
+                )),
               ),
             ),
-          ),
-          Container(
-            height: 350,
-            color: Colors.transparent,
-            child: Center(
-              child: Lottie.asset(
-                  'assets/animations/checkoutcart.json', 
-                  width: 350,
-                  height: 350,
-                  ),
+            Container(
+              alignment: const Alignment(0, 0.75),
+              color: Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text('The best POS Application that you can use to help all your business needs!',
+                style: GoogleFonts.robotoSerif(
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                )
+              ),
             ),
-          ),
-        ],
+          ]),
+        ),
       ),
     );
   }

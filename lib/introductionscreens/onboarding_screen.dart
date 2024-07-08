@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_application_1/introductionscreens/intropage1.dart';
+
 import 'package:flutter_application_1/introductionscreens/intropage2.dart';
+
 import 'package:flutter_application_1/introductionscreens/intropage3.dart';
+
 import 'package:flutter_application_1/loginwidget/signuppage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 void main() {
@@ -30,7 +35,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             controller: _controller,
             onPageChanged: (int index) {
               setState(() {
-                onLastPage = (index == 2); // Update UI based on current page (optional)
+                onLastPage =
+                    (index == 2); // Update UI based on current page (optional)
               });
             },
             children: const [
@@ -48,11 +54,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: [
                 //skip
                 GestureDetector(
-                  onTap: () {
-                    _controller.jumpToPage(2);
-                  },
-                  child: const Text('Skip')
-                  ),
+                    onTap: () {
+                      _controller.jumpToPage(2);
+                    },
+                    child: Text(
+                      'Skip',
+                      style: GoogleFonts.roboto(
+                        textStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )),
                 SmoothPageIndicator(
                   controller: _controller,
                   count: 3,
@@ -64,20 +78,42 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
 
                 //next or done
-                onLastPage ? GestureDetector(
-                  onTap: () {
-                   Navigator.push(context, MaterialPageRoute(builder: (context){
-                    return  const SignupScreen();
-                   }));
-                  },
-                  child: const Text('Done'),
-                ) : GestureDetector(
-                  onTap: () {
-                    _controller.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
-                  },
-                  child: const Text('Next'),
-                ),
-                
+                onLastPage
+                    ? GestureDetector(
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return const SignupScreen();
+                          }));
+                        },
+                        child: Text(
+                          'Done',
+                          style: GoogleFonts.roboto(
+                            textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          _controller.nextPage(
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeIn);
+                        },
+                        child: Text(
+                          'Next',
+                          style: GoogleFonts.roboto(
+                            textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
               ],
             ),
           ),
