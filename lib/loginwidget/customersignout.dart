@@ -13,7 +13,7 @@ class Customsignout extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black, // Set background color
+         backgroundColor: const Color.fromRGBO(31, 39, 37, 1), // Set background color
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10), // Add rounded corners
           ),

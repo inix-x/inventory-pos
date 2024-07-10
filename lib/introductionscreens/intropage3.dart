@@ -36,7 +36,7 @@ class IntroPage3 extends StatelessWidget {
                   style:  GoogleFonts.robotoSerif(
                                 textStyle: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 35,
+                                  fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -74,7 +74,7 @@ class IntroPage3 extends StatelessWidget {
                                 textStyle: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.normal,
                                 ),
                               ),
                 )

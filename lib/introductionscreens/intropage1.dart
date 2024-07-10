@@ -8,8 +8,8 @@ class IntroPage1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String firstWord = 'Easy';
-    const String secondWord = 'Professional';
+    const String firstWord = 'Make your Business';
+    const String secondWord = 'Professional.';
 
     return Scaffold(
       body: Center(
@@ -32,24 +32,28 @@ class IntroPage1 extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: RichText(
-                    text:  TextSpan(
-                  style:  GoogleFonts.robotoSerif(
-                                textStyle: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                    text: TextSpan(
+                  style: GoogleFonts.robotoSerif(
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   children: const [
-                    TextSpan(text: 'Make your Business '),
                     TextSpan(
                       text: firstWord,
                       style: TextStyle(
-                       
-                        color: Colors.blueAccent, // Color for the first word
+                        color: Colors.white, // Color for the first word
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    TextSpan(
+                        text: ' EASY',
+                        style: TextStyle(
+                          color: Colors.blueAccent,
+                          fontWeight: FontWeight.bold,
+                        )),
                     TextSpan(text: ' & '),
                     TextSpan(
                       text: secondWord,
@@ -58,7 +62,7 @@ class IntroPage1 extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    TextSpan(text: '.'),
+                   
                   ],
                 )),
               ),
@@ -68,15 +72,17 @@ class IntroPage1 extends StatelessWidget {
               color: Colors.transparent,
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: Text('The best POS Application that you can use to help all your business needs!',
+                child: 
+                Text('The best POS App for your business needs!.',
                 style: GoogleFonts.robotoSerif(
                                 textStyle: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.normal,
                                 ),
                               ),
                 )
+              
               ),
             ),
           ]),

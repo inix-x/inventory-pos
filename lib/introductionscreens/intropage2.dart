@@ -29,7 +29,7 @@ class IntroPage2 extends StatelessWidget {
                       colors: [Colors.black12, Colors.black87])),
             ),
             Container(
-              alignment: const Alignment(0, 0.5),
+              alignment: const Alignment(0, 0.55),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: RichText(
@@ -37,7 +37,7 @@ class IntroPage2 extends StatelessWidget {
                   style:  GoogleFonts.robotoSerif(
                                 textStyle: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 35,
+                                  fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -81,7 +81,7 @@ class IntroPage2 extends StatelessWidget {
                                 textStyle: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.normal,
                                 ),
                               ),
                 )

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
@@ -81,7 +82,11 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      // resizeToAvoidBottomInset: false,
+      body: Container(
+        decoration: const BoxDecoration(
+          color: Color.fromRGBO(58, 67, 80, 1),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30,),
           child: Column(
@@ -94,11 +99,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 flex: 3,
                 child: SizedBox(
                   height: 300,
+                  width: 300,
                   child: AspectRatio(
                     aspectRatio: 3 / 2,
                     child: FittedBox(
                       child: Image(
-                        image: AssetImage('assets/animations/signupscreenpic.png'),
+                        image: AssetImage('assets/animations/signupscreenpic1.png'),
                         fit: BoxFit.fitHeight,
                       ),
                     ),
@@ -107,56 +113,73 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                "Join us today! ",
+                "Join us today!",
                 style: GoogleFonts.roboto(
                   textStyle: const TextStyle(
-                    fontSize: 25,
+                    fontSize: 23,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
               const SizedBox(height: 5,),
               Text(
                 "Manage your business with style!",
-                style: GoogleFonts.lato(
+                style: GoogleFonts.robotoSerif(
                   textStyle: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey,
+                    color: Colors.white,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
               TextField(
+                style: const TextStyle(color: Colors.white),
                 obscureText: false,
                 controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'[a-zA-Z0-9@._-]'),
+                  ),
+                ],
                 decoration: InputDecoration(
                   hintText: "Enter your email",
+                   hintStyle: const TextStyle(
+                      color: Colors.white), // Set hint text color to white
                   contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   label: const Text('Email'),
+                   labelStyle: const TextStyle(
+                      color: Colors.white), // Set 
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
                     borderSide: const BorderSide(color: Colors.grey, width: 1),
                   ),
-                  prefixIcon: const Icon(Icons.email),
+                  prefixIcon: const Icon(Icons.email, color: Colors.white),
                 ),
               ),
               const SizedBox(height: 20),
               TextField(
+                style: const TextStyle(color: Colors.white),
                 obscureText: isVisible,
                 controller: _password,
                 decoration: InputDecoration(
                   hintText: "Enter your Password",
+                   hintStyle: const TextStyle(
+                      color: Colors.white), // Set hint text color to white
                   contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   label: const Text('Password'),
+                   labelStyle: const TextStyle(
+                      color: Colors.white), // Set 
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
                     borderSide: const BorderSide(color: Colors.grey, width: 1),
                   ),
-                  prefixIcon: const Icon(Icons.key),
+                  prefixIcon: const Icon(Icons.key, color: Colors.white),
                   suffixIcon: IconButton(
                     onPressed: isPasswordVisible,
-                    icon: isVisible ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
+                    icon: isVisible ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),  color: Colors.white
                   ),
                 ),
               ),
@@ -172,8 +195,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: isSigningIn 
                       ? const CircularProgressIndicator(color: accentColor)
                       : const Text(
-                          'Sign Up',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          'Sign up',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
                         ),
                 ),
               ),
@@ -181,10 +204,10 @@ class _SignupScreenState extends State<SignupScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Already have an account? "),
+                  const Text("Already have an account? ", style: TextStyle(color: Colors.white),),
                   InkWell(
                     onTap: () => goToLogin(context),
-                    child: const Text("Login", style: TextStyle(color: Colors.red)),
+                    child: const Text("Login", style: TextStyle(color: Colors.blue)),
                   ),
                 ],
               ),

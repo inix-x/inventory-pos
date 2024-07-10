@@ -1,14 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/customersignout.dart';
 import 'package:flutter_application_1/loginwidget/loginpage.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
+import 'package:flutter_application_1/providers/categoryprovider.dart'
+    as category_provider;
 import 'package:flutter_application_1/screens/additemspage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class Setuppage extends StatefulWidget {
@@ -37,73 +38,91 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
       _handleSignOut();
     }
   }
 
   void _addNewCategory() async {
-  final categoryNameController = TextEditingController();
+    final categoryNameController = TextEditingController();
 
-  await showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Add Category'),
-        content: TextField(
-          autofocus: true,
-          keyboardType: TextInputType.name,
-          controller: categoryNameController,
-          decoration: const InputDecoration(
-            labelText: 'Category Name',
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title:  Text('Add Category', style:  GoogleFonts.lato(
+                    textStyle: const TextStyle(
+                      color: Colors.black,
+             
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),),
+          content: TextField(
+            autofocus: true,
+            keyboardType: TextInputType.name,
+            controller: categoryNameController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Category Name', 
+              hintText: 'Enter a category',
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              setState(() {
-                categoryName = categoryNameController.text.trim();
-              });
+          actions: [
+            TextButton(
+              style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 247, 247, 247))),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.black),),
+            ),
+            TextButton(
+              style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green)),
+              onPressed: () async {
+                setState(() {
+                  categoryName = categoryNameController.text.trim();
+                });
 
-              // Regular expression to check for alphabets and spaces only
-              final validCategoryName = RegExp(r'^[a-zA-Z\s]+$');
+                // Regular expression to check for alphabets and spaces only
+                final validCategoryName = RegExp(r'^[a-zA-Z\s]+$');
 
-              if (categoryName.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Category name cannot be empty')),
-                );
-              } else if (!validCategoryName.hasMatch(categoryName)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Category name can only contain letters and spaces')),
-                );
-              } else {
-                final dbService = DatabaseService.instance;
-                final existingCategory = await dbService.fetchCategoryByNameChecker(categoryName);
-                if (existingCategory.isNotEmpty) {
+                if (categoryName.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('The category name already exists')),
+                    const SnackBar(
+                      backgroundColor: Colors.black,
+                        content: Text('Category name cannot be empty', style:  TextStyle(color: Colors.white),)),
+                  );
+                } else if (!validCategoryName.hasMatch(categoryName)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text(
+                            'Category name can only contain letters and spaces')),
                   );
                 } else {
-                  context.read<category_provider.CategoryProvider>().addNewCat(
-                    newCategoryNames: categoryName, 
-                    newItems: [],
-                  );
-                  Navigator.pop(context);
+                  final dbService = DatabaseService.instance;
+                  final existingCategory =
+                      await dbService.fetchCategoryByNameChecker(categoryName);
+                  if (existingCategory.isNotEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('The category name already exists')),
+                    );
+                  } else {
+                    context
+                        .read<category_provider.CategoryProvider>()
+                        .addNewCat(
+                      newCategoryNames: categoryName,
+                      newItems: [],
+                    );
+                    Navigator.pop(context);
+                  }
                 }
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+              },
+              child: const Text('Save', style: TextStyle(color: Colors.white),),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _removeCategory(int index) {
     final categoryProvider =
@@ -168,7 +187,7 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
           );
         },
       );
-    } else if(mounted){
+    } else if (mounted) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -190,7 +209,7 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: primaryColor,
+          backgroundColor: const Color.fromRGBO(31, 39, 37, 1),
           centerTitle: true,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -201,9 +220,14 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               const Spacer(),
-              const Text(
+              Text(
                 'Business Name',
-                style: TextStyle(color: accentColor),
+                style: GoogleFonts.roboto(
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               const Spacer(),
               const SizedBox(
@@ -213,10 +237,12 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
           ),
         ),
         body: Container(
-          color: Colors.white,
+          color: const Color.fromRGBO(43, 42, 51, 1),
           child: Center(
             child: Column(
-              mainAxisAlignment: categories.isNotEmpty ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: categories.isNotEmpty
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.spaceEvenly,
               mainAxisSize: MainAxisSize.min,
               children: [
                 categories.isNotEmpty
@@ -245,26 +271,39 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                                     MaterialPageRoute(
                                       builder: (context) => AddItemspage(
                                         itemIndex: index,
-                                        
                                         items: const [],
                                       ),
                                     ),
                                   );
                                 },
-                                child: Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(category.name),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () =>
-                                              _removeCategory(index),
-                                        ),
-                                      ],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Card(
+                                    // color: const Color.fromRGBO(31, 39, 37, 1),
+                                    color: const Color.fromRGBO(
+                                                          66, 65, 77, 1), // Set the background color
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            category.name,
+                                            style: GoogleFonts.robotoSerif(
+                                              textStyle: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.delete, color: Colors.white,),
+                                            onPressed: () =>
+                                                _removeCategory(index),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -273,16 +312,61 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                           },
                         ),
                       )
-                    : const Center(child: Text('Add Categories here')),
-                MaterialButton(
-                  onPressed: _addNewCategory,
-                  child: const Text('Add'),
+                    : Center(
+                        child: Text(
+                        'Add Categories here',
+                        style: GoogleFonts.robotoSerif(
+                          textStyle: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30.0), // Circular border
+                    child: MaterialButton(
+                      color: const Color.fromRGBO(
+                          66, 65, 77, 1), // Set the background color
+                  
+                      onPressed: _addNewCategory,
+                      child: Text(
+                        'Add',
+                        style: GoogleFonts.lato(
+                          textStyle: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                MaterialButton(
-                  onPressed: () async {
-                    await _checkItemsAndSaveChanges();
-                  },
-                  child: const Text('Save Changes'),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30.0), // Circular border
+                    child: MaterialButton(
+                      color: const Color.fromRGBO(
+                          66, 65, 77, 1), // Set the background color
+                      onPressed: () async {
+                        await _checkItemsAndSaveChanges();
+                      },
+                      child: Text(
+                        'Save Changes',
+                        style: GoogleFonts.lato(
+                          textStyle: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

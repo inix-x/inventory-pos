@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
@@ -36,17 +37,20 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-    Future<List<Map<String, Object?>>> fetchData() async {
+  Future<List<Map<String, Object?>>> fetchData() async {
     final db = await DatabaseService.instance.database;
     final maps = await db.query('categories');
     return maps.toList();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      // resizeToAvoidBottomInset: false, //this line of code disable the screen's resizing when typing something
+      body: Container(
+        decoration: const BoxDecoration(
+          color: Color.fromRGBO(58, 67, 80, 1),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
@@ -77,8 +81,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 "Welcome back!",
                 style: GoogleFonts.roboto(
                   textStyle: const TextStyle(
-                    fontSize: 25,
+                    fontSize: 23,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -87,11 +92,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               Text(
                 "We missed you!",
-                style: GoogleFonts.lato(
+                style: GoogleFonts.robotoSerif(
                   textStyle: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -100,38 +105,56 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               // const Spacer(),
               TextField(
+                style: const TextStyle(color: Colors.white),
                 obscureText: false,
                 controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'[a-zA-Z0-9@._-]'),
+                  ),
+                ],
                 decoration: InputDecoration(
-                    hintText: "Enter your email",
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 10),
-                    label: const Text('Email'),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide:
-                            const BorderSide(color: Colors.grey, width: 1)),
-                    prefixIcon: const Icon(Icons.email)),
+                  hintText: "Enter your email",
+                  hintStyle: const TextStyle(
+                      color: Colors.white), // Set hint text color to white
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  label: const Text('Email'),
+                  labelStyle: const TextStyle(
+                      color: Colors.white), // Set label color to white
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide:
+                          const BorderSide(color: Colors.white, width: 2)),
+                  prefixIcon: const Icon(Icons.email, color: Colors.white),
+                ),
               ),
               const SizedBox(height: 20),
               TextField(
+                style: const TextStyle(color: Colors.white),
                 obscureText: isVisible,
                 controller: _password,
                 decoration: InputDecoration(
                     hintText: "Enter your Password",
+                    hintStyle: const TextStyle(
+                        color: Colors.white), // Set hint text color to white
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 15, horizontal: 10),
                     label: const Text('Password'),
+                    labelStyle: const TextStyle(
+                        color: Colors.white), // Set label color to white
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
                         borderSide:
-                            const BorderSide(color: Colors.grey, width: 1)),
+                            const BorderSide(color: Colors.white, width: 1)),
                     suffixIcon: IconButton(
                         onPressed: isPasswordVisible,
                         icon: isVisible
                             ? const Icon(Icons.visibility_off)
-                            : const Icon(Icons.visibility)),
-                    prefixIcon: const Icon(Icons.key)),
+                            : const Icon(Icons.visibility),
+                        color: Colors.white),
+                    prefixIcon: const Icon(Icons.key, color: Colors.white)),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -147,19 +170,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: accentColor,
                         )
                       : const Text(
-                          'Login',
+                          'Sign In',
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                 ),
               ),
-              
+
               const SizedBox(height: 10),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Text("Don't have an account? "),
+                const Text(
+                  "Don't have an account? ",
+                  style: TextStyle(color: Colors.white),
+                ),
                 InkWell(
                   onTap: () => goToSignup(context),
-                  child:
-                      const Text("Signup", style: TextStyle(color: Colors.red)),
+                  child: const Text("Signup",
+                      style: TextStyle(color: Colors.blue)
+                      ),
                 ),
                 const SizedBox(width: 5),
               ]),
@@ -178,9 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   goToFetchData(BuildContext context) => Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) => const FetchDataScreen()
-                ),
+        MaterialPageRoute(builder: (context) => const FetchDataScreen()),
       );
 
   goToSetup(BuildContext context) => Navigator.push(
@@ -208,15 +233,13 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           if (mounted) {
             final checkDb = await fetchData();
-            if(checkDb.isEmpty){
+            if (checkDb.isEmpty) {
               // ignore: use_build_context_synchronously
               goToSetup(context);
-            }else{
+            } else {
               // ignore: use_build_context_synchronously
               goToFetchData(context);
             }
-            
-            
           }
         }
       } catch (e) {
