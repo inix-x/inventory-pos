@@ -7,7 +7,8 @@ import 'package:flutter_application_1/global/common/toast.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/signuppage.dart';
 import 'package:flutter_application_1/screens/fetchdatascreen.dart';
-import 'package:flutter_application_1/screens/setuppage.dart';
+
+import 'package:flutter_application_1/screens/setupscreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -210,10 +211,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   goToSetup(BuildContext context) => Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const Setuppage()),
+        MaterialPageRoute(builder: (context) =>  const Setupscreen()),
       );
 
-  _login() async {
+   _login() async {
     if (_email.text == '') {
       showToast(message: 'Please enter your email');
     } else if (_password.text == '') {
@@ -234,11 +235,14 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mounted) {
             final checkDb = await fetchData();
             if (checkDb.isEmpty) {
-              // ignore: use_build_context_synchronously
-              goToSetup(context);
+              if (mounted) {
+                goToSetup(context);
+                // goToFetchData(context);
+              }
             } else {
-              // ignore: use_build_context_synchronously
-              goToFetchData(context);
+              if (mounted) {
+                goToFetchData(context);
+              }
             }
           }
         }
@@ -253,4 +257,5 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
 }

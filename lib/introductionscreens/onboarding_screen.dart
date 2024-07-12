@@ -6,7 +6,10 @@ import 'package:flutter_application_1/introductionscreens/intropage2.dart';
 
 import 'package:flutter_application_1/introductionscreens/intropage3.dart';
 
+// ignore: unused_import
 import 'package:flutter_application_1/loginwidget/signuppage.dart';
+import 'package:flutter_application_1/screens/setupscreen.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -83,7 +86,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onTap: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
-                            return const SignupScreen();
+                            // return const SignupScreen();
+                              return  const Setupscreen();
                           }));
                         },
                         child: Text(

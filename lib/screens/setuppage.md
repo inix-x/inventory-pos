@@ -51,31 +51,35 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title:  Text('Add Category', style:  GoogleFonts.lato(
-                    textStyle: const TextStyle(
-                      color: Colors.black,
-             
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),),
+          title: Text('Add Category',
+              style: GoogleFonts.lato(
+                textStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              )),
           content: TextField(
             autofocus: true,
             keyboardType: TextInputType.name,
             controller: categoryNameController,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
-              labelText: 'Category Name', 
+              labelText: 'Category Name',
               hintText: 'Enter a category',
             ),
           ),
           actions: [
             TextButton(
-              style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 247, 247, 247))),
+              style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(
+                      const Color.fromARGB(255, 247, 247, 247))),
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.black),),
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.black)),
             ),
             TextButton(
-              style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.green)),
+              style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.green)),
               onPressed: () async {
                 setState(() {
                   categoryName = categoryNameController.text.trim();
@@ -88,13 +92,16 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       backgroundColor: Colors.black,
-                        content: Text('Category name cannot be empty', style:  TextStyle(color: Colors.white),)),
+                      content: Text('Category name cannot be empty',
+                          style: TextStyle(color: Colors.white)),
+                    ),
                   );
                 } else if (!validCategoryName.hasMatch(categoryName)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text(
-                            'Category name can only contain letters and spaces')),
+                      content: Text(
+                          'Category name can only contain letters and spaces'),
+                    ),
                   );
                 } else {
                   final dbService = DatabaseService.instance;
@@ -103,7 +110,8 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                   if (existingCategory.isNotEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('The category name already exists')),
+                        content: Text('The category name already exists'),
+                      ),
                     );
                   } else {
                     context
@@ -116,7 +124,7 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                   }
                 }
               },
-              child: const Text('Save', style: TextStyle(color: Colors.white),),
+              child: const Text('Save', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -131,7 +139,7 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
     setState(() {});
   }
 
-  //signout
+  // Sign out
   Future<void> _handleSignOut() async {
     // ignore: no_leading_underscores_for_local_identifiers
     final _auth = AuthService();
@@ -248,14 +256,9 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                 categories.isNotEmpty
                     ? Flexible(
                         child: ListView.builder(
-                          itemCount: context
-                              .watch<category_provider.CategoryProvider>()
-                              .categories
-                              .length,
+                          itemCount: categories.length,
                           itemBuilder: (context, index) {
-                            final category = context
-                                .watch<category_provider.CategoryProvider>()
-                                .categories[index];
+                            final category = categories[index];
                             return Dismissible(
                               key: Key(category.name),
                               background: Container(
@@ -279,9 +282,7 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Card(
-                                    // color: const Color.fromRGBO(31, 39, 37, 1),
-                                    color: const Color.fromRGBO(
-                                                          66, 65, 77, 1), // Set the background color
+                                    color: const Color.fromRGBO(66, 65, 77, 1),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Row(
@@ -298,7 +299,8 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                                             ),
                                           ),
                                           IconButton(
-                                            icon: const Icon(Icons.delete, color: Colors.white,),
+                                            icon: const Icon(Icons.delete,
+                                                color: Colors.white),
                                             onPressed: () =>
                                                 _removeCategory(index),
                                           ),
@@ -314,23 +316,29 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                       )
                     : Center(
                         child: Text(
-                        'Add Categories here',
-                        style: GoogleFonts.robotoSerif(
-                          textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          'Add Categories here',
+                          style: GoogleFonts.robotoSerif(
+                            textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      )),
+                      ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30.0), // Circular border
-                    child: MaterialButton(
-                      color: const Color.fromRGBO(
-                          66, 65, 77, 1), // Set the background color
-                  
+                    borderRadius: BorderRadius.circular(30.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(
+                            66, 65, 77, 1), // Set the background color
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
                       onPressed: _addNewCategory,
                       child: Text(
                         'Add',
@@ -348,10 +356,16 @@ class _SetuppageState extends State<Setuppage> with WidgetsBindingObserver {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30.0), // Circular border
-                    child: MaterialButton(
-                      color: const Color.fromRGBO(
-                          66, 65, 77, 1), // Set the background color
+                    borderRadius: BorderRadius.circular(30.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(
+                            66, 65, 77, 1), // Set the background color
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
                       onPressed: () async {
                         await _checkItemsAndSaveChanges();
                       },

@@ -6,7 +6,7 @@ import 'package:flutter_application_1/global/common/toast.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
 import 'package:flutter_application_1/loginwidget/loginpage.dart';
-import 'package:flutter_application_1/screens/setuppage.dart';
+import 'package:flutter_application_1/screens/setupscreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -231,6 +231,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   goToSetup(BuildContext context) => Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => const Setuppage()),
+    MaterialPageRoute(builder: (context) => const Setupscreen()),
   );
 }
