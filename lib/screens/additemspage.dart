@@ -1,4 +1,3 @@
-import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +7,7 @@ import 'package:flutter_application_1/loginwidget/customersignout.dart';
 import 'package:flutter_application_1/providers/categoryprovider.dart'
     as category_provider;
 import 'package:flutter_application_1/providers/themeprovider.dart';
+import 'package:flutter_application_1/themes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/themes/theme_color.dart';
@@ -29,6 +29,7 @@ class AddItemspage extends StatefulWidget {
 class _AddItemspageState extends State<AddItemspage>
     with WidgetsBindingObserver {
   bool isSaved = true;
+  // ignore: prefer_final_fields
   bool _isSwitched = ThemeProvider().isDarkTheme;
   late ThemeProvider themeProvider;
 
@@ -37,6 +38,12 @@ class _AddItemspageState extends State<AddItemspage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> _showAddItemDialog() async {
@@ -56,12 +63,7 @@ class _AddItemspageState extends State<AddItemspage>
               : ThemeColors.lightAlertDialogColor,
           title: Text(
             'Add Item details',
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: isDarkTheme ? Colors.white : Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            style: Theme.of(context).textTheme.displayMedium
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -98,10 +100,12 @@ class _AddItemspageState extends State<AddItemspage>
                 ),
               ),
               onPressed: () => Navigator.pop(context),
-              child:  Text('Cancel' , 
-              style: TextStyle(
-                color: isDarkTheme ? Colors.white : Colors.black,
-              ),),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isDarkTheme ? Colors.white : Colors.black,
+                ),
+              ),
             ),
             TextButton(
               style: ButtonStyle(
@@ -272,19 +276,17 @@ class _AddItemspageState extends State<AddItemspage>
         categoryProvider.getPlaceholderItems(widget.itemIndex);
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     var isDarkTheme = themeProvider.isDarkTheme;
-
+    // ignore: unused_local_variable
+    var isDarkSwitch = _isSwitched;
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: isDarkTheme
-              ? ThemeColors.darkAppBarBackground
-              : ThemeColors.lightAppBarBackground,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           title: Row(
-            mainAxisAlignment:
-                MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               isSaved
@@ -315,103 +317,90 @@ class _AddItemspageState extends State<AddItemspage>
                 ),
               ),
               const Spacer(),
-              DayNightSwitcherIcon(
-                isDarkModeEnabled: _isSwitched,
-                onStateChanged: (isDarkModeEnabled) {
-                  setState(() {
-                    _isSwitched = isDarkModeEnabled;
-                   
-                  });
-                   themeProvider.toggleTheme();
+              //setting icon
+              IconButton(
+                icon: Icon(
+                  Icons.settings,
+                  color: isDarkTheme
+                      ? ThemeColors.darkIconColor
+                      : ThemeColors.lightIconColor,
+                ),
+                onPressed: () {
+                  SettingsDialog.show(context);
                 },
-              ),
-              const SizedBox(
-                width: 20,
               ),
             ],
           ),
         ),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: isDarkTheme
-                ? const LinearGradient(
-                    colors: [
-                      ThemeColors.darkGradientStart,
-                      ThemeColors.darkGradientEnd,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  )
-                : const LinearGradient(
-                    colors: [
-                      ThemeColors.lightGradientStart,
-                      ThemeColors.lightGradientEnd,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                placeholderItems.isNotEmpty
-                    ? Flexible(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: placeholderItems.length,
-                          itemBuilder: (context, index) {
-                            final item = placeholderItems[index];
-                            return ItemCard(
-                              item: item,
-                              onDelete: () => _removeItem(index),
-                            );
-                          },
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              placeholderItems.isNotEmpty
+                  ? Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: placeholderItems.length,
+                        itemBuilder: (context, index) {
+                          final item = placeholderItems[index];
+                          return ItemCard(
+                            item: item,
+                            onDelete: () => _removeItem(index),
+                          );
+                        },
+                      ),
+                    )
+                  : Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: isDarkTheme
+                              ? ThemeColors.darkEmptyMessageContainerColor
+                              : ThemeColors.lightEmptyMessageContainerColor,
                         ),
-                      )
-                    : Center(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: isDarkTheme
-                                ? ThemeColors.darkEmptyMessageContainerColor
-                                : ThemeColors.lightEmptyMessageContainerColor,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Text(
-                              'Please add items for ${category.name}',
-                              style: GoogleFonts.robotoSerif(
-                                textStyle: TextStyle(
-                                  color: isDarkTheme
-                                      ? ThemeColors.darkEmptyMessageColor
-                                      : ThemeColors.lightEmptyMessageColor,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Text(
+                            'Please add items for ${category.name}',
+                            style: GoogleFonts.robotoSerif(
+                              textStyle: TextStyle(
+                                color: isDarkTheme
+                                    ? ThemeColors.darkEmptyMessageColor
+                                    : ThemeColors.lightEmptyMessageColor,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
                         ),
                       ),
-                const SizedBox(height: 10),
-                ActionButton(
-                  text: 'Add items',
-                  onPressed: _showAddItemDialog,
-                  isDarkTheme: isDarkTheme,
-                ),
-                const SizedBox(height: 10),
-                ActionButton(
-                  text: 'Save items',
-                  onPressed: _saveItemsToDatabase,
-                  isDarkTheme: isDarkTheme,
-                ),
-              ],
-            ),
+                    ),
+             
+            ],
           ),
         ),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            ActionButton(
+              iconData: Icons.add,
+              onPressed: _showAddItemDialog,
+              isDarkTheme: isDarkTheme,
+            ),
+            const SizedBox(height: 16), // Adjust spacing if needed
+            ActionButton(
+              iconData: Icons.save,
+              onPressed: _saveItemsToDatabase,
+              isDarkTheme: isDarkTheme,
+            ),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
+
+  
 
   Widget _buildTextField(TextEditingController controller, String hintText,
       TextInputType keyboardType, bool isDarkTheme,
@@ -523,42 +512,35 @@ class ItemCard extends StatelessWidget {
 }
 
 class ActionButton extends StatelessWidget {
-  final String text;
   final VoidCallback onPressed;
   final bool isDarkTheme;
+  final IconData iconData;
 
   const ActionButton({
     super.key,
-    required this.text,
     required this.onPressed,
     required this.isDarkTheme,
+    required this.iconData,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(25.0),
-        child: MaterialButton(
+    Color iconColor = isDarkTheme
+        ? ThemeColors.darkButtonColor
+        : ThemeColors.lightButtonColor;
+    Color borderColor = iconColor.withOpacity(1); // Adjust opacity if needed
+    return CircleAvatar(
+      backgroundColor: borderColor,
+      child: IconButton(
+        icon: Icon(
+          iconData,
           color: isDarkTheme
-              ? ThemeColors.darkButtonColor
-              : ThemeColors.lightButtonColor,
-          onPressed: onPressed,
-          child: Text(
-            text,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: isDarkTheme
-                    ? ThemeColors.darkButtonTextColor
-                    : ThemeColors.lightButtonTextColor,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+              ? ThemeColors.lightButtonTextColor
+              : ThemeColors.darkButtonTextColor,
         ),
+        onPressed: onPressed,
       ),
     );
   }
 }
+

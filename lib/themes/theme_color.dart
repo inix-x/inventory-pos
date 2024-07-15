@@ -45,8 +45,12 @@ class ThemeColors {
   static const Color darkButtonColor = Color.fromRGBO(68, 174, 254, 1);
   static const Color lightButtonColor = Color.fromRGBO(0, 143, 254, 1);
 
+  //checkout button color
+  static const Color checkoutButtonColor = Color.fromRGBO(118, 205, 38, 1);
+
+
   //button text color
-  static const Color darkButtonTextColor = Color.fromRGBO(235, 255, 255, 1);
+  static const Color darkButtonTextColor = Color.fromRGBO(77, 77, 77, 1);
   static const Color lightButtonTextColor = Color.fromRGBO(233, 255, 255, 1);
 
   //alertdialog color

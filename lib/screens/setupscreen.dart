@@ -1,6 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
@@ -11,6 +9,7 @@ import 'package:flutter_application_1/providers/categoryprovider.dart'
 import 'package:flutter_application_1/providers/themeprovider.dart';
 import 'package:flutter_application_1/screens/additemspage.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
+import 'package:flutter_application_1/themes/settings.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/themes/theme_color.dart';
@@ -23,6 +22,7 @@ class Setupscreen extends StatefulWidget {
 }
 
 class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
+  // ignore: prefer_final_fields
   bool _isSwitched = ThemeProvider().isDarkTheme;
 
   late ThemeProvider themeProvider;
@@ -224,6 +224,8 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
     final categories = categoryProvider.categories;
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     var isDarkTheme = themeProvider.isDarkTheme;
+    // ignore: unused_local_variable
+    var isDarkSwitch = _isSwitched;
 
     // ignore: deprecated_member_use
     return WillPopScope(
@@ -231,9 +233,7 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: isDarkTheme
-              ? ThemeColors.darkAppBarBackground
-              : ThemeColors.lightAppBarBackground,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           centerTitle: true,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -247,124 +247,94 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
                         : ThemeColors.lightSignoutIconColor),
               ),
               const Spacer(),
-              Text(
-                'Business Name',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                     fontSize: 25,
-                    letterSpacing: 2,
-                    color: isDarkTheme
-                        ? ThemeColors.darkIconColor
-                        : ThemeColors.lightIconColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              Text('Business Name',
+                  style: Theme.of(context).textTheme.displayMedium),
               const Spacer(),
-              DayNightSwitcherIcon(
-                isDarkModeEnabled: _isSwitched,
-                onStateChanged: (isDarkModeEnabled) {
-                  setState(() {
-                    _isSwitched = isDarkModeEnabled;
-                    
-                  });
-                  themeProvider.toggleTheme();
+              //setting icon
+              IconButton(
+                icon: Icon(
+                  Icons.settings,
+                  color: isDarkTheme
+                      ? ThemeColors.darkSignoutIconColor
+                      : ThemeColors.lightSignoutIconColor,
+                ),
+                onPressed: () {
+                  SettingsDialog.show(context);
                 },
               ),
-              const SizedBox(
-                width: 20,
-              ),
+              
             ],
           ),
         ),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: isDarkTheme
-                ? const LinearGradient(
-                    colors: [
-                      ThemeColors.darkGradientStart,
-                      ThemeColors.darkGradientEnd,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  )
-                : const LinearGradient(
-                    colors: [
-                      ThemeColors.lightGradientStart,
-                      ThemeColors.lightGradientEnd,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: categories.isNotEmpty
-                  ? MainAxisAlignment.spaceBetween
-                  : MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                categories.isNotEmpty
-                    ? Flexible(
-                        child: ListView.builder(
-                          itemCount: categories.length,
-                          itemBuilder: (context, index) {
-                            final category = categories[index];
-                            return CategoryCard(
-                              category: category,
-                              onDelete: () => _removeCategory(index),
-                              onTap: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddItemspage(
-                                      itemIndex: index,
-                                      items: const [],
-                                    ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: categories.isNotEmpty
+                ? MainAxisAlignment.spaceBetween
+                : MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              categories.isNotEmpty
+                  ? Flexible(
+                      child: ListView.builder(
+                        itemCount: categories.length,
+                        itemBuilder: (context, index) {
+                          final category = categories[index];
+                          return CategoryCard(
+                            category: category,
+                            onDelete: () => _removeCategory(index),
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddItemspage(
+                                    itemIndex: index,
+                                    items: const [],
                                   ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      )
-                    : Center(
-                        child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: isDarkTheme
-                                ? ThemeColors.darkEmptyMessageContainerColor
-                                : ThemeColors.lightEmptyMessageContainerColor),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Text(
-                            'Add Categories here',
-                            style: GoogleFonts.robotoSerif(
-                              textStyle: TextStyle(
-                                color: isDarkTheme
-                                    ? ThemeColors.darkEmptyMessageColor
-                                    : ThemeColors.lightEmptyMessageColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    )
+                  : Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'Add Categories here',
+                          style: GoogleFonts.robotoSerif(
+                            textStyle: TextStyle(
+                              color: isDarkTheme
+                                  ? ThemeColors.darkEmptyMessageColor
+                                  : ThemeColors.lightEmptyMessageColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      )),
-                ActionButton(
-                  text: 'Add',
-                  onPressed: _showAddCategoryDialog,
-                  isDarkTheme: isDarkTheme,
-                ),
-                ActionButton(
-                  text: 'Save Changes',
-                  onPressed: _checkItemsAndSaveChanges,
-                  isDarkTheme: isDarkTheme,
-                ),
-              ],
-            ),
+                      ),
+                    ),
+            ],
           ),
         ),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            ActionButton(
+              iconData: Icons.add,
+              onPressed: _showAddCategoryDialog,
+              isDarkTheme: isDarkTheme,
+            ),
+            const SizedBox(height: 16), // Adjust spacing if needed
+            ActionButton(
+              iconData: Icons.save,
+              onPressed: _checkItemsAndSaveChanges,
+              isDarkTheme: isDarkTheme,
+            ),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
@@ -408,9 +378,11 @@ class CategoryCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon:  Icon(
+                    icon: Icon(
                       Icons.delete,
-                      color: isDarkTheme ? ThemeColors.darkDeleteIconColor : ThemeColors.lightDeleteIconColor,
+                      color: isDarkTheme
+                          ? ThemeColors.darkDeleteIconColor
+                          : ThemeColors.lightDeleteIconColor,
                     ),
                     onPressed: onDelete,
                   ),
@@ -427,9 +399,11 @@ class CategoryCard extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon:  Icon(
+                    icon: Icon(
                       Icons.arrow_right_alt,
-                      color: isDarkTheme ? ThemeColors.darkDeleteIconColor : ThemeColors.lightDeleteIconColor,
+                      color: isDarkTheme
+                          ? ThemeColors.darkDeleteIconColor
+                          : ThemeColors.lightDeleteIconColor,
                     ),
                     onPressed: onTap,
                   ),
@@ -444,41 +418,33 @@ class CategoryCard extends StatelessWidget {
 }
 
 class ActionButton extends StatelessWidget {
-  final String text;
   final VoidCallback onPressed;
   final bool isDarkTheme;
+  final IconData iconData;
 
   const ActionButton({
     super.key,
-    required this.text,
     required this.onPressed,
     required this.isDarkTheme,
+    required this.iconData,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(25.0),
-        child: MaterialButton(
+    Color iconColor = isDarkTheme
+        ? ThemeColors.darkButtonColor
+        : ThemeColors.lightButtonColor;
+    Color borderColor = iconColor.withOpacity(1); // Adjust opacity if needed
+    return CircleAvatar(
+      backgroundColor: borderColor,
+      child: IconButton(
+        icon: Icon(
+          iconData,
           color: isDarkTheme
-              ? ThemeColors.darkButtonColor
-              : ThemeColors.lightButtonColor,
-          onPressed: onPressed,
-          child: Text(
-            text,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: isDarkTheme
-                    ? ThemeColors.darkButtonTextColor
-                    : ThemeColors.lightButtonTextColor,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+              ? ThemeColors.lightButtonTextColor
+              : ThemeColors.darkButtonTextColor,
         ),
+        onPressed: onPressed,
       ),
     );
   }

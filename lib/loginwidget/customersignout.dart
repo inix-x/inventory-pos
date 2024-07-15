@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/themeprovider.dart';
-import 'package:flutter_application_1/themes/theme_color.dart';
 import 'package:provider/provider.dart';
 
 class Customsignout extends StatelessWidget {
@@ -10,7 +9,7 @@ class Customsignout extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    Provider.of<ThemeProvider>(context, listen: false);
     return SizedBox(
       width: 40,
       height: 40, // Increase height for better icon visibility
@@ -18,7 +17,7 @@ class Customsignout extends StatelessWidget {
         onPressed: onPressed,
         
         style: ElevatedButton.styleFrom(
-         backgroundColor: themeProvider.isDarkTheme ?  ThemeColors.lightSignoutIconColor :  ThemeColors.darkSignoutIconColor, // Set background color
+         backgroundColor: Theme.of(context).appBarTheme.backgroundColor, // Set background color
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10), // Add rounded corners
           ),

@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_application_1/colors.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
-import 'package:flutter_application_1/providers/categoryprovider.dart' as category_provider;
+import 'package:flutter_application_1/providers/categoryprovider.dart'
+    as category_provider;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
@@ -65,7 +65,8 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   // Implementing the observer method
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
       AuthService().signout();
     }
   }
@@ -96,7 +97,8 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
     setState(() {
       final selectedItem = selectedItems.firstWhere(
         (selectedItem) => selectedItem.name == item.name,
-        orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+        orElse: () =>
+            SelectedItem(name: item.name, price: item.price, count: 0),
       );
 
       if (selectedItem.count == 0) {
@@ -115,7 +117,8 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
     setState(() {
       final selectedItem = selectedItems.firstWhere(
         (selectedItem) => selectedItem.name == item.name,
-        orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+        orElse: () =>
+            SelectedItem(name: item.name, price: item.price, count: 0),
       );
 
       if (selectedItem.count > 0) {
@@ -137,7 +140,8 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   }
 
   double _getTotalPrice() {
-    return selectedItems.fold(0.0, (total, item) => total + (item.price * item.count));
+    return selectedItems.fold(
+        0.0, (total, item) => total + (item.price * item.count));
   }
 
   void _navigateToCartScreen() {
@@ -152,7 +156,8 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final categoryProvider = context.read<category_provider.CategoryProvider>();
-    Future<List<category_provider.Category>> categoryList = categoryProvider.fetchCategory();
+    Future<List<category_provider.Category>> categoryList =
+        categoryProvider.fetchCategory();
 
     return Scaffold(
       body: FutureBuilder<List<category_provider.Category>>(
@@ -165,7 +170,9 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No categories available'));
           } else {
-            if (selectedCategoryId.value == null && snapshot.hasData && snapshot.data!.isNotEmpty) {
+            if (selectedCategoryId.value == null &&
+                snapshot.hasData &&
+                snapshot.data!.isNotEmpty) {
               selectedCategoryId.value = snapshot.data!.first.id;
             }
 
@@ -178,13 +185,18 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search for items',
-                      prefixIcon: const Icon(Icons.search),
+                      hintStyle: Theme.of(context).textTheme.displaySmall,
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
                 ),
+
                 if (_searchResults.isNotEmpty)
                   Expanded(
                     child: ListView(
@@ -192,7 +204,8 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                         return Card(
                           child: ListTile(
                             title: Text(item.name),
-                            subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                            subtitle:
+                                Text('\$${item.price.toStringAsFixed(2)}'),
                             leading: item.imagePath.isNotEmpty
                                 ? Image.network(item.imagePath)
                                 : null,
@@ -212,37 +225,50 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                       valueListenable: selectedCategoryId,
                       builder: (context, selectedCategoryIdValue, child) {
                         if (selectedCategoryIdValue == null) {
-                          return const Center(child: Text('No items available'));
+                          return const Center(
+                              child: Text('No items available'));
                         }
 
                         return FutureBuilder<List<Item>>(
-                          future: categoryProvider.fetchItemByCategoryId(selectedCategoryIdValue),
+                          future: categoryProvider
+                              .fetchItemByCategoryId(selectedCategoryIdValue),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             } else if (snapshot.hasError) {
-                              return Center(child: Text('Error: ${snapshot.error}'));
-                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return const Center(child: Text('No items available'));
+                              return Center(
+                                  child: Text('Error: ${snapshot.error}'));
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Center(
+                                  child: Text('No items available'));
                             } else {
                               return ListView(
                                 children: snapshot.data!.map((item) {
                                   final selectedItem = selectedItems.firstWhere(
-                                    (selectedItem) => selectedItem.name == item.name,
-                                    orElse: () => SelectedItem(name: item.name, price: item.price, count: 0),
+                                    (selectedItem) =>
+                                        selectedItem.name == item.name,
+                                    orElse: () => SelectedItem(
+                                        name: item.name,
+                                        price: item.price,
+                                        count: 0),
                                   );
 
                                   return Card(
                                     child: ListTile(
                                       title: Text(item.name),
-                                      subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                                      subtitle: Text(
+                                          '\$${item.price.toStringAsFixed(2)}'),
                                       leading: item.imagePath.isNotEmpty
                                           ? Image.network(item.imagePath)
                                           : null,
                                       trailing: SizedBox(
                                         width: 120,
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             IconButton(
                                               icon: const Icon(Icons.remove),
@@ -299,16 +325,13 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                   ),
                 ],
               ),
-              const DottedLine(
-                direction: Axis.vertical,
-                alignment: WrapAlignment.center,
-                dashLength: 5,
-                lineLength: double.infinity,
-                lineThickness: 1.0,
-                dashColor: primaryColor,
-              ),
-              Flexible(
+              
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).highlightColor,
+                ),
                 child: MaterialButton(
+                  
                   onPressed: () {
                     if (selectedItems.isEmpty) {
                       showToast(message: 'No items to checkout');
@@ -367,7 +390,9 @@ class CategoryScrollView extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black),
                   borderRadius: BorderRadius.circular(8),
-                  color: selectedCategoryIdValue == category.id ? Colors.blueAccent : Colors.transparent,
+                  color: selectedCategoryIdValue == category.id
+                      ? Colors.blueAccent
+                      : Theme.of(context).cardColor,
                 ),
                 child: GestureDetector(
                   onTap: () {
@@ -379,7 +404,7 @@ class CategoryScrollView extends StatelessWidget {
                   child: Center(
                     child: Text(
                       category.name,
-                      style: const TextStyle(fontSize: 16),
+                      style: Theme.of(context).textTheme.titleSmall,
                       textAlign: TextAlign.center,
                     ),
                   ),

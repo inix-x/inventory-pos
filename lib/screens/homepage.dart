@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 import 'package:flutter_application_1/loginwidget/customersignout.dart';
 import 'package:flutter_application_1/loginwidget/loginpage.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_application_1/themes/settings.dart';
 import 'package:provider/provider.dart';
 import '../screens/menupage.dart';
 import '../screens/accountpage.dart';
@@ -23,8 +23,7 @@ class HomeApp extends StatefulWidget {
 bool _isClicked = false;
 bool _isFinished = false;
 
-class _HomeAppState extends State<HomeApp> {
-  bool _isSwitched = ThemeProvider().isDarkTheme;
+class _HomeAppState extends State<HomeApp>  with WidgetsBindingObserver {
   late ThemeProvider themeProvider;
 
   @override
@@ -112,9 +111,7 @@ class _HomeAppState extends State<HomeApp> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: isDarkTheme
-              ? ThemeColors.darkAppBarBackground
-              : ThemeColors.lightAppBarBackground,
+         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           centerTitle: true,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -131,26 +128,18 @@ class _HomeAppState extends State<HomeApp> {
               // Text(businessName.isEmpty ? 'Nothing\'s here ' : 'Yep', style: const TextStyle(color: accentColor)),
                Text(
                 'Menu',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    fontSize: 25,
-                    letterSpacing: 2,
-                    color: isDarkTheme
-                        ? ThemeColors.darkIconColor
-                        : ThemeColors.lightIconColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                style: Theme.of(context).textTheme.displayMedium
               ),
               const Spacer(),
-               DayNightSwitcherIcon(
-                isDarkModeEnabled: _isSwitched,
-                onStateChanged: (isDarkModeEnabled) {
-                  setState(() {
-                    _isSwitched = isDarkModeEnabled;
-                    
-                  });
-                  themeProvider.toggleTheme();
+               IconButton(
+                icon: Icon(
+                  Icons.settings,
+                  color: isDarkTheme
+                      ? ThemeColors.darkIconColor
+                      : ThemeColors.lightIconColor,
+                ),
+                onPressed: () {
+                  SettingsDialog.show(context);
                 },
               ),
               const SizedBox(
