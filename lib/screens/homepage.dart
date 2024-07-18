@@ -7,7 +7,6 @@ import 'package:flutter_application_1/loginwidget/loginpage.dart';
 import 'package:flutter_application_1/themes/settings.dart';
 import 'package:provider/provider.dart';
 import '../screens/menupage.dart';
-import '../screens/accountpage.dart';
 import 'package:flutter_application_1/providers/themeprovider.dart';
 import 'package:flutter_application_1/themes/theme_color.dart';
 
@@ -33,15 +32,7 @@ class _HomeAppState extends State<HomeApp>  with WidgetsBindingObserver {
     themeProvider = Provider.of<ThemeProvider>(context, listen: false);
   }
 
-  void navigateToAccount(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AccountScreen()),
-    );
-    setState(() {
-      _isClicked = false;
-    });
-  }
+ 
 
   //signout
   Future<void> _handleSignOut() async {
@@ -142,9 +133,7 @@ class _HomeAppState extends State<HomeApp>  with WidgetsBindingObserver {
                   SettingsDialog.show(context);
                 },
               ),
-              const SizedBox(
-                width: 20,
-              ),
+         
             ],
           ),
         ),

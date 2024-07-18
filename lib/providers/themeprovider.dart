@@ -33,7 +33,8 @@ class ThemeProvider extends ChangeNotifier {
       iconTheme: const IconThemeData(
         color: ThemeColors.darkIconColor,
       ),
-      cardColor: ThemeColors.darkIconColor,
+      cardColor: ThemeColors.darkCardColor,
+    
       textTheme: TextTheme(
         displayMedium: GoogleFonts.roboto(
           textStyle: const TextStyle(
@@ -61,7 +62,18 @@ class ThemeProvider extends ChangeNotifier {
             fontWeight: FontWeight.bold,
           ),
         ), // Define other text styles as needed
+
+        //horizontal category scrollview
+        labelSmall: GoogleFonts.lato(
+          textStyle: const TextStyle(
+            fontSize: 12,
+            letterSpacing: 1,
+            color: ThemeColors.darkIconColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
+      primaryColor: ThemeColors.darkAlertDialogColor,
       highlightColor: ThemeColors.checkoutButtonColor,
       scaffoldBackgroundColor: ThemeColors.darkGradientStart,
     );
@@ -75,7 +87,7 @@ class ThemeProvider extends ChangeNotifier {
       iconTheme: const IconThemeData(
         color: ThemeColors.lightIconColor,
       ),
-      cardColor: ThemeColors.lightIconColor,
+      cardColor: ThemeColors.lightCardColor,
       textTheme: TextTheme(
         displayMedium: GoogleFonts.roboto(
           textStyle: const TextStyle(
@@ -90,7 +102,7 @@ class ThemeProvider extends ChangeNotifier {
           textStyle: const TextStyle(
             fontSize: 14,
             letterSpacing: 2,
-            color: ThemeColors.darkIconColor,
+            color: ThemeColors.lightIconColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -104,6 +116,8 @@ class ThemeProvider extends ChangeNotifier {
           ),
         ),
       ),
+      primaryColor: ThemeColors.lightAlertDialogColor,
+      highlightColor: ThemeColors.checkoutButtonColor,
       scaffoldBackgroundColor: ThemeColors.lightGradientStart,
     );
   }

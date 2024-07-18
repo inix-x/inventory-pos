@@ -39,6 +39,7 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  //user log out if the app is in background or terminated
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -65,36 +66,41 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(
-            'Add Category',
-            style: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          backgroundColor: Theme.of(context).primaryColor,
+          title: Text('Add Category',
+              style: Theme.of(context).textTheme.displayMedium),
           content: TextField(
             autofocus: true,
             keyboardType: TextInputType.name,
             controller: categoryNameController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
               labelText: 'Category Name',
               hintText: 'Enter a category',
+              labelStyle: TextStyle(
+                color: Theme.of(context).iconTheme.color,
+              ),
+              hintStyle: TextStyle(
+                color: Theme.of(context).iconTheme.color,
+              ),
+            ),
+            style: TextStyle(
+              color: Theme.of(context).iconTheme.color,
             ),
           ),
           actions: [
             TextButton(
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
-                  const Color.fromARGB(255, 247, 247, 247),
+                  Theme.of(context).primaryColor,
                 ),
               ),
               onPressed: () => Navigator.pop(context),
-              child: const Text(
+              child: Text(
                 'Cancel',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(
+                  color: Theme.of(context).iconTheme.color,
+                ),
               ),
             ),
             TextButton(
@@ -231,6 +237,7 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
     return WillPopScope(
       onWillPop: _showLogoutConfirmation,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
@@ -241,10 +248,10 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
             children: [
               Customsignout(
                 onPressed: _showLogoutConfirmation,
-                icon: Icon(Icons.arrow_back_ios,
-                    color: isDarkTheme
-                        ? ThemeColors.darkSignoutIconColor
-                        : ThemeColors.lightSignoutIconColor),
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: Theme.of(context).iconTheme.color,
+                ),
               ),
               const Spacer(),
               Text('Business Name',
@@ -254,15 +261,12 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
               IconButton(
                 icon: Icon(
                   Icons.settings,
-                  color: isDarkTheme
-                      ? ThemeColors.darkSignoutIconColor
-                      : ThemeColors.lightSignoutIconColor,
+                  color: Theme.of(context).iconTheme.color,
                 ),
                 onPressed: () {
                   SettingsDialog.show(context);
                 },
               ),
-              
             ],
           ),
         ),
@@ -271,7 +275,7 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
             mainAxisAlignment: categories.isNotEmpty
                 ? MainAxisAlignment.spaceBetween
                 : MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
               categories.isNotEmpty
                   ? Flexible(
@@ -304,9 +308,7 @@ class _SetupscreenState extends State<Setupscreen> with WidgetsBindingObserver {
                           'Add Categories here',
                           style: GoogleFonts.robotoSerif(
                             textStyle: TextStyle(
-                              color: isDarkTheme
-                                  ? ThemeColors.darkEmptyMessageColor
-                                  : ThemeColors.lightEmptyMessageColor,
+                              color: Theme.of(context).iconTheme.color,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
@@ -354,8 +356,7 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    final isDarkTheme = themeProvider.isDarkTheme;
+    Provider.of<ThemeProvider>(context, listen: false);
 
     return Dismissible(
       key: Key(category.name),
@@ -367,11 +368,9 @@ class CategoryCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           child: Card(
-            color: isDarkTheme
-                ? ThemeColors.darkCardColor
-                : ThemeColors.lightCardColor,
+            color: Theme.of(context).cardColor,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -380,9 +379,7 @@ class CategoryCard extends StatelessWidget {
                   IconButton(
                     icon: Icon(
                       Icons.delete,
-                      color: isDarkTheme
-                          ? ThemeColors.darkDeleteIconColor
-                          : ThemeColors.lightDeleteIconColor,
+                      color: Theme.of(context).iconTheme.color,
                     ),
                     onPressed: onDelete,
                   ),
@@ -391,9 +388,7 @@ class CategoryCard extends StatelessWidget {
                     style: GoogleFonts.roboto(
                       textStyle: TextStyle(
                         letterSpacing: 2,
-                        color: isDarkTheme
-                            ? ThemeColors.darkTextColor
-                            : ThemeColors.lightTextColor,
+                        color: Theme.of(context).iconTheme.color,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -401,9 +396,7 @@ class CategoryCard extends StatelessWidget {
                   IconButton(
                     icon: Icon(
                       Icons.arrow_right_alt,
-                      color: isDarkTheme
-                          ? ThemeColors.darkDeleteIconColor
-                          : ThemeColors.lightDeleteIconColor,
+                      color: Theme.of(context).iconTheme.color,
                     ),
                     onPressed: onTap,
                   ),
@@ -442,7 +435,7 @@ class ActionButton extends StatelessWidget {
           iconData,
           color: isDarkTheme
               ? ThemeColors.lightButtonTextColor
-              : ThemeColors.darkButtonTextColor,
+              : ThemeColors.lightButtonTextColor,
         ),
         onPressed: onPressed,
       ),

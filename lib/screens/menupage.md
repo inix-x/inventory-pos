@@ -21,13 +21,28 @@ class MenuScreen extends StatefulWidget {
   _MenuScreenState createState() => _MenuScreenState();
 }
 
+class SelectedItem {
+  final String name;
+  final double price;
+  int count;
+
+  SelectedItem({required this.name, required this.price, required this.count});
+
+  Map<String, dynamic> toMap() => {
+        'name': name,
+        'price': price,
+        'count': count,
+      };
+}
+
 class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
+  Map<int, List<Item>> placeholderItemsMap = {};
   final ValueNotifier<int?> selectedCategoryId = ValueNotifier<int?>(null);
   late ScrollController _scrollController;
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   List<Item> _searchResults = [];
-  List<SelectedItems> selectedItems = [];
+  List<SelectedItem> selectedItems = [];
 
   @override
   void initState() {
@@ -35,7 +50,6 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
     _scrollController = ScrollController();
     _searchController.addListener(_onSearchChanged);
     WidgetsBinding.instance.addObserver(this);
-    _fetchSelectedItems();
   }
 
   @override
@@ -47,20 +61,13 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  // Implementing the observer method
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       AuthService().signout();
     }
-  }
-
-  void _fetchSelectedItems() async {
-    final dbService = DatabaseService.instance;
-    final items = await dbService.fetchSelectedItems();
-    setState(() {
-      selectedItems = items;
-    });
   }
 
   void _onSearchChanged() {
@@ -85,102 +92,76 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
     });
   }
 
-  // Inside your existing MenuScreen widget
-
-//OTHER CODE
-void _incrementItemCount(SelectedItems item) async {
-  final dbService = DatabaseService.instance;
-  final isCountGreaterThanZero = await dbService.isItemCountGreaterThanZero(item.id!);
-
-  if (isCountGreaterThanZero) {
+  void _incrementItemCount(Item item) {
     setState(() {
       final selectedItem = selectedItems.firstWhere(
         (selectedItem) => selectedItem.name == item.name,
-        orElse: () {
-          final newItem = SelectedItems(
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            imagePath: item.imagePath,
-            count: item.count,
-            max: item.max, // Initialize max with item's max value
-          );
-          selectedItems.add(newItem);
-          return newItem;
-        },
+        orElse: () =>
+            SelectedItem(name: item.name, price: item.price, count: 0),
       );
 
-      if (selectedItem.max < item.count) { // Check if max is less than item's count
-       
-        selectedItem.max += 1; // Increment max value dynamically
+      if (selectedItem.count == 0) {
+        selectedItems.add(selectedItem);
+      }
+
+      // Ensure selectedItem.count does not exceed item.count
+      if (selectedItem.count < item.count) {
+        selectedItem.count += 1;
       } else {
-        showToast(message: 'Item has reached its maximum count.');
+        showToast(message: 'Cannot add more items. Stock limit reached.');
+      }
+
+      if (kDebugMode) {
+        print(selectedItems.map((item) => item.toMap()).toList());
       }
     });
-  } else {
-    showToast(message: 'Item is out of stock.');
   }
-}
 
 
-
-void _decrementItemCount(SelectedItems item) async {
-  final dbService = DatabaseService.instance;
-  final isCountGreaterThanZero =
-      await dbService.isItemCountGreaterThanZero(item.id!);
-
-  if (isCountGreaterThanZero) {
+  void _decrementItemCount(Item item) {
     setState(() {
       final selectedItem = selectedItems.firstWhere(
         (selectedItem) => selectedItem.name == item.name,
-        orElse: () {
-          final newItem = SelectedItems(
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            imagePath: item.imagePath,
-            count: 0,
-            max: item.max,
-          );
-          return newItem;
-        },
+        orElse: () =>
+            SelectedItem(name: item.name, price: item.price, count: 0),
       );
 
       if (selectedItem.count > 0) {
         selectedItem.count -= 1;
-        selectedItem.max -= 1; // Decrement max value dynamically
 
         if (selectedItem.count == 0) {
           selectedItems.removeWhere((element) => element.name == item.name);
         }
       }
+
+      if (kDebugMode) {
+        print(selectedItems.map((item) => item.toMap()).toList());
+      }
     });
-  } else {
-    showToast(message: 'Item is out of stock.');
   }
-}
 
   int _getTotalItemCount() {
-    return selectedItems.fold(0, (total, item) => total + item.max);
+    return selectedItems.fold(0, (total, item) => total + item.count);
   }
 
   double _getTotalPrice() {
     return selectedItems.fold(
-        0.0, (total, item) => total + (item.price * item.max));
+        0.0, (total, item) => total + (item.price * item.count));
   }
 
   void _navigateToCartScreen() {
-    if (selectedItems.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CartScreen(selectedItems: selectedItems),
-        ),
-      );
-    } else {
-      showToast(message: 'No items to checkout');
-    }
+  if (selectedItems.isNotEmpty) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CartScreen(selectedItems: selectedItems),
+      ),
+    );
+  } else {
+    showToast(message: 'No items to checkout');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -233,22 +214,19 @@ void _decrementItemCount(SelectedItems item) async {
                   Expanded(
                     child: ListView(
                       children: _searchResults.map((item) {
-                        return Padding(
-                          padding:  const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                          child: Card(
-                            child: ListTile(
-                              title: Text(item.name),
-                              subtitle:
-                                  Text('\$${item.price.toStringAsFixed(2)}'),
-                              leading: item.imagePath.isNotEmpty
-                                  ? Image.network(item.imagePath)
-                                  : null,
-                              onTap: () {
-                                selectedCategoryId.value = item.id;
-                                _searchController.clear();
-                                _searchResults.clear();
-                              },
-                            ),
+                        return Card(
+                          child: ListTile(
+                            title: Text(item.name),
+                            subtitle:
+                                Text('\$${item.price.toStringAsFixed(2)}'),
+                            leading: item.imagePath.isNotEmpty
+                                ? Image.network(item.imagePath)
+                                : null,
+                            onTap: () {
+                              selectedCategoryId.value = item.id;
+                              _searchController.clear();
+                              _searchResults.clear();
+                            },
                           ),
                         );
                       }).toList(),
@@ -258,73 +236,102 @@ void _decrementItemCount(SelectedItems item) async {
                   Expanded(
                     child: ValueListenableBuilder<int?>(
                       valueListenable: selectedCategoryId,
-                      builder: (context, selectedId, _) {
-                        if (selectedId == null) {
+                      builder: (context, selectedCategoryIdValue, child) {
+                        if (selectedCategoryIdValue == null) {
                           return const Center(
-                              child: Text('Select a category to view items'));
+                              child: Text('No items available'));
                         }
 
-                        Future<List<Item>> itemList =
-                            categoryProvider.fetchItemByCategoryId(selectedId);
-
                         return FutureBuilder<List<Item>>(
-                          future: itemList,
-                          builder: (context, itemSnapshot) {
-                            if (itemSnapshot.connectionState ==
+                          future: categoryProvider
+                              .fetchItemByCategoryId(selectedCategoryIdValue),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const Center(
                                   child: CircularProgressIndicator());
-                            } else if (itemSnapshot.hasError) {
+                            } else if (snapshot.hasError) {
                               return Center(
-                                  child: Text('Error: ${itemSnapshot.error}'));
-                            } else if (!itemSnapshot.hasData ||
-                                itemSnapshot.data!.isEmpty) {
+                                  child: Text('Error: ${snapshot.error}'));
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
                               return const Center(
                                   child: Text('No items available'));
                             } else {
                               return ListView(
-                                controller: _scrollController,
-                                children: itemSnapshot.data!.map((item) {
+                                children: snapshot.data!.map((item) {
                                   final selectedItem = selectedItems.firstWhere(
                                     (selectedItem) =>
                                         selectedItem.name == item.name,
-                                    orElse: () => SelectedItems(
-                                      id: item.id,
-                                      name: item.name,
-                                      price: item.price,
-                                      imagePath: item.imagePath,
-                                      count: 0,
-                                      max: item.max,
-                                    ),
+                                    orElse: () => SelectedItem(
+                                        name: item.name,
+                                        price: item.price,
+                                        count: 0),
                                   );
 
                                   return Padding(
-                                    padding:  const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 3),
                                     child: Card(
+                                      color: Theme.of(context).cardColor,
                                       child: ListTile(
-                                        title: Text(item.name),
+                                        title: Text(
+                                          item.name,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .iconTheme
+                                                .color,
+                                          ),
+                                        ),
                                         subtitle: Text(
-                                            '\$${item.price.toStringAsFixed(2)}'),
+                                          '\$${item.price.toStringAsFixed(2)}',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .iconTheme
+                                                .color,
+                                          ),
+                                        ),
                                         leading: item.imagePath.isNotEmpty
                                             ? Image.network(item.imagePath)
                                             : null,
-                                        trailing: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            IconButton(
-                                              icon: const Icon(Icons.remove),
-                                              onPressed: () =>
-                                                  _decrementItemCount(
-                                                      selectedItem),
-                                            ),
-                                            Text('${selectedItem.max}'),
-                                            IconButton(
-                                              icon: const Icon(Icons.add),
-                                              onPressed: () =>
-                                                  _incrementItemCount(
-                                                      selectedItem),
-                                            ),
-                                          ],
+                                        trailing: SizedBox(
+                                          width: 120,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              IconButton(
+                                                icon: Icon(
+                                                  Icons.remove,
+                                                  color: Theme.of(context)
+                                                      .iconTheme
+                                                      .color,
+                                                ),
+                                                onPressed: () {
+                                                  _decrementItemCount(item);
+                                                },
+                                              ),
+                                              Text(
+                                                '${selectedItem.count}',
+                                                style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .iconTheme
+                                                      .color,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: Icon(
+                                                  Icons.add,
+                                                  color: Theme.of(context)
+                                                      .iconTheme
+                                                      .color,
+                                                ),
+                                                onPressed: () {
+                                                  _incrementItemCount(item);
+                                                },
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -337,7 +344,6 @@ void _decrementItemCount(SelectedItems item) async {
                       },
                     ),
                   ),
-
                 CategoryScrollView(
                   categoryList: snapshot.data!,
                   selectedCategoryId: selectedCategoryId,
@@ -442,7 +448,7 @@ class CategoryScrollView extends StatelessWidget {
 }
 
 class CheckoutButton extends StatelessWidget {
-  final List<SelectedItems> selectedItems;
+  final List<SelectedItem> selectedItems;
   final VoidCallback onPressed;
 
   const CheckoutButton({
@@ -456,7 +462,7 @@ class CheckoutButton extends StatelessWidget {
     return FloatingActionButton(
       onPressed: onPressed,
       backgroundColor: Colors.greenAccent,
-      child: const Icon(Icons.shopping_cart_checkout, color: Colors.white),
+      child:  const Icon(Icons.shopping_cart_checkout , color: Colors.white),
     );
   }
 }

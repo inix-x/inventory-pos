@@ -1,8 +1,10 @@
 // main.dart
 import 'package:flutter/material.dart';
+// ignore: unused_import
+import 'package:flutter_application_1/screens/getstarted.dart';
+import 'package:flutter_application_1/screens/setupscreen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/providers/themeprovider.dart';
-import 'package:flutter_application_1/screens/setupscreen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -34,7 +36,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             theme: themeProvider.themeData,
             debugShowCheckedModeBanner: false,
-            home: const Setupscreen(), //GetStarted to dapat
+            home: const Setupscreen(),
+            // home: const GetStarted(), //GetStarted to dapat
           );
         },
       ),

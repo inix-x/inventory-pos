@@ -27,7 +27,7 @@ class Customsignout extends StatelessWidget {
           'Sign Out',
           style: TextStyle(color: Colors.white, fontSize: 14), // White text
         ),
-      ),
+      ),  
     );
   }
 }

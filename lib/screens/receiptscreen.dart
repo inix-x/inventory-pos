@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/colors.dart';
+import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/screens/homepage.dart';
-import 'package:flutter_application_1/screens/menupage.dart';
+import 'package:flutter_application_1/themes/settings.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
@@ -11,9 +12,10 @@ import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ReceiptScreen extends StatefulWidget {
-  final List<SelectedItem> selectedItems;
+  final List<SelectedItems> selectedItems;
   final double change;
-  final screenshotController = ScreenshotController(); // New variable for screenshot
+  final screenshotController =
+      ScreenshotController(); // New variable for screenshot
 
   ReceiptScreen({super.key, required this.selectedItems, required this.change});
 
@@ -54,7 +56,8 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       receiptText +=
           "\n${item.count}       ${item.name} ------------- ${item.price}\n";
     }
-    receiptText += "\n######################\nTotal: \$${total.toStringAsFixed(2)}\n";
+    receiptText +=
+        "\n######################\nTotal: \$${total.toStringAsFixed(2)}\n";
     if (widget.change >= 0) {
       receiptText += "Change: \$${widget.change.toStringAsFixed(2)}\n";
     }
@@ -124,64 +127,91 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   Widget build(BuildContext context) {
     calculateTotalPrice();
     return Scaffold(
+      
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 90),
-          child: Text('Receipt',
-              style: GoogleFonts.lato(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              )),
-        ),
+        automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context), // Navigate back on press
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).iconTheme.color,
+          ),
+          onPressed: (){},
         ),
+        title: Row(children: [
+          const Spacer(),
+          Text('Receipt', style: Theme.of(context).textTheme.displayMedium),
+          const Spacer(),
+          IconButton(
+            icon: Icon(
+              Icons.settings,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            onPressed: () {
+              SettingsDialog.show(context);
+            },
+          ),
+        ]),
       ),
-      body: Screenshot(
-        controller: screenshotController,
-        child: FutureBuilder(
-          future: Future.delayed(const Duration(milliseconds: 100)), // Short delay
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return Center(
-                child: Container(
-                  width: 400,
-                  color: Colors.white,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Omar\'s Eatery, Inc.',
-                        style: GoogleFonts.lato(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
+      body: Column(
+        children: [
+          Expanded(
+            child: Screenshot(
+              controller: screenshotController,
+              child: FutureBuilder(
+                future: Future.delayed(
+                    const Duration(milliseconds: 100)), // Short delay
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Center(
+                      child: Container(
+                        width: 400,
+                        color: Theme.of(context).appBarTheme.backgroundColor,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Business Name, Inc.',
+                                style:
+                                    Theme.of(context).textTheme.displayMedium),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                generateReceiptText(),
+                                textAlign: TextAlign.left,
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: takeScreenshot,
+                              child: const Text('Screenshot Receipt'),
+                            ),
+                          ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          generateReceiptText(),
-                          textAlign: TextAlign.left,
-                          style: GoogleFonts.roboto(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: takeScreenshot,
-                        child: const Text('Screenshot Receipt'),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
+          ),
+          // Container for the ad
+          Container(
+            // margin: const EdgeInsets.all(10),
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Center(
+              child: Text(
+                "ADS HERE",
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

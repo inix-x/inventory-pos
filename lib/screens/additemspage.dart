@@ -58,13 +58,9 @@ class _AddItemspageState extends State<AddItemspage>
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: isDarkTheme
-              ? ThemeColors.darkAlertDialogColor
-              : ThemeColors.lightAlertDialogColor,
-          title: Text(
-            'Add Item details',
-            style: Theme.of(context).textTheme.displayMedium
-          ),
+         backgroundColor: Theme.of(context).primaryColor,
+          title: Text('Add Item details',
+              style: Theme.of(context).textTheme.displayMedium),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -128,7 +124,6 @@ class _AddItemspageState extends State<AddItemspage>
       },
     );
   }
-
   Future<void> _saveItem(category_provider.CategoryProvider categoryProvider,
       String itemName, String itemPriceText, String itemCountText) async {
     final validItemName = RegExp(r'^[a-zA-Z\s]+$');
@@ -145,7 +140,7 @@ class _AddItemspageState extends State<AddItemspage>
       try {
         final itemPrice = double.parse(itemPriceText);
         final itemStock = int.parse(itemCountText);
-
+        
         if (itemPrice <= 0) {
           showToast(message: 'Item price must be greater than 0');
         } else if (itemStock <= 0) {
@@ -157,12 +152,13 @@ class _AddItemspageState extends State<AddItemspage>
           if (itemExists) {
             showToast(message: 'The item already exists');
           } else {
+            const initialMax = 0;
             final newItem = Item(
               name: itemName,
               price: itemPrice,
               imagePath: '',
               count: itemStock,
-              max: 10,
+              max: initialMax, // Initialize max with itemStock value
             );
 
             categoryProvider.addItemToPlaceholder(widget.itemIndex, newItem);
@@ -184,6 +180,62 @@ class _AddItemspageState extends State<AddItemspage>
       }
     }
   }
+
+  // Future<void> _saveItem(category_provider.CategoryProvider categoryProvider,
+  //     String itemName, String itemPriceText, String itemCountText) async {
+  //   final validItemName = RegExp(r'^[a-zA-Z\s]+$');
+
+  //   if (itemName.isEmpty) {
+  //     showToast(message: 'Item name cannot be empty');
+  //   } else if (!validItemName.hasMatch(itemName)) {
+  //     showToast(message: 'Item name can only contain letters and spaces');
+  //   } else if (itemPriceText.isEmpty) {
+  //     showToast(message: 'Item price cannot be empty');
+  //   } else if (itemCountText.isEmpty) {
+  //     showToast(message: 'Item count cannot be empty');
+  //   } else {
+  //     try {
+  //       final itemPrice = double.parse(itemPriceText);
+  //       final itemStock = int.parse(itemCountText);
+
+  //       if (itemPrice <= 0) {
+  //         showToast(message: 'Item price must be greater than 0');
+  //       } else if (itemStock <= 0) {
+  //         showToast(message: 'Item count must be greater than 0');
+  //       } else {
+  //         final dbService = DatabaseService.instance;
+  //         final itemExists = await dbService.itemExists(itemName);
+
+  //         if (itemExists) {
+  //           showToast(message: 'The item already exists');
+  //         } else {
+  //           final newItem = Item(
+  //             name: itemName,
+  //             price: itemPrice,
+  //             imagePath: '',
+  //             count: itemStock,
+  //             max: 0, //eto may mali
+  //           );
+
+  //           categoryProvider.addItemToPlaceholder(widget.itemIndex, newItem);
+
+  //           if (mounted) {
+  //             setState(() {
+  //               isSaved = false;
+  //             });
+  //           }
+  //           showToast(message: 'Please save the items first.');
+
+  //           if (mounted) {
+  //             Navigator.pop(context);
+  //           }
+  //         }
+  //       }
+  //     } catch (e) {
+  //       showToast(message: 'Invalid input for price or count');
+  //     }
+  //   }
+  // }
 
   void _saveItemsToDatabase() async {
     final categoryProvider = context.read<category_provider.CategoryProvider>();
@@ -282,12 +334,13 @@ class _AddItemspageState extends State<AddItemspage>
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        resizeToAvoidBottomInset:false,
         appBar: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
               isSaved
                   ? Customsignout(
@@ -297,9 +350,7 @@ class _AddItemspageState extends State<AddItemspage>
                         }
                       },
                       icon: Icon(Icons.arrow_back_ios,
-                          color: isDarkTheme
-                              ? ThemeColors.darkIconColor
-                              : ThemeColors.lightIconColor),
+                         color: Theme.of(context).iconTheme.color,),
                     )
                   : const SizedBox(width: 1),
               const Spacer(),
@@ -309,9 +360,7 @@ class _AddItemspageState extends State<AddItemspage>
                   textStyle: TextStyle(
                     fontSize: 25,
                     letterSpacing: 2,
-                    color: isDarkTheme
-                        ? ThemeColors.darkIconColor
-                        : ThemeColors.lightIconColor,
+                   color: Theme.of(context).iconTheme.color,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -321,9 +370,7 @@ class _AddItemspageState extends State<AddItemspage>
               IconButton(
                 icon: Icon(
                   Icons.settings,
-                  color: isDarkTheme
-                      ? ThemeColors.darkIconColor
-                      : ThemeColors.lightIconColor,
+                 color: Theme.of(context).iconTheme.color,
                 ),
                 onPressed: () {
                   SettingsDialog.show(context);
@@ -334,7 +381,10 @@ class _AddItemspageState extends State<AddItemspage>
         ),
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: placeholderItems.isNotEmpty
+                ? MainAxisAlignment.spaceBetween
+                : MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.max,
             children: [
               placeholderItems.isNotEmpty
                   ? Flexible(
@@ -374,7 +424,6 @@ class _AddItemspageState extends State<AddItemspage>
                         ),
                       ),
                     ),
-             
             ],
           ),
         ),
@@ -400,8 +449,6 @@ class _AddItemspageState extends State<AddItemspage>
     );
   }
 
-  
-
   Widget _buildTextField(TextEditingController controller, String hintText,
       TextInputType keyboardType, bool isDarkTheme,
       [List<TextInputFormatter>? inputFormatters]) {
@@ -415,14 +462,14 @@ class _AddItemspageState extends State<AddItemspage>
         labelText: hintText,
         hintText: hintText,
         labelStyle: TextStyle(
-          color: isDarkTheme ? Colors.white : Colors.black,
+         color: Theme.of(context).iconTheme.color,
         ),
         hintStyle: TextStyle(
-          color: isDarkTheme ? Colors.grey : Colors.black54,
+         color: Theme.of(context).iconTheme.color,
         ),
       ),
       style: TextStyle(
-        color: isDarkTheme ? Colors.white : Colors.black,
+        color: Theme.of(context).iconTheme.color,
       ),
     );
   }
@@ -440,70 +487,62 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    final isDarkTheme = themeProvider.isDarkTheme;
+    Provider.of<ThemeProvider>(context, listen: false);
 
     return Dismissible(
       key: ValueKey(item.id),
-      background: Container(
+      background: Container(  
         color: Colors.red,
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) => onDelete(),
-      child: Card(
-        color: isDarkTheme
-            ? ThemeColors.darkCardColor
-            : ThemeColors.lightCardColor,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.name,
-                    style: GoogleFonts.robotoSerif(
-                      textStyle: TextStyle(
-                        color: isDarkTheme
-                            ? ThemeColors.darkTextColor
-                            : ThemeColors.lightTextColor,
-                        fontWeight: FontWeight.bold,
+      child: Padding(
+         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+        child: Card(
+          color: Theme.of(context).cardColor,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.name,
+                      style: GoogleFonts.robotoSerif(
+                        textStyle: TextStyle(
+                          color: Theme.of(context).iconTheme.color,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  Text(
-                    'Price: ${item.price.toString()}',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                        color: isDarkTheme
-                            ? ThemeColors.darkTextColor
-                            : ThemeColors.lightTextColor,
+                    Text(
+                      'Price: ${item.price.toString()}',
+                      style: GoogleFonts.roboto(
+                        textStyle: TextStyle(
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                       ),
                     ),
-                  ),
-                  Text(
-                    'Stocks: ${item.count.toString()}',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                        color: isDarkTheme
-                            ? ThemeColors.darkTextColor
-                            : ThemeColors.lightTextColor,
+                    Text(
+                      'Stocks: ${item.count.toString()}',
+                      style: GoogleFonts.roboto(
+                        textStyle: TextStyle(
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete),
-                color: isDarkTheme
-                    ? ThemeColors.darkIconColor
-                    : ThemeColors.lightIconColor,
-                onPressed: onDelete,
-              ),
-            ],
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  color: Theme.of(context).iconTheme.color,
+                  onPressed: onDelete,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -536,11 +575,10 @@ class ActionButton extends StatelessWidget {
           iconData,
           color: isDarkTheme
               ? ThemeColors.lightButtonTextColor
-              : ThemeColors.darkButtonTextColor,
+              : ThemeColors.lightButtonTextColor,
         ),
         onPressed: onPressed,
       ),
     );
   }
 }
-
