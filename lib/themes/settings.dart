@@ -25,6 +25,7 @@ class SettingsDialog {
                   const GlobalDayNightSwitch(),
                 ],
               ),
+              
             ],
           ),
           actions: [

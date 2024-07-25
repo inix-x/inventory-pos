@@ -220,12 +220,26 @@ class DatabaseService {
 
   //fetch the items from db items to selectedItems list
   Future<List<SelectedItems>> fetchSelectedItems() async {
-    final db = await database;
-    final maps = await db.query('items');
-    return List.generate(maps.length, (i) {
-      return SelectedItems.fromMap(maps[i]);
-    });
-  }
+  final db = await database;
+  final maps = await db.query(
+    'items',
+    where: 'count > 0',
+  );
+  return List.generate(maps.length, (i) {
+    return SelectedItems.fromMap(maps[i]);
+  });
+}
+
+  Future<List<SelectedItems>> fetchOutOfStockSelectedItems() async {
+  final db = await database;
+  final maps = await db.query(
+    'items',
+    where: 'count = 0',
+  );
+  return List.generate(maps.length, (i) {
+    return SelectedItems.fromMap(maps[i]);
+  });
+}
 
   Future<bool> isItemCountGreaterThanZero(int itemId) async {
     final db = await database;

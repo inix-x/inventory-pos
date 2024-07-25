@@ -14,10 +14,11 @@ import 'package:path_provider/path_provider.dart';
 class ReceiptScreen extends StatefulWidget {
   final List<SelectedItems> selectedItems;
   final double change;
+  final String orderNumber; // Add orderNumber parameter
   final screenshotController =
       ScreenshotController(); // New variable for screenshot
 
-  ReceiptScreen({super.key, required this.selectedItems, required this.change});
+  ReceiptScreen({super.key, required this.selectedItems, required this.change, required this.orderNumber});
 
   @override
   State<ReceiptScreen> createState() => _ReceiptScreenState();
@@ -50,7 +51,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
   String generateReceiptText() {
     String receiptText =
-        "            ${getFormattedDateTime()}--------------------------------\n                  Order #\nQty.             Item.           Price\n";
+        "            ${getFormattedDateTime()}--------------------------------\n       Order #${widget.orderNumber}\nQty.             Item.           Price\n";
 
     for (var item in widget.selectedItems) {
       receiptText +=
@@ -75,7 +76,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Omar\'s Eatery, Inc.',
+              'Business Inc.',
               style: GoogleFonts.lato(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
@@ -177,7 +178,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                               child: Text(
                                 generateReceiptText(),
                                 textAlign: TextAlign.left,
-                                style: Theme.of(context).textTheme.labelSmall,
+                                style: Theme.of(context).textTheme.displaySmall,
                               ),
                             ),
                             ElevatedButton(

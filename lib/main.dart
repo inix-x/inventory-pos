@@ -1,5 +1,6 @@
 // main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/providers/ordernumberprovider.dart';
 // ignore: unused_import
 import 'package:flutter_application_1/screens/getstarted.dart';
 import 'package:flutter_application_1/screens/setupscreen.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => category_provider.CategoryProvider(categories: [])),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

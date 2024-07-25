@@ -6,6 +6,7 @@ import 'package:flutter_application_1/global/common/toast.dart';
 import 'package:flutter_application_1/providers/categoryprovider.dart'
     as category_provider;
 import 'package:flutter_application_1/providers/themeprovider.dart';
+import 'package:flutter_application_1/themes/theme_color.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/loginwidget/auth_service.dart';
 
@@ -36,6 +37,7 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
     _searchController.addListener(_onSearchChanged);
     WidgetsBinding.instance.addObserver(this);
     _fetchSelectedItems();
+    selectedItems = [];
   }
 
   @override
@@ -88,70 +90,33 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   // Inside your existing MenuScreen widget
 
 //OTHER CODE
-void _incrementItemCount(SelectedItems item) async {
-  final dbService = DatabaseService.instance;
-  final isCountGreaterThanZero = await dbService.isItemCountGreaterThanZero(item.id!);
-
-  if (isCountGreaterThanZero) {
-    setState(() {
-      final selectedItem = selectedItems.firstWhere(
-        (selectedItem) => selectedItem.name == item.name,
-        orElse: () {
-          final newItem = SelectedItems(
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            imagePath: item.imagePath,
-            count: item.count,
-            max: item.max, // Initialize max with item's max value
-          );
-          selectedItems.add(newItem);
-          return newItem;
-        },
-      );
-
-      if (selectedItem.max < item.count) { // Check if max is less than item's count
-       
-        selectedItem.max += 1; // Increment max value dynamically
-      } else {
-        showToast(message: 'Item has reached its maximum count.');
-      }
-    });
-  } else {
-    showToast(message: 'Item is out of stock.');
-  }
-}
-
-
-
-void _decrementItemCount(SelectedItems item) async {
+ void _incrementItemCount(SelectedItems item) async {
   final dbService = DatabaseService.instance;
   final isCountGreaterThanZero =
       await dbService.isItemCountGreaterThanZero(item.id!);
 
   if (isCountGreaterThanZero) {
     setState(() {
-      final selectedItem = selectedItems.firstWhere(
-        (selectedItem) => selectedItem.name == item.name,
-        orElse: () {
-          final newItem = SelectedItems(
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            imagePath: item.imagePath,
-            count: 0,
-            max: item.max,
-          );
-          return newItem;
-        },
-      );
+      final existingItemIndex = selectedItems.indexWhere((selectedItem) => selectedItem.name == item.name);
 
-      if (selectedItem.count > 0) {
-        selectedItem.count -= 1;
-        selectedItem.max -= 1; // Decrement max value dynamically
-
-        if (selectedItem.count == 0) {
-          selectedItems.removeWhere((element) => element.name == item.name);
+      if (existingItemIndex != -1) {
+        final selectedItem = selectedItems[existingItemIndex];
+        if (selectedItem.max < selectedItem.count) {
+          selectedItem.max += 1; // Increment count value dynamically
+        } else {
+          showToast(message: 'Item has reached its maximum count.');
+        }
+      } else if (item.max > 0 && item.count > 0) {
+        final newItem = SelectedItems(
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          imagePath: item.imagePath,
+          count: item.count,
+          max: item.max, // Initialize max with item's max value
+        );
+       if (newItem.max > 0 && newItem.count > 0) {
+          selectedItems.add(newItem);
         }
       }
     });
@@ -159,6 +124,41 @@ void _decrementItemCount(SelectedItems item) async {
     showToast(message: 'Item is out of stock.');
   }
 }
+
+
+  void _decrementItemCount(SelectedItems item) async {
+    final dbService = DatabaseService.instance;
+    final isCountGreaterThanZero =
+        await dbService.isItemCountGreaterThanZero(item.id!);
+
+    if (isCountGreaterThanZero) {
+      setState(() {
+        final selectedItem = selectedItems.firstWhere(
+          (selectedItem) => selectedItem.name == item.name,
+          orElse: () {
+            final newItem = SelectedItems(
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              imagePath: item.imagePath,
+              count: 0,
+              max: item.max,
+            );
+            return newItem;
+          },
+        );
+
+        if (selectedItem.max > 0) {
+          selectedItem.max -= 1; // Decrement max value dynamically
+          if (selectedItem.max == 0) {
+            selectedItems.removeWhere((element) => element.name == item.name);
+          }
+        }
+      });
+    } else {
+      showToast(message: 'Item is out of stock.');
+    }
+  }
 
   int _getTotalItemCount() {
     return selectedItems.fold(0, (total, item) => total + item.max);
@@ -170,7 +170,9 @@ void _decrementItemCount(SelectedItems item) async {
   }
 
   void _navigateToCartScreen() {
-    if (selectedItems.isNotEmpty) {
+    selectedItems.removeWhere((item) => item.max == 0 || item.count == 0);
+    if (selectedItems.isNotEmpty &&
+        selectedItems.any((item) => item.max > 0)) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -234,7 +236,8 @@ void _decrementItemCount(SelectedItems item) async {
                     child: ListView(
                       children: _searchResults.map((item) {
                         return Padding(
-                          padding:  const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
                           child: Card(
                             child: ListTile(
                               title: Text(item.name),
@@ -282,9 +285,13 @@ void _decrementItemCount(SelectedItems item) async {
                               return const Center(
                                   child: Text('No items available'));
                             } else {
+                              final filteredItems = itemSnapshot.data!
+                                  .where((item) => item.count > 0)
+                                  .toList();
                               return ListView(
-                                controller: _scrollController,
-                                children: itemSnapshot.data!.map((item) {
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                children: filteredItems.map((item) {
                                   final selectedItem = selectedItems.firstWhere(
                                     (selectedItem) =>
                                         selectedItem.name == item.name,
@@ -297,10 +304,10 @@ void _decrementItemCount(SelectedItems item) async {
                                       max: item.max,
                                     ),
                                   );
-
                                   return Padding(
-                                    padding:  const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Card(
+                                       color: ThemeColors.lightCardColor,
                                       child: ListTile(
                                         title: Text(item.name),
                                         subtitle: Text(
@@ -338,10 +345,13 @@ void _decrementItemCount(SelectedItems item) async {
                     ),
                   ),
 
-                CategoryScrollView(
-                  categoryList: snapshot.data!,
-                  selectedCategoryId: selectedCategoryId,
-                  scrollController: _scrollController,
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: CategoryScrollView(
+                    categoryList: snapshot.data!,
+                    selectedCategoryId: selectedCategoryId,
+                    scrollController: _scrollController,
+                  ),
                 ),
               ],
             );
@@ -349,7 +359,7 @@ void _decrementItemCount(SelectedItems item) async {
         },
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).cardColor,
+        color: Theme.of(context).appBarTheme.backgroundColor,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -370,7 +380,9 @@ void _decrementItemCount(SelectedItems item) async {
         child: CheckoutButton(
           selectedItems: selectedItems,
           onPressed: () {
-            if (selectedItems.isEmpty) {
+            if (selectedItems.isEmpty ||
+                selectedItems.every((item) => item.max == 0)) {
+              //max property is the number of items added to the cart.
               showToast(message: 'No items to checkout');
             } else {
               _navigateToCartScreen();
@@ -414,7 +426,7 @@ class CategoryScrollView extends StatelessWidget {
                   border: Border.all(color: Colors.black),
                   borderRadius: BorderRadius.circular(8),
                   color: selectedCategoryIdValue == category.id
-                      ? Colors.blueAccent
+                      ? Colors.lightBlueAccent
                       : Theme.of(context).cardColor,
                 ),
                 child: GestureDetector(
@@ -427,7 +439,7 @@ class CategoryScrollView extends StatelessWidget {
                   child: Center(
                     child: Text(
                       category.name,
-                      style: Theme.of(context).textTheme.labelSmall,
+                      style: Theme.of(context).textTheme.displaySmall,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -455,8 +467,8 @@ class CheckoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton(
       onPressed: onPressed,
-      backgroundColor: Colors.greenAccent,
-      child: const Icon(Icons.shopping_cart_checkout, color: Colors.white),
+      backgroundColor: Colors.green,
+      child: const Icon(Icons.shopping_cart_checkout_sharp, color: Colors.white),
     );
   }
 }

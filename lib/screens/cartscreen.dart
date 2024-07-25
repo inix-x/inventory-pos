@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/database/database.service.dart';
 import 'package:flutter_application_1/providers/themeprovider.dart';
@@ -21,7 +22,14 @@ class _CartScreenState extends State<CartScreen> {
     total = 0.0; // Reset total before recalculating
 
     for (var item in widget.selectedItems) {
-      total += item.price * item.count;
+      total += item.price * item.max;
+    }
+
+    if (kDebugMode) {
+      for (var item in widget.selectedItems) {
+        print(
+            'Item: ${item.name}, Price: ${item.price}, Quantity: ${item.max}');
+      }
     }
   }
 
@@ -81,7 +89,8 @@ class _CartScreenState extends State<CartScreen> {
                     final item = widget.selectedItems[index];
 
                     return Padding(
-                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
                       child: Card(
                         color: Theme.of(context).cardColor,
                         child: Padding(
@@ -126,7 +135,7 @@ class _CartScreenState extends State<CartScreen> {
                                 margin: const EdgeInsets.all(10),
                                 decoration: const BoxDecoration(),
                                 child: Text(
-                                  'Qty: ${item.count}',
+                                  'Qty: ${item.max}',
                                   style: GoogleFonts.raleway(
                                     textStyle: TextStyle(
                                       fontSize: 16,
@@ -164,22 +173,20 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ),
         bottomNavigationBar: BottomAppBar(
-         
-         color: Theme.of(context).cardColor,
+          color: Theme.of(context).appBarTheme.backgroundColor,
           child: Row(
-               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'Total :',
-                   style: Theme.of(context).textTheme.displaySmall,
-                ),
-                Text(
-                  '\$${total.toStringAsFixed(2)}',
-                   style: Theme.of(context).textTheme.displaySmall,
-                ),
-              ],
-            ),
-       
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                'Total :',
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+              Text(
+                '\$${total.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+            ],
+          ),
         ),
         floatingActionButton: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
@@ -199,6 +206,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ),
           ),
-        ));
+        )
+        );
   }
 }

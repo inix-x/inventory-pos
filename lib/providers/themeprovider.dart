@@ -30,6 +30,9 @@ class ThemeProvider extends ChangeNotifier {
       appBarTheme: const AppBarTheme(
         backgroundColor: ThemeColors.darkAppBarBackground,
       ),
+       drawerTheme: const DrawerThemeData(
+        backgroundColor: ThemeColors.darkGradientStart
+      ),
       iconTheme: const IconThemeData(
         color: ThemeColors.darkIconColor,
       ),
@@ -73,9 +76,10 @@ class ThemeProvider extends ChangeNotifier {
           ),
         ),
       ),
+      focusColor: ThemeColors.tilefocusColorDark,
       primaryColor: ThemeColors.darkAlertDialogColor,
       highlightColor: ThemeColors.checkoutButtonColor,
-      scaffoldBackgroundColor: ThemeColors.darkGradientStart,
+      scaffoldBackgroundColor: ThemeColors.scaffoldBgColorDark,
     );
   }
 
@@ -83,6 +87,9 @@ class ThemeProvider extends ChangeNotifier {
     return ThemeData(
       appBarTheme: const AppBarTheme(
         backgroundColor: ThemeColors.lightAppBarBackground,
+      ),
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: ThemeColors.scaffoldBgColorLight
       ),
       iconTheme: const IconThemeData(
         color: ThemeColors.lightIconColor,
@@ -115,10 +122,19 @@ class ThemeProvider extends ChangeNotifier {
             fontWeight: FontWeight.bold,
           ),
         ),
+        labelSmall: GoogleFonts.lato(
+          textStyle: const TextStyle(
+            fontSize: 12,
+            letterSpacing: 1,
+            color: ThemeColors.darkIconColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
+      focusColor: ThemeColors.tilefocusColorLight,
       primaryColor: ThemeColors.lightAlertDialogColor,
       highlightColor: ThemeColors.checkoutButtonColor,
-      scaffoldBackgroundColor: ThemeColors.lightGradientStart,
+      scaffoldBackgroundColor: ThemeColors.scaffoldBgColorLight,
     );
   }
 }
