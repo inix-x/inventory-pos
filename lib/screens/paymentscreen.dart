@@ -7,7 +7,7 @@ import 'package:flutter_application_1/providers/ordernumberprovider.dart';
 import 'package:flutter_application_1/screens/receiptscreen.dart';
 import 'package:flutter_application_1/themes/settings.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart'; // For formatting date
+import 'package:provider/provider.dart';
 
 class PaymentScreen extends StatefulWidget {
   final List<SelectedItems> selectedItems;
@@ -19,6 +19,8 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   final player = AudioPlayer();
+  final TextEditingController _textFieldController =
+      TextEditingController(); // Add this line
   double total = 0.0;
   double? cashAmount; // Variable to store cash input
 
@@ -136,7 +138,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Consumer<OrderProvider>(
               builder: (context, orderProvider, child) {
                 return Text('Order #${orderProvider.orderNumber}',
-                    style: Theme.of(context).textTheme.displaySmall);
+                    style: Theme.of(context).textTheme.headlineMedium);
               },
             ),
             const Spacer(),
@@ -152,60 +154,185 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ],
         ),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text('Your Total is: \$${total.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.displayMedium),
-              SizedBox(
-                width: 300,
-                child: TextField(
-                  style: Theme.of(context).textTheme.displaySmall,
-                  keyboardType:
-                      TextInputType.number, // Display numeric keyboard
-                  inputFormatters: [
-                    FilteringTextInputFormatter
-                        .digitsOnly, // Allow only digits 0-9
-                    MaxValueInputFormatter(
-                        maxValue: 100000), // Limit maximum value to 10000
-                  ],
-                  obscureText: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    labelText: 'Payment Amount',
-                    labelStyle: Theme.of(context).textTheme.displaySmall,
-                  ),
-                  onChanged: (value) {
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: Center(
+              child: Text(
+                'Total: \$${total.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 300,
+            child: TextField(
+              controller: _textFieldController, // Add a controller
+              style: Theme.of(context).textTheme.displayMedium,
+              textAlign: TextAlign.right, // Align text to the right
+              keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true), // Display numeric keyboard with decimal
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'[0-9.]')), // Allow digits and decimal point
+                MaxValueInputFormatter(
+                    maxValue: 100000), // Limit maximum value to 10000
+              ],
+              obscureText: false,
+              decoration:  InputDecoration(
+                hintText: '0', // Set default hint text to "0"
+                hintStyle: Theme.of(context).textTheme.displayMedium,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  if (value.isEmpty) {
+                    _textFieldController.text =
+                        '0'; // Set default value to "0" if input is empty
+                    _textFieldController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _textFieldController.text.length),
+                    );
+                  } else if (RegExp(r'^0+$').hasMatch(value)) {
+                    _textFieldController.text =
+                        '0'; // Restrict input to a single "0" if a series of zeroes is detected
+                    _textFieldController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _textFieldController.text.length),
+                    );
+                  } else {
                     cashAmount = double.tryParse(
                         value); // Update cashAmount on input change
+                  }
+                });
+              },
+            ),
+          ),
+
+          const SizedBox(
+              height:
+                  10), // Add some spacing between the TextField and number pad
+          // Number pad
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 3,
+              childAspectRatio: 1,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              padding: const EdgeInsets.all(10),
+              children: [
+                ...List.generate(9, (index) {
+                  int number = index + 1;
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).scaffoldBackgroundColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(0)),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        // Update the TextField value
+                        _textFieldController.text += number.toString();
+                        cashAmount = double.tryParse(_textFieldController.text);
+                      });
+                    },
+                    child: Text(
+                      '$number',
+                      style: Theme.of(context).textTheme.displayMedium,
+                    ),
+                  );
+                }),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0)),
+                    elevation: 0,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _textFieldController.text += '.';
+                      cashAmount = double.tryParse(_textFieldController.text);
+                    });
                   },
-                ),
-              ),
-              Container(
-                height: 100,
-                width: 250,
-                color: Colors.green,
-                child: MaterialButton(
-                  onPressed: handleCashPayment,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('PAY',
-                          style: Theme.of(context).textTheme.displayMedium),
-                      Icon(
-                        Icons.payment_outlined,
-                        color: Theme.of(context).iconTheme.color,
-                      ),
-                    ],
+                  child: Text(
+                    '.',
+                    style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0)),
+                    elevation: 0,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _textFieldController.text += '0';
+                      cashAmount = double.tryParse(_textFieldController.text);
+                    });
+                  },
+                  child: Text(
+                    '0',
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0)),
+                    elevation: 0,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      if (_textFieldController.text.isNotEmpty) {
+                        _textFieldController.text = _textFieldController.text
+                            .substring(0, _textFieldController.text.length - 1);
+                        cashAmount = double.tryParse(_textFieldController.text);
+                      }
+                    });
+                  },
+                  child: Icon(
+                    Icons.backspace,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: SizedBox(
+          height: 60.0,
+          child: ElevatedButton(
+            onPressed: handleCashPayment,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).highlightColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
               ),
-            ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'PAY',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        color: Colors.white,
+                      ),
+                ),
+                const SizedBox(width: 8.0),
+                const Icon(
+                  Icons.payment_outlined,
+                  color: Colors.white,
+                ),
+              ],
+            ),
           ),
         ),
       ),

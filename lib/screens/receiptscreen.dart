@@ -45,17 +45,17 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     total = 0.0; // Reset total before recalculating
 
     for (var item in widget.selectedItems) {
-      total += item.price * item.count;
+      total += item.price * item.max;
     }
   }
 
   String generateReceiptText() {
     String receiptText =
-        "            ${getFormattedDateTime()}--------------------------------\n       Order #${widget.orderNumber}\nQty.             Item.           Price\n";
+        "            ${getFormattedDateTime()}--------------------------------\n       Order #${widget.orderNumber}\nItem.             Qty.           Price\n";
 
     for (var item in widget.selectedItems) {
       receiptText +=
-          "\n${item.count}       ${item.name} ------------- ${item.price}\n";
+          "\n${item.name}                  ${item.max}               ${item.price}\n";
     }
     receiptText +=
         "\n######################\nTotal: \$${total.toStringAsFixed(2)}\n";

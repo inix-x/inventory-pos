@@ -37,8 +37,9 @@ class ThemeProvider extends ChangeNotifier {
         color: ThemeColors.darkIconColor,
       ),
       cardColor: ThemeColors.darkCardColor,
-    
+      
       textTheme: TextTheme(
+
         displayMedium: GoogleFonts.roboto(
           textStyle: const TextStyle(
             fontSize: 25,
@@ -51,6 +52,15 @@ class ThemeProvider extends ChangeNotifier {
         displaySmall: GoogleFonts.lato(
           textStyle: const TextStyle(
             fontSize: 14,
+            letterSpacing: 2,
+            color: ThemeColors.darkIconColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        headlineMedium: GoogleFonts.roboto(
+          textStyle: const TextStyle(
+            fontSize: 22,
             letterSpacing: 2,
             color: ThemeColors.darkIconColor,
             fontWeight: FontWeight.bold,
@@ -78,7 +88,7 @@ class ThemeProvider extends ChangeNotifier {
       ),
       focusColor: ThemeColors.tilefocusColorDark,
       primaryColor: ThemeColors.darkAlertDialogColor,
-      highlightColor: ThemeColors.checkoutButtonColor,
+      highlightColor: Colors.green,
       scaffoldBackgroundColor: ThemeColors.scaffoldBgColorDark,
     );
   }
@@ -114,6 +124,15 @@ class ThemeProvider extends ChangeNotifier {
           ),
         ),
 
+        headlineMedium: GoogleFonts.roboto(
+          textStyle: const TextStyle(
+            fontSize: 22,
+            letterSpacing: 2,
+            color: ThemeColors.lightIconColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
         titleSmall: GoogleFonts.roboto(
           textStyle: const TextStyle(
             fontSize: 12,
@@ -133,7 +152,7 @@ class ThemeProvider extends ChangeNotifier {
       ),
       focusColor: ThemeColors.tilefocusColorLight,
       primaryColor: ThemeColors.lightAlertDialogColor,
-      highlightColor: ThemeColors.checkoutButtonColor,
+      highlightColor: Colors.blueAccent,
       scaffoldBackgroundColor: ThemeColors.scaffoldBgColorLight,
     );
   }
