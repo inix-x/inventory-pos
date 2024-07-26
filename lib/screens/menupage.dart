@@ -90,41 +90,41 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   // Inside your existing MenuScreen widget
 
 //OTHER CODE
- void _incrementItemCount(SelectedItems item) async {
-  final dbService = DatabaseService.instance;
-  final isCountGreaterThanZero =
-      await dbService.isItemCountGreaterThanZero(item.id!);
+  void _incrementItemCount(SelectedItems item) async {
+    final dbService = DatabaseService.instance;
+    final isCountGreaterThanZero =
+        await dbService.isItemCountGreaterThanZero(item.id!);
 
-  if (isCountGreaterThanZero) {
-    setState(() {
-      final existingItemIndex = selectedItems.indexWhere((selectedItem) => selectedItem.name == item.name);
+    if (isCountGreaterThanZero) {
+      setState(() {
+        final existingItemIndex = selectedItems
+            .indexWhere((selectedItem) => selectedItem.name == item.name);
 
-      if (existingItemIndex != -1) {
-        final selectedItem = selectedItems[existingItemIndex];
-        if (selectedItem.max < selectedItem.count) {
-          selectedItem.max += 1; // Increment count value dynamically
-        } else {
-          showToast(message: 'Item has reached its maximum count.');
+        if (existingItemIndex != -1) {
+          final selectedItem = selectedItems[existingItemIndex];
+          if (selectedItem.max < selectedItem.count) {
+            selectedItem.max += 1; // Increment count value dynamically
+          } else {
+            showToast(message: 'Item has reached its maximum count.');
+          }
+        } else if (item.max > 0 && item.count > 0) {
+          final newItem = SelectedItems(
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            imagePath: item.imagePath,
+            count: item.count,
+            max: item.max, // Initialize max with item's max value
+          );
+          if (newItem.max > 0 && newItem.count > 0) {
+            selectedItems.add(newItem);
+          }
         }
-      } else if (item.max > 0 && item.count > 0) {
-        final newItem = SelectedItems(
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          imagePath: item.imagePath,
-          count: item.count,
-          max: item.max, // Initialize max with item's max value
-        );
-       if (newItem.max > 0 && newItem.count > 0) {
-          selectedItems.add(newItem);
-        }
-      }
-    });
-  } else {
-    showToast(message: 'Item is out of stock.');
+      });
+    } else {
+      showToast(message: 'Item is out of stock.');
+    }
   }
-}
-
 
   void _decrementItemCount(SelectedItems item) async {
     final dbService = DatabaseService.instance;
@@ -133,25 +133,16 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
 
     if (isCountGreaterThanZero) {
       setState(() {
-        final selectedItem = selectedItems.firstWhere(
-          (selectedItem) => selectedItem.name == item.name,
-          orElse: () {
-            final newItem = SelectedItems(
-              id: item.id,
-              name: item.name,
-              price: item.price,
-              imagePath: item.imagePath,
-              count: 0,
-              max: item.max,
-            );
-            return newItem;
-          },
-        );
+        final existingItemIndex = selectedItems
+            .indexWhere((selectedItem) => selectedItem.name == item.name);
 
-        if (selectedItem.max > 0) {
-          selectedItem.max -= 1; // Decrement max value dynamically
-          if (selectedItem.max == 0) {
-            selectedItems.removeWhere((element) => element.name == item.name);
+        if (existingItemIndex != -1) {
+          final selectedItem = selectedItems[existingItemIndex];
+          if (selectedItem.max > 0) {
+            selectedItem.max -= 1; // Decrement max value dynamically
+            if (selectedItem.max == 0) {
+              selectedItem.max = 0; // Set max to 0 instead of removing the item
+            }
           }
         }
       });
@@ -171,8 +162,7 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
 
   void _navigateToCartScreen() {
     selectedItems.removeWhere((item) => item.max == 0 || item.count == 0);
-    if (selectedItems.isNotEmpty &&
-        selectedItems.any((item) => item.max > 0)) {
+    if (selectedItems.isNotEmpty && selectedItems.any((item) => item.max > 0)) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -307,7 +297,7 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                                   return Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Card(
-                                       color: ThemeColors.lightCardColor,
+                                      color: ThemeColors.lightCardColor,
                                       child: ListTile(
                                         title: Text(item.name),
                                         subtitle: Text(
@@ -468,7 +458,8 @@ class CheckoutButton extends StatelessWidget {
     return FloatingActionButton(
       onPressed: onPressed,
       backgroundColor: Colors.green,
-      child: const Icon(Icons.shopping_cart_checkout_sharp, color: Colors.white),
+      child:
+          const Icon(Icons.shopping_cart_checkout_sharp, color: Colors.white),
     );
   }
 }

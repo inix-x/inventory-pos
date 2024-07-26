@@ -4,7 +4,9 @@ import 'package:flutter_application_1/themes/settings.dart';
 import 'package:flutter_application_1/themes/theme_color.dart';
 
 class OutOfStockPage extends StatefulWidget {
-  const OutOfStockPage({super.key,});
+  const OutOfStockPage({
+    super.key,
+  });
 
   @override
   State<OutOfStockPage> createState() => _OutOfStockPageState();
@@ -64,24 +66,32 @@ class _OutOfStockPageState extends State<OutOfStockPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: outOfStockList.length,
-                itemBuilder: (context, index) {
-                  final item = outOfStockList[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      color: ThemeColors.lightCardColor,
-                      child: ListTile(
-                        title: Text(item.name),
-                        subtitle: Text('Count: ${item.count}'),
-                      ),
+            outOfStockList.isNotEmpty
+                ? Expanded(
+                    child: ListView.builder(
+                      itemCount: outOfStockList.length,
+                      itemBuilder: (context, index) {
+                        final item = outOfStockList[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Card(
+                            color: ThemeColors.lightCardColor,
+                            child: ListTile(
+                              title: Text(item.name),
+                              subtitle: Text('Count: ${item.count}'),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  )
+                : Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text('No items are out of Stock',
+                          style: Theme.of(context).textTheme.displaySmall),
+                    ),
+                  ),
           ],
         ),
       ),
@@ -96,7 +106,8 @@ class _OutOfStockPageState extends State<OutOfStockPage> {
               color: Colors.green,
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(10),
-              child: const Icon(Icons.refresh_outlined, color: Colors.white, size: 30),
+              child: const Icon(Icons.refresh_outlined,
+                  color: Colors.white, size: 30),
             ),
             const SizedBox(height: 15),
             MaterialButton(
@@ -104,7 +115,8 @@ class _OutOfStockPageState extends State<OutOfStockPage> {
               color: Colors.blue,
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(10),
-              child: const Icon(Icons.print_outlined, color: Colors.white, size: 30),
+              child: const Icon(Icons.print_outlined,
+                  color: Colors.white, size: 30),
             ),
           ],
         ),

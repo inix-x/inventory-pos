@@ -46,7 +46,7 @@ class _HomeAppState extends State<HomeApp> with WidgetsBindingObserver {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-          centerTitle: true,
+          // centerTitle: true,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -104,8 +104,8 @@ class _HomeAppState extends State<HomeApp> with WidgetsBindingObserver {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  leading: Icon(Icons.inventory,
-                      color: Theme.of(context).iconTheme.color),
+                  leading: Icon(_selectedTileIndex == 0 ? Icons.inventory_2_outlined : Icons.inventory_2_rounded,
+                      color:  _selectedTileIndex == 0 ? Theme.of(context).canvasColor : Theme.of(context).iconTheme.color ),
                   title: Text('Inventory',
                       style: _selectedTileIndex == 0
                           ? Theme.of(context).textTheme.labelSmall
@@ -127,8 +127,8 @@ class _HomeAppState extends State<HomeApp> with WidgetsBindingObserver {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  leading: Icon(Icons.money,
-                      color: Theme.of(context).iconTheme.color),
+                  leading: Icon(_selectedTileIndex == 1 ? Icons.addchart_outlined : Icons.add_chart_rounded,
+                      color:  _selectedTileIndex == 1 ? Theme.of(context).canvasColor : Theme.of(context).iconTheme.color ),
                   title: Text('Sales',
                       style: _selectedTileIndex == 1
                           ? Theme.of(context).textTheme.labelSmall
@@ -138,12 +138,7 @@ class _HomeAppState extends State<HomeApp> with WidgetsBindingObserver {
                       : Colors.transparent,
                   onTap: () {
                     _onTileTap(1);
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => const OutOfStockPage(),
-                    //   ),
-                    // );
+                  
                   },
                 ),
                 const SizedBox(height: 10),
@@ -151,8 +146,8 @@ class _HomeAppState extends State<HomeApp> with WidgetsBindingObserver {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  leading: Icon(Icons.phone,
-                      color: Theme.of(context).iconTheme.color),
+                  leading: Icon(_selectedTileIndex == 2 ? Icons.phone_outlined : Icons.phone_rounded,
+                      color:  _selectedTileIndex == 2 ? Theme.of(context).canvasColor : Theme.of(context).iconTheme.color ),
                   title: Text('Support',
                       style: _selectedTileIndex == 2
                           ? Theme.of(context).textTheme.labelSmall
@@ -169,8 +164,8 @@ class _HomeAppState extends State<HomeApp> with WidgetsBindingObserver {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  leading: Icon(Icons.person_add,
-                      color: Theme.of(context).iconTheme.color),
+                  leading: Icon( _selectedTileIndex == 3 ? Icons.person_add_outlined: Icons.person_add_rounded,
+                      color:  _selectedTileIndex == 3 ? Theme.of(context).canvasColor : Theme.of(context).iconTheme.color ),
                   title: Text('Refer-A-Friend',
                       style: _selectedTileIndex == 3
                           ? Theme.of(context).textTheme.labelSmall
@@ -187,8 +182,8 @@ class _HomeAppState extends State<HomeApp> with WidgetsBindingObserver {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  leading: Icon(Icons.settings,
-                      color: Theme.of(context).iconTheme.color),
+                  leading: Icon( _selectedTileIndex == 4 ? Icons.settings_outlined : Icons.settings_rounded,
+                      color:  _selectedTileIndex == 4 ? Theme.of(context).canvasColor : Theme.of(context).iconTheme.color ),
                   title: Text('Settings',
                       style: _selectedTileIndex == 4
                           ? Theme.of(context).textTheme.labelSmall

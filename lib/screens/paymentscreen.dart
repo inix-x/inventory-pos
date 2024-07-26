@@ -138,7 +138,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Consumer<OrderProvider>(
               builder: (context, orderProvider, child) {
                 return Text('Order #${orderProvider.orderNumber}',
-                    style: Theme.of(context).textTheme.headlineMedium);
+                    style: Theme.of(context).textTheme.displaySmall);
               },
             ),
             const Spacer(),
@@ -166,143 +166,319 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
           SizedBox(
             width: 300,
             child: TextField(
-              controller: _textFieldController, // Add a controller
+              controller: _textFieldController,
               style: Theme.of(context).textTheme.displayMedium,
-              textAlign: TextAlign.right, // Align text to the right
-              keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true), // Display numeric keyboard with decimal
+              textAlign: TextAlign.right,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                    RegExp(r'[0-9.]')), // Allow digits and decimal point
-                MaxValueInputFormatter(
-                    maxValue: 100000), // Limit maximum value to 10000
+                FilteringTextInputFormatter.allow(RegExp(
+                    r'^\d*\.?\d{0,2}$')), // Allow digits and up to two decimal places
+                LengthLimitingTextInputFormatter(5), // Limit to 5 digits
               ],
               obscureText: false,
-              decoration:  InputDecoration(
-                hintText: '0', // Set default hint text to "0"
+              decoration: InputDecoration(
+                hintText: '0',
                 hintStyle: Theme.of(context).textTheme.displayMedium,
               ),
               onChanged: (value) {
                 setState(() {
                   if (value.isEmpty) {
-                    _textFieldController.text =
-                        '0'; // Set default value to "0" if input is empty
+                    _textFieldController.text = '0';
                     _textFieldController.selection = TextSelection.fromPosition(
                       TextPosition(offset: _textFieldController.text.length),
                     );
-                  } else if (RegExp(r'^0+$').hasMatch(value)) {
-                    _textFieldController.text =
-                        '0'; // Restrict input to a single "0" if a series of zeroes is detected
+                  } else if (RegExp(r'^0{2,}$').hasMatch(value)) {
+                    _textFieldController.text = '0';
+                    _textFieldController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _textFieldController.text.length),
+                    );
+                  } else if (RegExp(r'^\.{2,}$').hasMatch(value)) {
+                    _textFieldController.text = '.';
                     _textFieldController.selection = TextSelection.fromPosition(
                       TextPosition(offset: _textFieldController.text.length),
                     );
                   } else {
-                    cashAmount = double.tryParse(
-                        value); // Update cashAmount on input change
+                    cashAmount = double.tryParse(value);
                   }
                 });
               },
             ),
           ),
 
-          const SizedBox(
-              height:
-                  10), // Add some spacing between the TextField and number pad
+// Number pad
           // Number pad
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 3,
-              childAspectRatio: 1,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              padding: const EdgeInsets.all(10),
-              children: [
-                ...List.generate(9, (index) {
-                  int number = index + 1;
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).scaffoldBackgroundColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0)),
-                      elevation: 0,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        // Update the TextField value
-                        _textFieldController.text += number.toString();
-                        cashAmount = double.tryParse(_textFieldController.text);
-                      });
-                    },
-                    child: Text(
-                      '$number',
-                      style: Theme.of(context).textTheme.displayMedium,
-                    ),
-                  );
-                }),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0)),
-                    elevation: 0,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _textFieldController.text += '.';
-                      cashAmount = double.tryParse(_textFieldController.text);
-                    });
-                  },
-                  child: Text(
-                    '.',
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0)),
-                    elevation: 0,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _textFieldController.text += '0';
-                      cashAmount = double.tryParse(_textFieldController.text);
-                    });
-                  },
-                  child: Text(
-                    '0',
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0)),
-                    elevation: 0,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      if (_textFieldController.text.isNotEmpty) {
-                        _textFieldController.text = _textFieldController.text
-                            .substring(0, _textFieldController.text.length - 1);
-                        cashAmount = double.tryParse(_textFieldController.text);
-                      }
-                    });
-                  },
-                  child: Icon(
-                    Icons.backspace,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                ),
-              ],
-            ),
+Expanded(
+  child: GridView.count(
+    crossAxisCount: 3,
+    childAspectRatio: 1.2,
+    mainAxisSpacing: 5,
+    crossAxisSpacing: 5,
+    padding: const EdgeInsets.all(5),
+    children: [
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
           ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '7';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '7',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '8';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '8',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '9';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '9',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '4';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '4',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '5';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '5',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '6';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '6',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '1';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '1',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '2';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '2',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5) {
+              _textFieldController.text += '3';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '3',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5 &&
+                !_textFieldController.text.contains('.')) {
+              _textFieldController.text += '.';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '.',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.length < 5 &&
+                _textFieldController.text != '0') {
+              _textFieldController.text += '0';
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Text(
+          '0',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+      ),
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_textFieldController.text.isNotEmpty) {
+              _textFieldController.text = _textFieldController.text
+                  .substring(0, _textFieldController.text.length - 1);
+              cashAmount = double.tryParse(_textFieldController.text);
+            }
+          });
+        },
+        child: Icon(
+          Icons.backspace,
+          color: Theme.of(context).iconTheme.color,
+        ),
+      ),
+    ],
+  ),
+),
+
         ],
       ),
       bottomNavigationBar: BottomAppBar(

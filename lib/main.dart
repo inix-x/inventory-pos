@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/providers/ordernumberprovider.dart';
 // ignore: unused_import
 import 'package:flutter_application_1/screens/getstarted.dart';
+// ignore: unused_import
 import 'package:flutter_application_1/screens/setupscreen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/providers/themeprovider.dart';
@@ -38,8 +39,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             theme: themeProvider.themeData,
             debugShowCheckedModeBanner: false,
-            home: const Setupscreen(),
-            // home: const GetStarted(), //GetStarted to dapat
+            // home: const Setupscreen(),
+            home: const GetStarted(), //GetStarted to dapat
           );
         },
       ),

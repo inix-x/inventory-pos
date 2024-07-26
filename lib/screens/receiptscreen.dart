@@ -18,7 +18,11 @@ class ReceiptScreen extends StatefulWidget {
   final screenshotController =
       ScreenshotController(); // New variable for screenshot
 
-  ReceiptScreen({super.key, required this.selectedItems, required this.change, required this.orderNumber});
+  ReceiptScreen(
+      {super.key,
+      required this.selectedItems,
+      required this.change,
+      required this.orderNumber});
 
   @override
   State<ReceiptScreen> createState() => _ReceiptScreenState();
@@ -51,16 +55,16 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
   String generateReceiptText() {
     String receiptText =
-        "            ${getFormattedDateTime()}--------------------------------\n       Order #${widget.orderNumber}\nItem.             Qty.           Price\n";
+        "            ${getFormattedDateTime()}--------------------------------\n       Order #${widget.orderNumber}\n\nItem.               Qty.           Price\n";
 
     for (var item in widget.selectedItems) {
       receiptText +=
-          "\n${item.name}                  ${item.max}               ${item.price}\n";
+          "\n${item.name.padRight(20)}${item.max.toString().padRight(8)}${item.price.toStringAsFixed(2).padLeft(10)}\n";
     }
     receiptText +=
-        "\n######################\nTotal: \$${total.toStringAsFixed(2)}\n";
+        "\n--------------------------------\n\nTotal: \$${total.toStringAsFixed(2)}\n";
     if (widget.change >= 0) {
-      receiptText += "Change: \$${widget.change.toStringAsFixed(2)}\n";
+      receiptText += "Change: \$${widget.change.toStringAsFixed(2)}\n--------------------------------";
     }
 
     return receiptText;
@@ -78,7 +82,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             Text(
               'Business Inc.',
               style: GoogleFonts.lato(
-                fontSize: 25,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: primaryColor,
               ),
@@ -128,7 +132,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   Widget build(BuildContext context) {
     calculateTotalPrice();
     return Scaffold(
-      
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: IconButton(
@@ -136,7 +139,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             Icons.arrow_back,
             color: Theme.of(context).iconTheme.color,
           ),
-          onPressed: (){},
+          onPressed: () {},
         ),
         title: Row(children: [
           const Spacer(),

@@ -37,7 +37,7 @@ class ThemeProvider extends ChangeNotifier {
         color: ThemeColors.darkIconColor,
       ),
       cardColor: ThemeColors.darkCardColor,
-      
+      canvasColor: ThemeColors.darkIconColor,
       textTheme: TextTheme(
 
         displayMedium: GoogleFonts.roboto(
@@ -105,6 +105,7 @@ class ThemeProvider extends ChangeNotifier {
         color: ThemeColors.lightIconColor,
       ),
       cardColor: ThemeColors.lightCardColor,
+      canvasColor: ThemeColors.darkIconColor,
       textTheme: TextTheme(
         displayMedium: GoogleFonts.roboto(
           textStyle: const TextStyle(
